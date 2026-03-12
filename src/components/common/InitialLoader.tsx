@@ -223,6 +223,12 @@ export function InitialLoader() {
                   <h2 className="font-headline text-4xl md:text-5xl font-black text-white tracking-widest text-center">
                     SHAIKH <span className="text-primary italic">&</span> SONS
                   </h2>
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: "100%" }}
+                    transition={{ delay: 0.5, duration: 1 }}
+                    className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mt-4"
+                  />
                 </motion.div>
               )}
             </AnimatePresence>

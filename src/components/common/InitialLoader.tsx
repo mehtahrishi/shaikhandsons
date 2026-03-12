@@ -30,13 +30,12 @@ export function InitialLoader() {
 
   // Diagonals for lightning: Top-Left (TL) and Bottom-Right (BR)
   const lightningBolts = useMemo(() => [
-    { id: 'tl', start: [0, 0], end: [50, 50], delay: 0 },
-    { id: 'br', start: [100, 100], end: [50, 50], delay: 1.05 }, // Staggered cycle
+    { id: 'tl', start: [0, 0], end: [50, 50], delay: 1 },
+    { id: 'br', start: [100, 100], end: [50, 50], delay: 1.5 },
   ], []);
 
   // Sparkle configuration for each strike
-  const sparkleCount = 10;
-  const cycleTime = 2.1; // 0.6s duration + 1.5s repeatDelay
+  const sparkleCount = 12;
 
   return (
     <AnimatePresence>
@@ -76,8 +75,6 @@ export function InitialLoader() {
                   }}
                   transition={{ 
                     duration: 0.6, 
-                    repeat: Infinity, 
-                    repeatDelay: 1.5,
                     delay: bolt.delay,
                     times: [0, 0.2, 0.4, 0.6, 1]
                   }}
@@ -97,8 +94,6 @@ export function InitialLoader() {
                   }}
                   transition={{ 
                     duration: 0.6, 
-                    repeat: Infinity, 
-                    repeatDelay: 1.5,
                     delay: bolt.delay + 0.05
                   }}
                 />
@@ -123,15 +118,13 @@ export function InitialLoader() {
                     }}
                     initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
                     animate={{
-                      x: [0, Math.cos((i * 360 / sparkleCount) * (Math.PI / 180)) * 120],
-                      y: [0, Math.sin((i * 360 / sparkleCount) * (Math.PI / 180)) * 120],
+                      x: [0, Math.cos((i * 360 / sparkleCount) * (Math.PI / 180)) * 150],
+                      y: [0, Math.sin((i * 360 / sparkleCount) * (Math.PI / 180)) * 150],
                       opacity: [0, 1, 0],
                       scale: [0, 1.5, 0.2],
                     }}
                     transition={{
                       duration: 0.8,
-                      repeat: Infinity,
-                      repeatDelay: 1.3, // CycleTime - Duration
                       delay: bolt.delay + 0.15, // Sync with impact
                       ease: "easeOut"
                     }}
@@ -173,15 +166,16 @@ export function InitialLoader() {
                           fill: [
                             "rgb(255, 255, 255)", 
                             "rgb(206, 18, 18)", 
+                            "rgb(255, 255, 255)",
+                            "rgb(206, 18, 18)",
                             "rgb(255, 255, 255)"
                           ]
                         }}
                         transition={{
-                          // Two quick red flashes synced with the two diagonal bolts
-                          duration: cycleTime,
-                          repeat: Infinity,
+                          duration: 3,
+                          delay: 0.5,
                           ease: "linear",
-                          times: [0, 0.1, 0.2, 0.5, 0.6, 0.7, 1], // Map to bolt impacts
+                          times: [0, 0.25, 0.35, 0.45, 0.55] // Staggered flashes for TL (1s) and BR (1.5s)
                         }}
                       />
                     </g>

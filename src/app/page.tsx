@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -6,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Typewriter } from '@/components/ui/Typewriter';
 import { VehicleShowroom } from '@/components/vehicles/VehicleShowroom';
 import { Zap, ShieldCheck, Leaf, ArrowRight, Gauge, Cpu, BatteryCharging } from 'lucide-react';
+import { motion as motion_div } from 'framer-motion';
 
 export default function Home() {
   return (
@@ -156,7 +156,7 @@ export default function Home() {
 
       {/* Inquiry Section */}
       <section id="inquiry" className="py-32 bg-black text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(187,100,42,0.1)_0%,transparent_70%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(206,18,18,0.1)_0%,transparent_70%)]"></div>
         <div className="container mx-auto px-6 max-w-4xl relative z-10">
           <h2 className="font-headline text-5xl md:text-8xl font-black mb-8 text-white tracking-tighter">
             The Future <br /> <span className="text-primary">Is An Inquiry Away</span>
@@ -165,7 +165,7 @@ export default function Home() {
             Each Veridian Noir is a bespoke commission. Join the waitlist for our next production cycle.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="rounded-full px-16 h-16 text-lg font-black uppercase tracking-tighter shadow-[0_0_20px_rgba(187,100,42,0.3)]">
+            <Button size="lg" className="rounded-full px-16 h-16 text-lg font-black uppercase tracking-tighter shadow-[0_0_20px_rgba(206,18,18,0.3)]">
               Begin Configuration
             </Button>
             <Button size="lg" variant="outline" className="rounded-full px-16 h-16 text-lg font-bold border-white/10 text-white hover:bg-white/5">
@@ -221,6 +221,3 @@ export default function Home() {
     </div>
   );
 }
-
-// Fixed import for motion to use simple framer-motion if possible, or fallback to standard div for SSR safety
-import { motion as motion_div } from 'framer-motion';

@@ -1,10 +1,11 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Typewriter } from '@/components/ui/Typewriter';
 import { VehicleShowroom } from '@/components/vehicles/VehicleShowroom';
-import { Zap, ShieldCheck, Leaf, ArrowRight } from 'lucide-react';
+import { Zap, ShieldCheck, Leaf, ArrowRight, Gauge, Cpu, BatteryCharging } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -16,122 +17,210 @@ export default function Home() {
           alt="Luxury EV Hero"
           fill
           priority
-          className="object-cover brightness-50"
-          data-ai-hint="luxury electric car dark"
+          className="object-cover brightness-[0.4]"
+          data-ai-hint="luxury electric car dark neon"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-transparent to-background"></div>
         
         <div className="container relative z-10 px-6 text-center">
-          <p className="text-primary font-bold uppercase tracking-[0.5em] mb-6 animate-pulse">
-            Experience Tomorrow
-          </p>
-          <h1 className="font-headline text-6xl md:text-9xl font-black text-white tracking-tighter mb-8 leading-none">
-            <Typewriter text="VERIDIAN" delay={4500} />
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-white/40 italic">
-              NOIR
-            </span>
-          </h1>
-          <p className="max-w-2xl mx-auto text-foreground/80 text-lg md:text-xl font-light mb-12">
-            The intersection of high-fashion editorial and cutting-edge electronic engineering. Redefining what it means to travel.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="rounded-full px-10 h-14 text-lg font-bold">
-              View Showroom
-            </Button>
-            <Button variant="outline" size="lg" className="rounded-full px-10 h-14 text-lg border-white/20 text-white hover:bg-white hover:text-black">
-              Our Vision
-            </Button>
-          </div>
+          <motion_div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <p className="text-primary font-bold uppercase tracking-[0.8em] mb-6 text-xs sm:text-sm">
+              The Evolution of Silent Power
+            </p>
+            <h1 className="font-headline text-6xl md:text-[10rem] font-black text-white tracking-tighter mb-4 leading-none">
+              <Typewriter text="VERIDIAN" delay={3500} speed={150} />
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-white/20 italic">
+                NOIR
+              </span>
+            </h1>
+            <p className="max-w-2xl mx-auto text-foreground/60 text-lg md:text-xl font-light mb-12 tracking-wide">
+              Architecting the future of electronic mobility. Where transcendental design meets extreme engineering.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <Button size="lg" className="rounded-full px-12 h-16 text-lg font-bold group">
+                Enter Showroom <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Button variant="outline" size="lg" className="rounded-full px-12 h-16 text-lg border-white/10 text-white hover:bg-white hover:text-black transition-all">
+                The Technology
+              </Button>
+            </div>
+          </motion_div>
         </div>
 
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Scroll</span>
-          <div className="w-[1px] h-12 bg-gradient-to-b from-primary to-transparent"></div>
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4">
+          <span className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground animate-pulse">Scroll to Explore</span>
+          <div className="w-[1px] h-16 bg-gradient-to-b from-primary via-primary/50 to-transparent"></div>
+        </div>
+      </section>
+
+      {/* Tech Specs Bar */}
+      <section className="bg-card border-y py-12">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="text-center space-y-2">
+              <p className="text-primary text-3xl font-black font-headline">1.8s</p>
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">0-60 MPH</p>
+            </div>
+            <div className="text-center space-y-2">
+              <p className="text-primary text-3xl font-black font-headline">840km</p>
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Max Range</p>
+            </div>
+            <div className="text-center space-y-2">
+              <p className="text-primary text-3xl font-black font-headline">15min</p>
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">80% Charge</p>
+            </div>
+            <div className="text-center space-y-2">
+              <p className="text-primary text-3xl font-black font-headline">A.I.</p>
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Level 4 Autonomy</p>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Showroom */}
       <VehicleShowroom />
 
-      {/* Philosophy Section */}
-      <section id="philosophy" className="py-24 bg-card border-y">
+      {/* Engineering Philosophy Section */}
+      <section id="philosophy" className="py-32 relative overflow-hidden">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="relative h-[600px] rounded-lg overflow-hidden group">
-              <Image 
-                src="https://picsum.photos/seed/ev5/1200/800" 
-                alt="Interior Luxury" 
-                fill 
-                className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
-                data-ai-hint="futuristic car interior"
-              />
-              <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            </div>
-            <div>
-              <h2 className="font-headline text-4xl md:text-6xl font-bold mb-8">Elegance is <span className="text-primary italic">Electric</span></h2>
-              <p className="text-muted-foreground text-lg mb-10 leading-relaxed">
-                Veridian Noir wasn't just built to move people. It was built to move the soul. We combine the sophistication of haute couture with the precision of silicon valley.
-              </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+            <div className="space-y-12">
+              <div>
+                <h2 className="font-headline text-5xl md:text-7xl font-bold mb-8 leading-tight">
+                  Intelligence <br /> <span className="text-primary italic">In Every Fiber.</span>
+                </h2>
+                <p className="text-muted-foreground text-xl leading-relaxed font-light">
+                  Veridian Noir is more than a vehicle; it's a mobile sanctuary engineered with computational precision. Our solid-state battery architecture and neural-link interfaces redefine the boundary between driver and machine.
+                </p>
+              </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
                 <div className="space-y-4">
-                  <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                    <Leaf className="h-6 w-6" />
+                  <div className="h-14 w-14 rounded-2xl bg-primary/5 border border-primary/20 flex items-center justify-center text-primary">
+                    <BatteryCharging className="h-7 w-7" />
                   </div>
-                  <h3 className="font-bold text-xl uppercase tracking-wider">Sustainable</h3>
-                  <p className="text-sm text-muted-foreground">Crafted with vegan leathers and recycled carbon composites.</p>
+                  <h3 className="font-bold text-lg uppercase tracking-wider">Solid-State Power</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">Next-generation density providing unparalleled range and thermal stability in all climates.</p>
                 </div>
                 <div className="space-y-4">
-                  <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                    <ShieldCheck className="h-6 w-6" />
+                  <div className="h-14 w-14 rounded-2xl bg-primary/5 border border-primary/20 flex items-center justify-center text-primary">
+                    <Cpu className="h-7 w-7" />
                   </div>
-                  <h3 className="font-bold text-xl uppercase tracking-wider">Secure</h3>
-                  <p className="text-sm text-muted-foreground">Military-grade encryption for all vehicle systems.</p>
+                  <h3 className="font-bold text-lg uppercase tracking-wider">Neural Compute</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">Proprietary AI core processing 2,500 trillion operations per second for seamless autonomy.</p>
+                </div>
+                <div className="space-y-4">
+                  <div className="h-14 w-14 rounded-2xl bg-primary/5 border border-primary/20 flex items-center justify-center text-primary">
+                    <Leaf className="h-7 w-7" />
+                  </div>
+                  <h3 className="font-bold text-lg uppercase tracking-wider">Bio-Circular</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">Interiors crafted from lab-grown silk and recycled ocean plastics, without compromise.</p>
+                </div>
+                <div className="space-y-4">
+                  <div className="h-14 w-14 rounded-2xl bg-primary/5 border border-primary/20 flex items-center justify-center text-primary">
+                    <ShieldCheck className="h-7 w-7" />
+                  </div>
+                  <h3 className="font-bold text-lg uppercase tracking-wider">Quantum Security</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">Encryption that anticipates threats, ensuring your digital and physical footprint remains private.</p>
                 </div>
               </div>
+            </div>
 
-              <Button variant="link" className="mt-12 text-primary p-0 h-auto group text-lg">
-                Read our Manifesto <ArrowRight className="ml-2 group-hover:translate-x-2 transition-transform" />
-              </Button>
+            <div className="relative">
+              <div className="aspect-[4/5] relative rounded-3xl overflow-hidden shadow-2xl">
+                <Image 
+                  src="https://picsum.photos/seed/ev5/1200/1500" 
+                  alt="Interior Luxury Technology" 
+                  fill 
+                  className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+                  data-ai-hint="futuristic luxury car cockpit"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+                <div className="absolute bottom-8 left-8 right-8 p-6 bg-background/40 backdrop-blur-xl border border-white/10 rounded-2xl">
+                  <p className="text-xs uppercase tracking-widest text-primary font-bold mb-2">Technical Insight</p>
+                  <p className="text-sm text-white/80 italic">"The cockpit doesn't just display information—it anticipates intent."</p>
+                </div>
+              </div>
+              {/* Decorative Elements */}
+              <div className="absolute -top-12 -right-12 h-64 w-64 bg-primary/10 rounded-full blur-[100px] -z-10"></div>
+              <div className="absolute -bottom-12 -left-12 h-64 w-64 bg-primary/5 rounded-full blur-[100px] -z-10"></div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section id="inquiry" className="py-24 bg-primary text-primary-foreground text-center">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <h2 className="font-headline text-5xl md:text-7xl font-black mb-8">Begin Your Journey</h2>
-          <p className="text-xl mb-12 opacity-90">
-            Request a personalized consultation with our Veridian Specialists.
+      {/* Inquiry Section */}
+      <section id="inquiry" className="py-32 bg-black text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(187,100,42,0.1)_0%,transparent_70%)]"></div>
+        <div className="container mx-auto px-6 max-w-4xl relative z-10">
+          <h2 className="font-headline text-5xl md:text-8xl font-black mb-8 text-white tracking-tighter">
+            The Future <br /> <span className="text-primary">Is An Inquiry Away</span>
+          </h2>
+          <p className="text-xl mb-12 text-white/60 font-light">
+            Each Veridian Noir is a bespoke commission. Join the waitlist for our next production cycle.
           </p>
-          <Button size="lg" variant="secondary" className="rounded-full px-12 h-16 text-lg font-black uppercase tracking-tighter">
-            Request Inquiry
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="rounded-full px-16 h-16 text-lg font-black uppercase tracking-tighter shadow-[0_0_20px_rgba(187,100,42,0.3)]">
+              Begin Configuration
+            </Button>
+            <Button size="lg" variant="outline" className="rounded-full px-16 h-16 text-lg font-bold border-white/10 text-white hover:bg-white/5">
+              Contact Concierge
+            </Button>
+          </div>
         </div>
       </section>
 
-      {/* Simple Footer */}
-      <footer className="py-12 bg-background border-t">
-        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-2">
-            <span className="font-headline text-xl font-black text-primary">VERIDIAN</span>
-            <span className="font-headline text-xl font-light tracking-widest text-foreground">NOIR</span>
+      {/* Footer */}
+      <footer className="py-20 bg-background border-t">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
+            <div className="md:col-span-2">
+              <Link href="/" className="flex items-center gap-2 mb-6">
+                <span className="font-headline text-3xl font-black text-primary">VERIDIAN</span>
+                <span className="font-headline text-3xl font-light tracking-widest text-foreground">NOIR</span>
+              </Link>
+              <p className="text-muted-foreground max-w-xs text-sm leading-relaxed">
+                Defining the pinnacle of electronic luxury through transcendental engineering and uncompromising design.
+              </p>
+            </div>
+            <div className="space-y-4">
+              <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary">The Fleet</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link href="#" className="hover:text-primary transition-colors">Aether Sedan</Link></li>
+                <li><Link href="#" className="hover:text-primary transition-colors">Lumina SUV</Link></li>
+                <li><Link href="#" className="hover:text-primary transition-colors">Spectre GT</Link></li>
+              </ul>
+            </div>
+            <div className="space-y-4">
+              <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary">Company</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link href="#" className="hover:text-primary transition-colors">Our Vision</Link></li>
+                <li><Link href="#" className="hover:text-primary transition-colors">Technology</Link></li>
+                <li><Link href="#" className="hover:text-primary transition-colors">Careers</Link></li>
+              </ul>
+            </div>
           </div>
-          <div className="flex gap-8 text-xs uppercase tracking-widest font-bold">
-            <Link href="#" className="hover:text-primary">Privacy</Link>
-            <Link href="#" className="hover:text-primary">Terms</Link>
-            <Link href="#" className="hover:text-primary">Careers</Link>
-            <Link href="#" className="hover:text-primary">Contact</Link>
+          
+          <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-muted gap-4">
+            <p className="text-muted-foreground text-[10px] tracking-widest uppercase font-medium">
+              © 2025 Veridian Noir Automotive Group. All Rights Reserved.
+            </p>
+            <div className="flex gap-8 text-[10px] uppercase tracking-widest font-bold">
+              <Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link>
+              <Link href="#" className="hover:text-primary transition-colors">Terms of Service</Link>
+              <Link href="#" className="hover:text-primary transition-colors">Cookies</Link>
+            </div>
           </div>
-          <p className="text-muted-foreground text-[10px] tracking-widest uppercase">
-            © 2025 Veridian Noir Automotive Group
-          </p>
         </div>
       </footer>
     </div>
   );
 }
 
-import Link from 'next/link';
+// Fixed import for motion to use simple framer-motion if possible, or fallback to standard div for SSR safety
+import { motion as motion_div } from 'framer-motion';

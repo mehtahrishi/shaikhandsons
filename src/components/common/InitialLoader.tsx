@@ -13,11 +13,6 @@ export function InitialLoader() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Characters for the circular text
-  const text = "VERIDIAN • NOIR • ";
-  const repeatedText = text.repeat(2);
-  const characters = repeatedText.split("");
-
   // Function to generate a zig-zag path for lightning
   const generateLightningPath = (startX: number, startY: number, endX: number, endY: number, segments: number = 8, jitter: number = 30) => {
     let path = `M ${startX} ${startY}`;
@@ -33,19 +28,15 @@ export function InitialLoader() {
     return path;
   };
 
-  // Top-Left and Bottom-Right bolts only
+  // Diagonals for lightning: Top-Left (TL) and Bottom-Right (BR)
   const lightningBolts = useMemo(() => [
     { id: 'tl', start: [0, 0], end: [50, 50], delay: 0 },
-    { id: 'br', start: [100, 100], end: [50, 50], delay: 0.8 },
+    { id: 'br', start: [100, 100], end: [50, 50], delay: 1.05 }, // Staggered cycle
   ], []);
 
-  // Sparkle particles configuration
-  const sparkles = useMemo(() => Array.from({ length: 12 }).map((_, i) => ({
-    id: i,
-    angle: (i * 360) / 12,
-    delay: Math.random() * 2,
-    size: Math.random() * 4 + 2
-  })), []);
+  // Sparkle configuration for each strike
+  const sparkleCount = 10;
+  const cycleTime = 2.1; // 0.6s duration + 1.5s repeatDelay
 
   return (
     <AnimatePresence>
@@ -91,134 +82,113 @@ export function InitialLoader() {
                     times: [0, 0.2, 0.4, 0.6, 1]
                   }}
                 />
-                {/* Secondary Red Glow Bolt */}
+                {/* Primary Red Glow Bolt */}
                 <motion.path
                   d={generateLightningPath(bolt.start[0], bolt.start[1], bolt.end[0], bolt.end[1], 10, 40)}
                   fill="none"
                   stroke="hsl(var(--primary))"
-                  strokeWidth="1"
-                  opacity="0.5"
+                  strokeWidth="1.2"
+                  opacity="0.6"
                   filter="url(#lightning-glow)"
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{ 
                     pathLength: [0, 1],
-                    opacity: [0, 0.6, 0]
+                    opacity: [0, 0.8, 0]
                   }}
                   transition={{ 
                     duration: 0.6, 
                     repeat: Infinity, 
                     repeatDelay: 1.5,
-                    delay: bolt.delay + 0.1
+                    delay: bolt.delay + 0.05
                   }}
                 />
               </React.Fragment>
             ))}
           </svg>
 
-          {/* Central Circular Brand Identity */}
+          {/* Central Bike Icon and Effects */}
           <div className="relative flex items-center justify-center scale-75 md:scale-100">
-            {/* Pulsing Core */}
+            {/* Impact Sparkles - Triggered per bolt impact */}
+            {lightningBolts.map((bolt) => (
+              <div key={`sparkles-${bolt.id}`} className="absolute inset-0 pointer-events-none">
+                {Array.from({ length: sparkleCount }).map((_, i) => (
+                  <motion.div
+                    key={`${bolt.id}-sparkle-${i}`}
+                    className="absolute bg-white rounded-full shadow-[0_0_10px_white]"
+                    style={{
+                      width: Math.random() * 4 + 2,
+                      height: Math.random() * 4 + 2,
+                      left: '50%',
+                      top: '50%',
+                    }}
+                    initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
+                    animate={{
+                      x: [0, Math.cos((i * 360 / sparkleCount) * (Math.PI / 180)) * 120],
+                      y: [0, Math.sin((i * 360 / sparkleCount) * (Math.PI / 180)) * 120],
+                      opacity: [0, 1, 0],
+                      scale: [0, 1.5, 0.2],
+                    }}
+                    transition={{
+                      duration: 0.8,
+                      repeat: Infinity,
+                      repeatDelay: 1.3, // CycleTime - Duration
+                      delay: bolt.delay + 0.15, // Sync with impact
+                      ease: "easeOut"
+                    }}
+                  />
+                ))}
+              </div>
+            ))}
+
+            {/* Pulsing Red Core behind Bike */}
             <motion.div 
-              className="absolute w-24 h-24 bg-primary/30 rounded-full blur-3xl"
+              className="absolute w-32 h-32 bg-primary/20 rounded-full blur-3xl"
               animate={{ 
-                scale: [1, 1.8, 1],
-                opacity: [0.3, 0.7, 0.3]
+                scale: [1, 1.4, 1],
+                opacity: [0.1, 0.4, 0.1]
               }}
-              transition={{ duration: 0.5, repeat: Infinity, repeatType: "mirror" }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             />
             
-            {/* Center Vehicle Icon (Bike) */}
+            {/* The Bike Icon */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
+              initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.8 }}
-              className="z-10 text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]"
+              transition={{ duration: 0.5 }}
+              className="z-10 text-white"
             >
               <svg 
-                width="80" 
-                height="80" 
+                width="120" 
+                height="120" 
                 viewBox="0 0 64 64" 
-                className="fill-white"
+                className="drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <g transform="translate(-352,-326)">
                   <g transform="translate(18.8303,326)">
                     <g transform="translate(269.17,-192)">
-                      <path d="M103.754,214L102.523,210L98,210C96.896,210 96,209.104 96,208C96,206.896 96.896,206 98,206L104,206C104.878,206 105.653,206.573 105.912,207.412L107.939,214L112,214C113.104,214 114,214.896 114,216C114,217.104 113.104,218 112,218L109.169,218L111.634,226.008C111.755,226.003 111.877,226 112,226C116.415,226 120,229.585 120,234C120,238.415 116.415,242 112,242C107.585,242 104,238.415 104,234C104,231.12 105.525,228.594 107.811,227.185L106.609,223.278C102.69,225.254 100,229.315 100,234C100,234 100,234 100,234C100,235.105 99.105,236 98,236L87.748,236C86.858,239.449 83.725,242 80,242C75.585,242 72,238.415 72,234C72,230.275 74.551,227.142 78,226.252L78,224L76,224C75.47,224 74.961,223.789 74.586,223.414C74.211,223.039 74,222.53 74,222C74,221.47 74.211,220.961 74.586,220.586C74.961,220.211 75.47,220 76,220C79.685,220 87.172,220 87.172,220C87.172,220 91.076,216.095 92.586,214.586C92.961,214.211 93.47,214 94,214L103.754,214ZM112,230C114.208,230 116,231.792 116,234C116,236.208 114.208,238 112,238C109.792,238 108,236.208 108,234C108,231.792 109.792,230 112,230ZM80,230C82.208,230 84,231.792 84,234C84,236.208 82.208,238 80,238C77.792,238 76,236.208 76,234C76,231.792 77.792,230 80,230ZM104.984,218L94.828,218C94.828,218 90.924,221.905 89.414,223.414C89.039,223.789 88.53,224 88,224L82,224L82,226.252C84.81,226.977 87.023,229.191 87.748,232L96.124,232C96.826,226.381 100.447,221.663 105.419,219.414L104.984,218Z" />
+                      <motion.path 
+                        d="M103.754,214L102.523,210L98,210C96.896,210 96,209.104 96,208C96,206.896 96.896,206 98,206L104,206C104.878,206 105.653,206.573 105.912,207.412L107.939,214L112,214C113.104,214 114,214.896 114,216C114,217.104 113.104,218 112,218L109.169,218L111.634,226.008C111.755,226.003 111.877,226 112,226C116.415,226 120,229.585 120,234C120,238.415 116.415,242 112,242C107.585,242 104,238.415 104,234C104,231.12 105.525,228.594 107.811,227.185L106.609,223.278C102.69,225.254 100,229.315 100,234C100,234 100,234 100,234C100,235.105 99.105,236 98,236L87.748,236C86.858,239.449 83.725,242 80,242C75.585,242 72,238.415 72,234C72,230.275 74.551,227.142 78,226.252L78,224L76,224C75.47,224 74.961,223.789 74.586,223.414C74.211,223.039 74,222.53 74,222C74,221.47 74.211,220.961 74.586,220.586C74.961,220.211 75.47,220 76,220C79.685,220 87.172,220 87.172,220C87.172,220 91.076,216.095 92.586,214.586C92.961,214.211 93.47,214 94,214L103.754,214ZM112,230C114.208,230 116,231.792 116,234C116,236.208 114.208,238 112,238C109.792,238 108,236.208 108,234C108,231.792 109.792,230 112,230ZM80,230C82.208,230 84,231.792 84,234C84,236.208 82.208,238 80,238C77.792,238 76,236.208 76,234C76,231.792 77.792,230 80,230ZM104.984,218L94.828,218C94.828,218 90.924,221.905 89.414,223.414C89.039,223.789 88.53,224 88,224L82,224L82,226.252C84.81,226.977 87.023,229.191 87.748,232L96.124,232C96.826,226.381 100.447,221.663 105.419,219.414L104.984,218Z" 
+                        animate={{
+                          fill: [
+                            "rgb(255, 255, 255)", 
+                            "rgb(206, 18, 18)", 
+                            "rgb(255, 255, 255)"
+                          ]
+                        }}
+                        transition={{
+                          // Two quick red flashes synced with the two diagonal bolts
+                          duration: cycleTime,
+                          repeat: Infinity,
+                          ease: "linear",
+                          times: [0, 0.1, 0.2, 0.5, 0.6, 0.7, 1], // Map to bolt impacts
+                        }}
+                      />
                     </g>
                   </g>
                 </g>
               </svg>
             </motion.div>
-
-            {/* Sparkles Effect */}
-            <div className="absolute inset-0 z-20 pointer-events-none">
-              {sparkles.map((sparkle) => (
-                <motion.div
-                  key={sparkle.id}
-                  className="absolute bg-white rounded-full shadow-[0_0_10px_white]"
-                  style={{
-                    width: sparkle.size,
-                    height: sparkle.size,
-                    left: '50%',
-                    top: '50%',
-                  }}
-                  animate={{
-                    x: [0, Math.cos(sparkle.angle * (Math.PI / 180)) * 120],
-                    y: [0, Math.sin(sparkle.angle * (Math.PI / 180)) * 120],
-                    opacity: [0, 1, 0],
-                    scale: [0, 1, 0.5],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: sparkle.delay,
-                    ease: "easeOut"
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Circular Text */}
-            <motion.div
-              className="absolute w-80 h-80 flex items-center justify-center"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            >
-              {characters.map((char, i) => {
-                const angle = (i * 360) / characters.length;
-                return (
-                  <span
-                    key={i}
-                    className="absolute font-headline text-sm font-black text-primary tracking-widest uppercase"
-                    style={{
-                      transform: `rotate(${angle}deg) translateY(-150px)`,
-                    }}
-                  >
-                    {char}
-                  </span>
-                );
-              })}
-            </motion.div>
-
-            {/* Electric Rings */}
-            {[1, 2, 3].map((i) => (
-              <motion.div 
-                key={i}
-                className="absolute border border-primary/20 rounded-full"
-                style={{ width: `${i * 100 + 100}px`, height: `${i * 100 + 100}px` }}
-                animate={{ 
-                  rotate: i % 2 === 0 ? 360 : -360,
-                  scale: [1, 1.05, 1],
-                  opacity: [0.1, 0.2, 0.1]
-                }}
-                transition={{ 
-                  rotate: { duration: 10 + i * 5, repeat: Infinity, ease: "linear" },
-                  scale: { duration: 2, repeat: Infinity },
-                  opacity: { duration: 2, repeat: Infinity }
-                }}
-              />
-            ))}
           </div>
 
           <motion.div

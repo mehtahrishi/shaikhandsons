@@ -1,11 +1,9 @@
-
 import type {Metadata} from 'next';
 import './globals.css';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { Toaster } from '@/components/ui/toaster';
 import { AnnouncementBar } from '@/components/common/AnnouncementBar';
 import { InitialLoader } from '@/components/common/InitialLoader';
-import { ChatWidget } from '@/components/common/ChatWidget';
 
 export const metadata: Metadata = {
   title: 'Veridian Noir | The Future of Electronic Luxury',
@@ -31,7 +29,6 @@ export default function RootLayout({
         <main>
           {children}
         </main>
-        <ChatWidget />
         <Toaster />
       </body>
     </html>

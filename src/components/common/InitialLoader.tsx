@@ -33,14 +33,10 @@ export function InitialLoader() {
     return path;
   };
 
-  // We use useMemo to avoid regenerating the paths on every render, 
-  // but since we want a "flicker" effect, we can actually let them be dynamic or use a key.
-  // For the "Thor" feel, we'll create a few variations.
+  // Only Top-Left and Bottom-Right bolts
   const lightningBolts = useMemo(() => [
     { id: 'tl', start: [0, 0], end: [50, 50], delay: 0 },
-    { id: 'tr', start: [100, 0], end: [50, 50], delay: 0.4 },
-    { id: 'bl', start: [0, 100], end: [50, 50], delay: 0.8 },
-    { id: 'br', start: [100, 100], end: [50, 50], delay: 1.2 },
+    { id: 'br', start: [100, 100], end: [50, 50], delay: 0.8 },
   ], []);
 
   return (

@@ -6,8 +6,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 export function InitialLoader() {
   const [isLoading, setIsLoading] = useState(true);
   const [showText, setShowText] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     // Phase 1: Main Loader Duration
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -47,6 +49,11 @@ export function InitialLoader() {
 
   // Sparkle configuration for each strike
   const sparkleCount = 12;
+
+  // Hydration safe check
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <AnimatePresence>
@@ -127,30 +134,36 @@ export function InitialLoader() {
                   {/* Impact Sparkles - Triggered per bolt impact */}
                   {lightningBolts.map((bolt) => (
                     <div key={`sparkles-${bolt.id}`} className="absolute inset-0 pointer-events-none">
-                      {Array.from({ length: sparkleCount }).map((_, i) => (
-                        <motion.div
-                          key={`${bolt.id}-sparkle-${i}`}
-                          className="absolute bg-white rounded-full shadow-[0_0_10px_white]"
-                          style={{
-                            width: Math.random() * 4 + 2,
-                            height: Math.random() * 4 + 2,
-                            left: '50%',
-                            top: '50%',
-                          }}
-                          initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
-                          animate={{
-                            x: [0, Math.cos((i * 360 / sparkleCount) * (Math.PI / 180)) * 150],
-                            y: [0, Math.sin((i * 360 / sparkleCount) * (Math.PI / 180)) * 150],
-                            opacity: [0, 1, 0],
-                            scale: [0, 1.5, 0.2],
-                          }}
-                          transition={{
-                            duration: 0.8,
-                            delay: bolt.delay + 0.15,
-                            ease: "easeOut"
-                          }}
-                        />
-                      ))}
+                      {Array.from({ length: sparkleCount }).map((_, i) => {
+                        // Generate random dimensions here inside the map, which is safe because we check !mounted above
+                        const sWidth = Math.random() * 4 + 2;
+                        const sHeight = Math.random() * 4 + 2;
+                        
+                        return (
+                          <motion.div
+                            key={`${bolt.id}-sparkle-${i}`}
+                            className="absolute bg-white rounded-full shadow-[0_0_10px_white]"
+                            style={{
+                              width: sWidth,
+                              height: sHeight,
+                              left: '50%',
+                              top: '50%',
+                            }}
+                            initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
+                            animate={{
+                              x: [0, Math.cos((i * 360 / sparkleCount) * (Math.PI / 180)) * 150],
+                              y: [0, Math.sin((i * 360 / sparkleCount) * (Math.PI / 180)) * 150],
+                              opacity: [0, 1, 0],
+                              scale: [0, 1.5, 0.2],
+                            }}
+                            transition={{
+                              duration: 0.8,
+                              delay: bolt.delay + 0.15,
+                              ease: "easeOut"
+                            }}
+                          />
+                        );
+                      })}
                     </div>
                   ))}
 

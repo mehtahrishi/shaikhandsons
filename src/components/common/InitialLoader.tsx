@@ -135,7 +135,6 @@ export function InitialLoader() {
                   {lightningBolts.map((bolt) => (
                     <div key={`sparkles-${bolt.id}`} className="absolute inset-0 pointer-events-none">
                       {Array.from({ length: sparkleCount }).map((_, i) => {
-                        // Generate random dimensions here inside the map, which is safe because we check !mounted above
                         const sWidth = Math.random() * 4 + 2;
                         const sHeight = Math.random() * 4 + 2;
                         
@@ -224,25 +223,10 @@ export function InitialLoader() {
                   <h2 className="font-headline text-4xl md:text-5xl font-black text-white tracking-widest text-center">
                     SHAIKH <span className="text-primary italic">&</span> SONS
                   </h2>
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: "100%" }}
-                    transition={{ delay: 0.5, duration: 1 }}
-                    className="h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent mt-4"
-                  />
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 2.5 }}
-            className="absolute bottom-12 text-[10px] uppercase tracking-[1em] text-white/40 font-bold"
-          >
-            Engineering Transcendence
-          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>

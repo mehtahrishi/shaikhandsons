@@ -21,7 +21,7 @@ export function HeroSection() {
       id: 'aether',
       title: 'AETHER',
       subtitle: 'TRANSCENDENTAL SEDAN',
-      image: 'https://picsum.photos/seed/ev2/1920/1080',
+      image: '/images/1.png',
       hint: 'electric luxury sedan teal',
       href: '/vehicles/v1',
     },
@@ -29,7 +29,7 @@ export function HeroSection() {
       id: 'lumina',
       title: 'LUMINA',
       subtitle: 'INFINITE SUV',
-      image: 'https://picsum.photos/seed/ev3/1920/1080',
+      image: '/images/image.png',
       hint: 'electric luxury suv white',
       href: '/vehicles/v2',
     },
@@ -37,7 +37,7 @@ export function HeroSection() {
       id: 'spectre',
       title: 'SPECTRE',
       subtitle: 'MASTER THE DARK',
-      image: 'https://picsum.photos/seed/ev4/1920/1080',
+      image: '/images/2.png',
       hint: 'electric sports car black',
       href: '/vehicles/v3',
     }
@@ -111,7 +111,7 @@ export function HeroSection() {
         <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-3 z-20 pointer-events-none">
           {slides.map((_, i) => (
             <div key={i} className="h-[2px] w-8 rounded-full bg-white/20 overflow-hidden">
-              {/* Note: This is a visual hint, real indicator logic would sync with Embla API */}
+              {/* Visual indicator logic is handled by Embla underlyingly, this is decorative */}
             </div>
           ))}
         </div>

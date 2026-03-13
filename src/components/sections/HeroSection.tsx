@@ -82,7 +82,7 @@ export function HeroSection() {
                   src={panel.image}
                   alt={panel.title}
                   fill
-                  className="object-cover transition-all duration-500"
+                  className="object-cover"
                   style={{ objectPosition: panel.objectPosition }}
                   priority
                   data-ai-hint={panel.hint}
@@ -94,8 +94,8 @@ export function HeroSection() {
               <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
                 <motion.div
                   animate={{ 
-                    y: isHovered ? -20 : 0,
-                    scale: isHovered ? 1.1 : 1 
+                    y: isHovered ? -20 : 0
+                    // Removed scale to prevent zooming of the text container
                   }}
                   transition={{ duration: 0.5 }}
                 >

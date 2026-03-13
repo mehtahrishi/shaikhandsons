@@ -95,7 +95,6 @@ export function HeroSection() {
                 <motion.div
                   animate={{ 
                     y: isHovered ? -20 : 0
-                    // Removed scale to prevent zooming of the text container
                   }}
                   transition={{ duration: 0.5 }}
                 >

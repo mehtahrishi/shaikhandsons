@@ -3,17 +3,13 @@
 
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
+import Autoplay from 'embla-carousel-autoplay';
 import { 
   Carousel, 
   CarouselContent, 
-  CarouselItem, 
-  CarouselNext, 
-  CarouselPrevious 
+  CarouselItem 
 } from '@/components/ui/carousel';
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
 
 export function HeroSection() {
   const slides = [
@@ -23,7 +19,6 @@ export function HeroSection() {
       subtitle: 'TRANSCENDENTAL SEDAN',
       image: '/images/1.png',
       hint: 'electric luxury sedan teal',
-      href: '/vehicles/v1',
     },
     {
       id: 'lumina',
@@ -31,7 +26,6 @@ export function HeroSection() {
       subtitle: 'INFINITE SUV',
       image: '/images/image.png',
       hint: 'electric luxury suv white',
-      href: '/vehicles/v2',
     },
     {
       id: 'spectre',
@@ -39,9 +33,12 @@ export function HeroSection() {
       subtitle: 'MASTER THE DARK',
       image: '/images/2.png',
       hint: 'electric sports car black',
-      href: '/vehicles/v3',
     }
   ];
+
+  const plugin = React.useRef(
+    Autoplay({ delay: 5000, stopOnInteraction: false })
+  );
 
   return (
     <section className="relative w-full bg-black overflow-hidden pt-[72px]">
@@ -51,6 +48,7 @@ export function HeroSection() {
           loop: true,
           startIndex: 1, // Sets the middle slide (Lumina) as default
         }}
+        plugins={[plugin.current]}
         className="w-full h-[75vh] md:h-[85vh]"
       >
         <CarouselContent className="-ml-0 h-full">
@@ -83,17 +81,6 @@ export function HeroSection() {
                     <h2 className="font-headline text-5xl md:text-8xl font-black text-white tracking-tighter">
                       {slide.title}
                     </h2>
-                    <div className="pt-10">
-                      <Link href={slide.href}>
-                        <Button 
-                          variant="outline" 
-                          size="lg" 
-                          className="bg-white/5 backdrop-blur-md border-white/10 text-white hover:bg-white hover:text-black rounded-full px-12 h-16 transition-all uppercase font-bold tracking-[0.2em] text-[10px]"
-                        >
-                          Explore Collection <ArrowRight className="ml-3 h-4 w-4" />
-                        </Button>
-                      </Link>
-                    </div>
                   </motion.div>
                 </div>
               </div>
@@ -101,17 +88,11 @@ export function HeroSection() {
           ))}
         </CarouselContent>
         
-        {/* Navigation */}
-        <div className="hidden md:block">
-          <CarouselPrevious className="left-8 bg-black/40 border-white/10 text-white hover:bg-primary hover:text-white h-14 w-14 backdrop-blur-sm" />
-          <CarouselNext className="right-8 bg-black/40 border-white/10 text-white hover:bg-primary hover:text-white h-14 w-14 backdrop-blur-sm" />
-        </div>
-
         {/* Custom Progress Indicators */}
         <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-3 z-20 pointer-events-none">
           {slides.map((_, i) => (
             <div key={i} className="h-[2px] w-8 rounded-full bg-white/20 overflow-hidden">
-              {/* Visual indicator logic is handled by Embla underlyingly, this is decorative */}
+              {/* Visual indicator for current active slide is decorative */}
             </div>
           ))}
         </div>

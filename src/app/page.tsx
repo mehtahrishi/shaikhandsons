@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { VehicleShowroom } from '@/components/vehicles/VehicleShowroom';
 import { HeroSection } from '@/components/sections/HeroSection';
-import { ShieldCheck, Leaf, BatteryCharging, Cpu, Car } from 'lucide-react';
+import { ShieldCheck, Leaf, BatteryCharging, Cpu } from 'lucide-react';
 
 const BikeIcon = ({ className }: { className?: string }) => (
   <svg 
@@ -35,6 +35,36 @@ const BikeIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const ScootyIcon = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 464.457 464.457" 
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g>
+      <path d="M463.994,276.597c0.83-2.232,0.531-4.727-0.801-6.7c-12.385-18.357-32.975-29.317-55.084-29.317
+        c-0.586,0-1.174,0.014-1.762,0.029v-8.667c0-4.204-3.008-7.807-7.145-8.558l-14.324-2.601l-14.793-59.729
+        c-0.551-2.214-1.945-4.124-3.891-5.318l-5.086-3.126c0.77-0.502,1.521-1.028,2.24-1.601c2.072-1.65,3.279-4.154,3.279-6.804
+        v-30.707c0-0.554-0.053-1.104-0.158-1.648l-0.771-4.001c-0.412-2.13-1.604-4.031-3.344-5.327
+        c-6.635-4.942-15.295-6.933-23.434-5.361c-8.01,1.545-14.65,6.188-18.926,12.443l-42.016,4.474
+        c-7.164,0.763-12.354,7.189-11.592,14.354c0.715,6.695,6.373,11.666,12.959,11.666c0.459,0,0.928-0.024,1.396-0.075l35.552-3.785
+        c1.256,4.203,3.4,7.985,6.197,11.152c0.014,0.03,0.021,0.061,0.033,0.091c10.322,23.743,33.264,91.222,15.729,117.964
+        c-5.004,7.634-13.285,11.343-25.318,11.343h-48.647c-13.961,0-26.21-6.247-31.967-16.303c-6.205-10.835-4.744-25.234,4.195-41.802
+        c2.625-1.497,4.394-4.322,4.394-7.56v-44.355c0-4.804-3.894-8.697-8.698-8.697H82.187c-4.803,0-8.697,3.894-8.697,8.697v37.693
+        c-17.688,6.46-49.748,25.028-72.758,77.533C0.249,283.093,0,284.28,0,285.482v16.821c0,4.804,3.894,8.698,8.697,8.698H21.81
+        c1.148,31.574,27.09,56.823,58.945,56.823c31.854,0,57.797-25.249,58.941-56.823h204.503c1.146,31.574,27.09,56.823,58.943,56.823
+        c32.584,0,58.998-26.414,58.998-58.998c0-9.643-2.328-18.733-6.428-26.771l3.305-0.904
+        C461.314,280.525,463.168,278.829,463.994,276.597z M102.228,227.229h37.333c2.763,0,5,2.239,5,5s-2.237,5-5,5h-37.333
+        c-2.762,0-5-2.239-5-5S99.466,227.229,102.228,227.229z M80.755,331.706c-11.881,0-21.674-9.104-22.771-20.702h45.541
+        C102.426,322.601,92.636,331.706,80.755,331.706z M139.561,273.563h-37.333c-2.762,0-5-2.238-5-5c0-2.761,2.238-5,5-5h37.333
+        c2.763,0,5,2.239,5,5C144.561,271.325,142.324,273.563,139.561,273.563z M156.395,255.396h-71c-2.762,0-5-2.239-5-5s2.238-5,5-5h71
+        c2.762,0,5,2.239,5,5S159.157,255.396,156.395,255.396z M403.145,331.706c-12.615,0-22.877-10.263-22.877-22.877
+        c0-2.214,0.322-4.353,0.91-6.377l37.611-10.291c4.445,4.177,7.23,10.102,7.23,16.668
+        C426.021,321.443,415.758,331.706,403.145,331.706z" fill="currentColor" />
+    </g>
+  </svg>
+);
+
 export default function Home() {
   return (
     <div className="flex flex-col">
@@ -55,13 +85,13 @@ export default function Home() {
               <span className="font-bold uppercase tracking-[0.3em] text-[10px] group-hover:tracking-[0.4em] transition-all">Bikes</span>
             </Link>
             <Link 
-              href="/category/cars" 
+              href="/category/scooty" 
               className="flex-1 py-6 flex items-center justify-center gap-4 group hover:bg-muted/30 transition-all duration-300"
             >
-              <div className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors duration-300 flex items-center justify-center">
-                <Car className="w-full h-full stroke-[1.2]" />
+              <div className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors duration-300">
+                <ScootyIcon className="w-full h-full" />
               </div>
-              <span className="font-bold uppercase tracking-[0.3em] text-[10px] group-hover:tracking-[0.4em] transition-all">Cars</span>
+              <span className="font-bold uppercase tracking-[0.3em] text-[10px] group-hover:tracking-[0.4em] transition-all">Scooty</span>
             </Link>
           </div>
         </div>

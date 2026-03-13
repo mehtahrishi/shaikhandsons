@@ -235,19 +235,19 @@ export function InitialLoader() {
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.4, duration: 1, ease: "easeOut" }}
-                      className="w-[180px] h-[180px] border-[4px] border-primary rounded-full z-0 flex items-center justify-center relative -translate-y-2"
+                      className="w-[70px] h-[70px] border-[3px] border-primary rounded-full z-0 flex items-center justify-center relative"
                     >
                       {/* Secondary Inner Glow */}
                       <motion.div 
                         initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 0.15, scale: 1.1 }}
+                        animate={{ opacity: 0.2, scale: 1.2 }}
                         transition={{ delay: 0.5, duration: 1.2 }}
-                        className="absolute inset-0 bg-primary/20 rounded-full blur-3xl z-0"
+                        className="absolute inset-0 bg-primary/20 rounded-full blur-2xl z-0"
                       />
                     </motion.div>
                   </div>
 
-                  <div className="z-10 flex flex-col items-center justify-center py-12 px-16 -translate-y-2">
+                  <div className="z-10 flex flex-col items-center justify-center py-12 px-16">
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: "100%" }}

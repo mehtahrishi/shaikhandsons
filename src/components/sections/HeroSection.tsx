@@ -82,7 +82,7 @@ export function HeroSection() {
   }, [activeMobileIndex]);
 
   return (
-    <section className="relative h-[90vh] md:h-[85vh] min-h-[600px] w-full bg-black overflow-hidden pt-[72px]">
+    <section className="relative h-[75vh] md:h-[85vh] min-h-[500px] md:min-h-[600px] w-full bg-black overflow-hidden pt-[72px]">
       {/* Desktop Layout: Reveal Accordion */}
       <div className="hidden md:flex h-full w-full">
         {panels.map((panel, index) => {
@@ -175,7 +175,7 @@ export function HeroSection() {
               key={panel.id} 
               className="flex-shrink-0 w-full h-full snap-center relative flex flex-col items-center justify-center bg-black"
             >
-              <div className="relative w-full h-2/3 mt-10">
+              <div className="relative w-full h-3/4">
                 <Image
                   src={panel.image}
                   alt={panel.title}
@@ -187,7 +187,7 @@ export function HeroSection() {
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-40" />
               
-              <div className="absolute inset-x-0 bottom-0 p-8 pb-32 flex flex-col items-center text-center">
+              <div className="absolute inset-x-0 bottom-0 p-8 pb-20 flex flex-col items-center text-center">
                 <motion.p 
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -221,7 +221,7 @@ export function HeroSection() {
         </div>
 
         {/* Mobile Navigation Indicators */}
-        <div className="absolute bottom-12 left-0 right-0 flex justify-center gap-3 z-20">
+        <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-3 z-20">
           {panels.map((_, idx) => (
             <button
               key={idx}

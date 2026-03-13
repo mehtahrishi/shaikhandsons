@@ -20,7 +20,7 @@ export function HeroSection() {
       image: '/images/1.png',
       hint: 'electric sedan teal',
       href: '/vehicles/v1',
-      objectPosition: 'left center'
+      objectPosition: 'center'
     },
     {
       id: 'lumina',
@@ -38,7 +38,7 @@ export function HeroSection() {
       image: '/images/2.png',
       hint: 'electric sports car black',
       href: '/vehicles/v3',
-      objectPosition: 'right center'
+      objectPosition: 'center'
     }
   ];
 
@@ -69,8 +69,10 @@ export function HeroSection() {
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(1)}
             >
-              {/* Static Background Image (No Scaling) */}
-              <div className="absolute inset-0 w-full h-full bg-black">
+              {/* FIXED SCALE IMAGE CONTAINER: This container is always 100vw wide. 
+                  The parent motion.div (panel) crops it. 
+                  Because the image is always 100vw, it NEVER zooms or magnifies when the panel expands. */}
+              <div className="absolute inset-0 w-[100vw] h-full left-1/2 -translate-x-1/2 pointer-events-none">
                 <motion.div
                   className="absolute inset-0 w-full h-full"
                   animate={{
@@ -83,13 +85,12 @@ export function HeroSection() {
                     src={panel.image}
                     alt={panel.title}
                     fill
-                    className="object-cover pointer-events-none select-none"
+                    className="object-cover"
                     style={{ 
                       objectPosition: panel.objectPosition,
-                      // Ensure no browser-level transitions interfere with framer motion
                       transition: 'none' 
                     }}
-                    sizes="50vw"
+                    sizes="100vw"
                     priority
                     data-ai-hint={panel.hint}
                   />

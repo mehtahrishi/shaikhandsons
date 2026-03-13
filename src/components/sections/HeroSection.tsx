@@ -67,8 +67,8 @@ export function HeroSection() {
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-1000" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
                 
-                {/* Content - Moved down above indicators */}
-                <div className="absolute inset-0 flex flex-col items-center justify-end pb-24 md:pb-32 p-8 text-center z-10">
+                {/* Content - Moved further down just above indicators */}
+                <div className="absolute inset-0 flex flex-col items-center justify-end pb-16 md:pb-20 p-8 text-center z-10">
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -92,7 +92,7 @@ export function HeroSection() {
         <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-3 z-20 pointer-events-none">
           {slides.map((_, i) => (
             <div key={i} className="h-[2px] w-12 rounded-full bg-white/20 overflow-hidden relative">
-              {/* Visual indicator bar */}
+              {/* Visual indicator bar could be animated based on carousel api state if needed */}
             </div>
           ))}
         </div>

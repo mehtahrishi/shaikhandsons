@@ -235,7 +235,7 @@ export function InitialLoader() {
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.4, duration: 1, ease: "easeOut" }}
-                      className="w-[70px] h-[70px] border-[3px] border-primary rounded-full z-0 flex items-center justify-center relative"
+                      className="w-[110px] h-[110px] border-[3px] border-primary rounded-full z-0 flex items-center justify-center relative"
                     >
                       {/* Secondary Inner Glow */}
                       <motion.div 

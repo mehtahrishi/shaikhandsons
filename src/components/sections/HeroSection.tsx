@@ -10,7 +10,8 @@ import { ArrowRight } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export function HeroSection() {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  // Middle index (1) is now selected by default
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(1);
 
   const panels = [
     {
@@ -43,7 +44,7 @@ export function HeroSection() {
   ];
 
   return (
-    <section className="relative h-[80vh] min-h-[600px] w-full bg-black overflow-hidden">
+    <section className="relative h-[85vh] min-h-[700px] w-full bg-black overflow-hidden pt-20 md:pt-24">
       {/* Desktop Layout: Hover Accordion */}
       <div className="hidden md:flex h-full w-full">
         {panels.map((panel, index) => {
@@ -67,7 +68,7 @@ export function HeroSection() {
                 transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] }
               }}
               onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
+              onMouseLeave={() => setHoveredIndex(1)} // Reset to middle on leave
             >
               {/* Image Container */}
               <motion.div 
@@ -140,7 +141,7 @@ export function HeroSection() {
       </div>
 
       {/* Mobile Layout: Snap Carousel */}
-      <div className="flex md:hidden h-full w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide bg-black pt-20">
+      <div className="flex md:hidden h-full w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide bg-black">
         {panels.map((panel) => (
           <div 
             key={panel.id} 

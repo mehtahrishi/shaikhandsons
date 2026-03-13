@@ -38,43 +38,34 @@ const BikeIcon = ({ className }: { className?: string }) => (
 export default function Home() {
   return (
     <div className="flex flex-col">
-      {/* Dynamic Hover Accordion Hero Section */}
+      {/* Hero Section */}
       <HeroSection />
 
-      {/* Category Sections (Replaces Tech Specs Bar) */}
-      <section className="bg-card border-y py-20">
+      {/* Compact Category Bar */}
+      <nav className="bg-background border-y border-border/50 z-40 relative">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
-            {/* Bike Category */}
-            <Link href="/category/bikes" className="group block">
-              <div className="bg-background border rounded-3xl p-12 lg:p-16 flex flex-col items-center justify-center transition-all duration-500 hover:border-primary/50 hover:shadow-[0_0_40px_rgba(var(--primary),0.1)] relative overflow-hidden h-full">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl transition-opacity group-hover:opacity-100 opacity-0" />
-                <div className="w-48 h-48 lg:w-64 lg:h-64 mb-10 text-muted-foreground group-hover:text-primary transition-colors duration-500">
-                  <BikeIcon className="w-full h-full" />
-                </div>
-                <div className="text-center">
-                  <h3 className="font-headline text-5xl lg:text-6xl font-black uppercase tracking-tighter mb-2">Bikes</h3>
-                  <p className="text-muted-foreground uppercase tracking-[0.3em] text-[10px] font-bold">Two-Wheeled Transcendence</p>
-                </div>
+          <div className="flex justify-center divide-x divide-border/50">
+            <Link 
+              href="/category/bikes" 
+              className="flex-1 py-6 flex items-center justify-center gap-4 group hover:bg-muted/30 transition-all duration-300"
+            >
+              <div className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors duration-300">
+                <BikeIcon className="w-full h-full" />
               </div>
+              <span className="font-bold uppercase tracking-[0.3em] text-[10px] group-hover:tracking-[0.4em] transition-all">Bikes</span>
             </Link>
-
-            {/* Car Category */}
-            <Link href="/category/cars" className="group block">
-              <div className="bg-background border rounded-3xl p-12 lg:p-16 flex flex-col items-center justify-center transition-all duration-500 hover:border-primary/50 hover:shadow-[0_0_40px_rgba(var(--primary),0.1)] relative overflow-hidden h-full">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl transition-opacity group-hover:opacity-100 opacity-0" />
-                <div className="w-48 h-48 lg:w-64 lg:h-64 mb-10 text-muted-foreground group-hover:text-primary transition-colors duration-500 flex items-center justify-center">
-                  <Car className="w-full h-full stroke-[0.5]" />
-                </div>
-                <div className="text-center">
-                  <h3 className="font-headline text-5xl lg:text-6xl font-black uppercase tracking-tighter mb-2">Cars</h3>
-                  <p className="text-muted-foreground uppercase tracking-[0.3em] text-[10px] font-bold">Four-Wheeled Excellence</p>
-                </div>
+            <Link 
+              href="/category/cars" 
+              className="flex-1 py-6 flex items-center justify-center gap-4 group hover:bg-muted/30 transition-all duration-300"
+            >
+              <div className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors duration-300 flex items-center justify-center">
+                <Car className="w-full h-full stroke-[1.2]" />
               </div>
+              <span className="font-bold uppercase tracking-[0.3em] text-[10px] group-hover:tracking-[0.4em] transition-all">Cars</span>
             </Link>
           </div>
         </div>
-      </section>
+      </nav>
 
       {/* Showroom */}
       <VehicleShowroom />
@@ -140,7 +131,6 @@ export default function Home() {
                   <p className="text-sm text-white/80 italic">"The cockpit doesn't just display information—it anticipates intent."</p>
                 </div>
               </div>
-              {/* Decorative Elements */}
               <div className="absolute -top-12 -right-12 h-64 w-64 bg-primary/10 rounded-full blur-[100px] -z-10"></div>
               <div className="absolute -bottom-12 -left-12 h-64 w-64 bg-primary/5 rounded-full blur-[100px] -z-10"></div>
             </div>

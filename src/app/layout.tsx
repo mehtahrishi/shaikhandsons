@@ -2,7 +2,6 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { Toaster } from '@/components/ui/toaster';
-import { AnnouncementBar } from '@/components/common/AnnouncementBar';
 import { InitialLoader } from '@/components/common/InitialLoader';
 
 export const metadata: Metadata = {
@@ -24,7 +23,6 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased selection:bg-primary/30 min-h-screen">
         <InitialLoader />
-        <AnnouncementBar />
         <SiteHeader />
         <main>
           {children}

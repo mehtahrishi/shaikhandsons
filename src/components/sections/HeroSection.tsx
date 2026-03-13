@@ -1,16 +1,19 @@
 
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function HeroSection() {
-  // Middle index (1) is selected by default
+  // Middle index (1) is selected by default for desktop
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(1);
+  const [activeMobileIndex, setActiveMobileIndex] = useState(0);
+  const mobileCarouselRef = useRef<HTMLDivElement>(null);
 
   const panels = [
     {
@@ -42,8 +45,33 @@ export function HeroSection() {
     }
   ];
 
+  // Handle mobile scroll sync for dots
+  useEffect(() => {
+    const el = mobileCarouselRef.current;
+    if (!el) return;
+
+    const handleScroll = () => {
+      const index = Math.round(el.scrollLeft / el.offsetWidth);
+      if (!isNaN(index)) {
+        setActiveMobileIndex(index);
+      }
+    };
+
+    el.addEventListener('scroll', handleScroll);
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToPanel = (index: number) => {
+    if (mobileCarouselRef.current) {
+      mobileCarouselRef.current.scrollTo({
+        left: index * mobileCarouselRef.current.offsetWidth,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
-    <section className="relative h-[85vh] min-h-[600px] w-full bg-black overflow-hidden pt-[72px]">
+    <section className="relative h-[90vh] md:h-[85vh] min-h-[600px] w-full bg-black overflow-hidden pt-[72px]">
       {/* Desktop Layout: Reveal Accordion */}
       <div className="hidden md:flex h-full w-full">
         {panels.map((panel, index) => {
@@ -125,38 +153,102 @@ export function HeroSection() {
         })}
       </div>
 
-      {/* Mobile Layout: Snap Carousel */}
-      <div className="flex md:hidden h-full w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide bg-black">
-        {panels.map((panel) => (
-          <div 
-            key={panel.id} 
-            className="flex-shrink-0 w-full h-full snap-center relative"
-          >
-            <Image
-              src={panel.image}
-              alt={panel.title}
-              fill
-              className="object-cover"
-              style={{ objectPosition: 'center' }}
-              data-ai-hint={panel.hint}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
-            
-            <div className="absolute inset-x-0 bottom-0 p-12 flex flex-col items-center text-center">
-              <p className="text-primary font-bold tracking-[0.3em] text-[10px] mb-2 uppercase">
-                {panel.subtitle}
-              </p>
-              <h2 className="font-headline text-5xl font-black text-white tracking-tighter mb-8">
-                {panel.title}
-              </h2>
-              <Link href={panel.href} className="w-full max-w-xs">
-                <Button className="w-full bg-primary text-white rounded-full h-14 font-bold uppercase tracking-widest text-sm">
-                  View Details
-                </Button>
-              </Link>
+      {/* Mobile Layout: Enhanced Snap Carousel */}
+      <div className="md:hidden relative h-full w-full bg-black">
+        <div 
+          ref={mobileCarouselRef}
+          className="flex h-full w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+        >
+          {panels.map((panel) => (
+            <div 
+              key={panel.id} 
+              className="flex-shrink-0 w-full h-full snap-center relative"
+            >
+              <Image
+                src={panel.image}
+                alt={panel.title}
+                fill
+                className="object-cover"
+                style={{ objectPosition: 'center' }}
+                data-ai-hint={panel.hint}
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+              <div className="absolute inset-0 bg-black/20" />
+              
+              <div className="absolute inset-x-0 bottom-0 p-8 pb-24 flex flex-col items-center text-center">
+                <motion.p 
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  className="text-primary font-bold tracking-[0.3em] text-[10px] mb-2 uppercase"
+                >
+                  {panel.subtitle}
+                </motion.p>
+                <motion.h2 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="font-headline text-5xl font-black text-white tracking-tighter mb-8"
+                >
+                  {panel.title}
+                </motion.h2>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="w-full max-w-xs"
+                >
+                  <Link href={panel.href}>
+                    <Button className="w-full bg-primary text-white rounded-full h-14 font-bold uppercase tracking-widest text-xs">
+                      View Collection
+                    </Button>
+                  </Link>
+                </motion.div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+
+        {/* Mobile Navigation Indicators */}
+        <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-2 z-20">
+          {panels.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => scrollToPanel(idx)}
+              className={cn(
+                "h-1 transition-all duration-300 rounded-full",
+                activeMobileIndex === idx ? "w-8 bg-primary" : "w-4 bg-white/30"
+              )}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Mobile Navigation Arrows */}
+        <div className="absolute inset-y-0 left-2 right-2 flex items-center justify-between pointer-events-none z-10">
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(
+              "rounded-full bg-black/10 backdrop-blur-sm text-white/50 hover:text-white pointer-events-auto",
+              activeMobileIndex === 0 && "opacity-0 pointer-events-none"
+            )}
+            onClick={() => scrollToPanel(activeMobileIndex - 1)}
+          >
+            <ChevronLeft className="h-8 w-8" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(
+              "rounded-full bg-black/10 backdrop-blur-sm text-white/50 hover:text-white pointer-events-auto",
+              activeMobileIndex === panels.length - 1 && "opacity-0 pointer-events-none"
+            )}
+            onClick={() => scrollToPanel(activeMobileIndex + 1)}
+          >
+            <ChevronRight className="h-8 w-8" />
+          </Button>
+        </div>
       </div>
     </section>
   );

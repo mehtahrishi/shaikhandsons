@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export function HeroSection() {
   // Middle index (1) is now selected by default
@@ -44,7 +43,7 @@ export function HeroSection() {
   ];
 
   return (
-    <section className="relative h-[85vh] min-h-[700px] w-full bg-black overflow-hidden pt-20 md:pt-24">
+    <section className="relative h-[85vh] min-h-[600px] w-full bg-black overflow-hidden pt-[64px] md:pt-[72px]">
       {/* Desktop Layout: Hover Accordion */}
       <div className="hidden md:flex h-full w-full">
         {panels.map((panel, index) => {

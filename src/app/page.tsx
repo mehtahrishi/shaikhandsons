@@ -4,59 +4,14 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Typewriter } from '@/components/ui/Typewriter';
 import { VehicleShowroom } from '@/components/vehicles/VehicleShowroom';
+import { HeroSection } from '@/components/sections/HeroSection';
 import { Zap, ShieldCheck, Leaf, ArrowRight, Gauge, Cpu, BatteryCharging } from 'lucide-react';
-import { motion as motion_div } from 'framer-motion';
 
 export default function Home() {
   return (
     <div className="flex flex-col">
-      {/* Hero Section */}
-      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
-        <Image 
-          src="https://picsum.photos/seed/ev1/1920/1080"
-          alt="Luxury EV Hero"
-          fill
-          priority
-          className="object-cover brightness-[0.4]"
-          data-ai-hint="luxury electric car dark neon"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-transparent to-background"></div>
-        
-        <div className="container relative z-10 px-6 text-center">
-          <motion_div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <p className="text-primary font-bold uppercase tracking-[0.8em] mb-6 text-xs sm:text-sm">
-              The Evolution of Silent Power
-            </p>
-            <h1 className="font-headline text-6xl md:text-[10rem] font-black text-white tracking-tighter mb-4 leading-none">
-              <Typewriter text="VERIDIAN" delay={3500} speed={150} />
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-white/20 italic">
-                NOIR
-              </span>
-            </h1>
-            <p className="max-w-2xl mx-auto text-foreground/60 text-lg md:text-xl font-light mb-12 tracking-wide">
-              Architecting the future of electronic mobility. Where transcendental design meets extreme engineering.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Button size="lg" className="rounded-full px-12 h-16 text-lg font-bold group">
-                Enter Showroom <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button variant="outline" size="lg" className="rounded-full px-12 h-16 text-lg border-white/10 text-white hover:bg-white hover:text-black transition-all">
-                The Technology
-              </Button>
-            </div>
-          </motion_div>
-        </div>
-
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4">
-          <span className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground animate-pulse">Scroll to Explore</span>
-          <div className="w-[1px] h-16 bg-gradient-to-b from-primary via-primary/50 to-transparent"></div>
-        </div>
-      </section>
+      {/* Dynamic Hover Accordion Hero Section */}
+      <HeroSection />
 
       {/* Tech Specs Bar */}
       <section className="bg-card border-y py-12">

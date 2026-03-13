@@ -2,31 +2,31 @@
   "placeholderImages": [
     {
       "id": "hero-bg",
-      "description": "Main background for the hero section. Save your file to /public/images/hero.jpg and change imageUrl to '/images/hero.jpg'",
+      "description": "Main background for the hero section.",
       "imageUrl": "https://picsum.photos/seed/ev1/1920/1080",
       "imageHint": "luxury electric car dark neon"
     },
     {
       "id": "model-aether",
-      "description": "Sleek teal electric sedan. Save your file to /public/images/aether.jpg and change imageUrl to '/images/aether.jpg'",
-      "imageUrl": "https://picsum.photos/seed/ev2/800/600",
+      "description": "Left hero image (Veridian Aether). Reference: public/images/1.png",
+      "imageUrl": "/images/1.png",
       "imageHint": "electric sedan teal"
     },
     {
       "id": "model-lumina",
-      "description": "Primary hero image. Middle panel. Reference: public/images/image.png",
+      "description": "Middle hero image (Veridian Lumina). Reference: public/images/image.png",
       "imageUrl": "/images/image.png",
       "imageHint": "electric suv white"
     },
     {
       "id": "model-noir",
-      "description": "Black high-performance electric sports car. Save your file to /public/images/noir.jpg and change imageUrl to '/images/noir.jpg'",
-      "imageUrl": "https://picsum.photos/seed/ev4/800/600",
+      "description": "Right hero image (Noir Spectre). Reference: public/images/2.png",
+      "imageUrl": "/images/2.png",
       "imageHint": "electric sports car black"
     },
     {
       "id": "interior-luxury",
-      "description": "Futuristic luxury car interior. Save your file to /public/images/interior.jpg and change imageUrl to '/images/interior.jpg'",
+      "description": "Futuristic luxury car interior.",
       "imageUrl": "https://picsum.photos/seed/ev5/1200/800",
       "imageHint": "luxury car interior screens"
     }

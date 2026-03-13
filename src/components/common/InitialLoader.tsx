@@ -1,24 +1,48 @@
+
 "use client"
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function InitialLoader() {
   const [isLoading, setIsLoading] = useState(true);
   const [showText, setShowText] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [paths, setPaths] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setMounted(true);
-    // Phase 1: Main Loader Duration
+
+    // Generate paths on client only to avoid hydration mismatch
+    const generatePath = (startX: number, startY: number, endX: number, endY: number, segments: number = 8, jitter: number = 30) => {
+      let path = `M ${startX} ${startY}`;
+      const dx = (endX - startX) / segments;
+      const dy = (endY - startY) / segments;
+      for (let i = 1; i < segments; i++) {
+        const x = startX + dx * i + (Math.random() - 0.5) * jitter;
+        const y = startY + dy * i + (Math.random() - 0.5) * jitter;
+        path += ` L ${x} ${y}`;
+      }
+      path += ` L ${endX} ${endY}`;
+      return path;
+    };
+
+    setPaths({
+      tlCore: generatePath(0, 0, 50, 50),
+      tlGlow: generatePath(0, 0, 50, 50, 10, 40),
+      brCore: generatePath(100, 100, 50, 50),
+      brGlow: generatePath(100, 100, 50, 50, 10, 40)
+    });
+
+    // Phase 1: Total duration (reduced for snappiness)
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 5500);
+    }, 4500);
 
-    // Phase 2: Transition from Bike to Text
+    // Phase 2: Transition from Icon to Text
     const textTimer = setTimeout(() => {
       setShowText(true);
-    }, 3200);
+    }, 2800);
 
     return () => {
       clearTimeout(timer);
@@ -26,34 +50,17 @@ export function InitialLoader() {
     };
   }, []);
 
-  // Function to generate a zig-zag path for lightning
-  const generateLightningPath = (startX: number, startY: number, endX: number, endY: number, segments: number = 8, jitter: number = 30) => {
-    let path = `M ${startX} ${startY}`;
-    const dx = (endX - startX) / segments;
-    const dy = (endY - startY) / segments;
-
-    for (let i = 1; i < segments; i++) {
-      const x = startX + dx * i + (Math.random() - 0.5) * jitter;
-      const y = startY + dy * i + (Math.random() - 0.5) * jitter;
-      path += ` L ${x} ${y}`;
-    }
-    path += ` L ${endX} ${endY}`;
-    return path;
-  };
-
-  // Diagonals for lightning: Top-Left (TL) and Bottom-Right (BR)
-  const lightningBolts = useMemo(() => [
-    { id: 'tl', start: [0, 0], end: [50, 50], delay: 1 },
-    { id: 'br', start: [100, 100], end: [50, 50], delay: 1.5 },
-  ], []);
-
-  // Sparkle configuration for each strike
-  const sparkleCount = 12;
-
-  // Hydration safe check
+  // Return a black screen immediately to prevent flash of content while hydration happens
   if (!mounted) {
-    return null;
+    return <div className="fixed inset-0 z-[100] bg-[#020202]" />;
   }
+
+  const lightningBolts = [
+    { id: 'tl', delay: 0.5 },
+    { id: 'br', delay: 1.2 },
+  ];
+
+  const sparkleCount = 12;
 
   return (
     <AnimatePresence>
@@ -80,41 +87,45 @@ export function InitialLoader() {
             {lightningBolts.map((bolt) => (
               <React.Fragment key={bolt.id}>
                 {/* Core Bolt */}
-                <motion.path
-                  d={generateLightningPath(bolt.start[0], bolt.start[1], bolt.end[0], bolt.end[1])}
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="0.5"
-                  filter="url(#lightning-glow)"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ 
-                    pathLength: [0, 1, 1],
-                    opacity: [0, 1, 0, 1, 0],
-                  }}
-                  transition={{ 
-                    duration: 0.6, 
-                    delay: bolt.delay,
-                    times: [0, 0.2, 0.4, 0.6, 1]
-                  }}
-                />
+                {paths[`${bolt.id}Core`] && (
+                  <motion.path
+                    d={paths[`${bolt.id}Core`]}
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="0.5"
+                    filter="url(#lightning-glow)"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ 
+                      pathLength: [0, 1],
+                      opacity: [0, 1, 0, 1, 0],
+                    }}
+                    transition={{ 
+                      duration: 0.4, 
+                      delay: bolt.delay,
+                      times: [0, 0.2, 0.4, 0.6, 1]
+                    }}
+                  />
+                )}
                 {/* Primary Red Glow Bolt */}
-                <motion.path
-                  d={generateLightningPath(bolt.start[0], bolt.start[1], bolt.end[0], bolt.end[1], 10, 40)}
-                  fill="none"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth="1.2"
-                  opacity="0.6"
-                  filter="url(#lightning-glow)"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ 
-                    pathLength: [0, 1],
-                    opacity: [0, 0.8, 0]
-                  }}
-                  transition={{ 
-                    duration: 0.6, 
-                    delay: bolt.delay + 0.05
-                  }}
-                />
+                {paths[`${bolt.id}Glow`] && (
+                  <motion.path
+                    d={paths[`${bolt.id}Glow`]}
+                    fill="none"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth="1.2"
+                    opacity="0.6"
+                    filter="url(#lightning-glow)"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ 
+                      pathLength: [0, 1],
+                      opacity: [0, 0.8, 0]
+                    }}
+                    transition={{ 
+                      duration: 0.4, 
+                      delay: bolt.delay + 0.05
+                    }}
+                  />
+                )}
               </React.Fragment>
             ))}
           </svg>
@@ -131,42 +142,37 @@ export function InitialLoader() {
                   transition={{ duration: 0.5 }}
                   className="relative flex items-center justify-center"
                 >
-                  {/* Impact Sparkles - Triggered per bolt impact */}
+                  {/* Impact Sparkles */}
                   {lightningBolts.map((bolt) => (
                     <div key={`sparkles-${bolt.id}`} className="absolute inset-0 pointer-events-none">
-                      {Array.from({ length: sparkleCount }).map((_, i) => {
-                        const sWidth = Math.random() * 4 + 2;
-                        const sHeight = Math.random() * 4 + 2;
-                        
-                        return (
-                          <motion.div
-                            key={`${bolt.id}-sparkle-${i}`}
-                            className="absolute bg-white rounded-full shadow-[0_0_10px_white]"
-                            style={{
-                              width: sWidth,
-                              height: sHeight,
-                              left: '50%',
-                              top: '50%',
-                            }}
-                            initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
-                            animate={{
-                              x: [0, Math.cos((i * 360 / sparkleCount) * (Math.PI / 180)) * 150],
-                              y: [0, Math.sin((i * 360 / sparkleCount) * (Math.PI / 180)) * 150],
-                              opacity: [0, 1, 0],
-                              scale: [0, 1.5, 0.2],
-                            }}
-                            transition={{
-                              duration: 0.8,
-                              delay: bolt.delay + 0.15,
-                              ease: "easeOut"
-                            }}
-                          />
-                        );
-                      })}
+                      {Array.from({ length: sparkleCount }).map((_, i) => (
+                        <motion.div
+                          key={`${bolt.id}-sparkle-${i}`}
+                          className="absolute bg-white rounded-full shadow-[0_0_10px_white]"
+                          style={{
+                            width: Math.random() * 4 + 2,
+                            height: Math.random() * 4 + 2,
+                            left: '50%',
+                            top: '50%',
+                          }}
+                          initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
+                          animate={{
+                            x: [0, Math.cos((i * 360 / sparkleCount) * (Math.PI / 180)) * 150],
+                            y: [0, Math.sin((i * 360 / sparkleCount) * (Math.PI / 180)) * 150],
+                            opacity: [0, 1, 0],
+                            scale: [0, 1.5, 0.2],
+                          }}
+                          transition={{
+                            duration: 0.6,
+                            delay: bolt.delay + 0.1,
+                            ease: "easeOut"
+                          }}
+                        />
+                      ))}
                     </div>
                   ))}
 
-                  {/* Pulsing Red Core behind Bike */}
+                  {/* Pulsing Core behind Bike */}
                   <motion.div 
                     className="absolute w-32 h-32 bg-primary/20 rounded-full blur-3xl"
                     animate={{ 
@@ -193,14 +199,14 @@ export function InitialLoader() {
                               animate={{
                                 fill: [
                                   "rgb(255, 255, 255)", 
-                                  "rgb(206, 18, 18)", 
+                                  "rgb(239, 68, 68)", 
                                   "rgb(255, 255, 255)",
-                                  "rgb(206, 18, 18)",
+                                  "rgb(239, 68, 68)",
                                   "rgb(255, 255, 255)"
                                 ]
                               }}
                               transition={{
-                                duration: 3,
+                                duration: 2,
                                 delay: 0.5,
                                 ease: "linear",
                                 times: [0, 0.25, 0.35, 0.45, 0.55]

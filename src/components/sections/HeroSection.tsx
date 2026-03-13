@@ -20,7 +20,7 @@ export function HeroSection() {
       image: '/images/1.png',
       hint: 'electric sedan teal',
       href: '/vehicles/v1',
-      objectPosition: 'left center'
+      objectPosition: '20% center'
     },
     {
       id: 'lumina',
@@ -38,12 +38,12 @@ export function HeroSection() {
       image: '/images/2.png',
       hint: 'electric sports car black',
       href: '/vehicles/v3',
-      objectPosition: 'right center'
+      objectPosition: '80% center'
     }
   ];
 
   return (
-    <section className="relative h-[85vh] min-h-[600px] w-full bg-black overflow-hidden pt-20">
+    <section className="relative h-[85vh] min-h-[600px] w-full bg-black overflow-hidden pt-[72px]">
       {/* Desktop Layout: Reveal Accordion */}
       <div className="hidden md:flex h-full w-full">
         {panels.map((panel, index) => {
@@ -52,7 +52,7 @@ export function HeroSection() {
           
           let flexValue = 1;
           if (isAnyHovered) {
-            flexValue = isHovered ? 2.5 : 0.75;
+            flexValue = isHovered ? 1.8 : 0.6;
           } else {
             flexValue = index === 1 ? 1.2 : 1;
           }
@@ -69,36 +69,22 @@ export function HeroSection() {
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(1)}
             >
-              {/* 
-                THE SLIDING VIEWPORT:
-                The container below is ALWAYS 100vw wide. 
-                Because its width never changes, the image inside NEVER zooms or scales.
-                The parent motion.div (the panel) simply masks it.
-              */}
-              <div className="absolute inset-0 w-[100vw] h-full left-1/2 -translate-x-1/2 pointer-events-none">
-                <motion.div
-                  className="absolute inset-0 w-full h-full"
-                  animate={{
-                    opacity: isHovered ? 1 : 0.4,
-                    filter: isHovered ? 'grayscale(0)' : 'grayscale(0.5)',
+              <div className="absolute inset-0 w-full h-full">
+                <Image
+                  src={panel.image}
+                  alt={panel.title}
+                  fill
+                  className="object-cover"
+                  style={{ 
+                    objectPosition: panel.objectPosition,
+                    transition: 'none' 
                   }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <Image
-                    src={panel.image}
-                    alt={panel.title}
-                    fill
-                    className="object-cover"
-                    style={{ 
-                      objectPosition: panel.objectPosition,
-                      transition: 'none' 
-                    }}
-                    sizes="100vw"
-                    priority
-                    data-ai-hint={panel.hint}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/30" />
-                </motion.div>
+                  sizes="100vw"
+                  priority
+                  data-ai-hint={panel.hint}
+                />
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
               </div>
 
               {/* Panel Content */}

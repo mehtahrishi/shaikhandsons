@@ -227,23 +227,39 @@ export function InitialLoader() {
                   initial={{ opacity: 0, y: 10, letterSpacing: "1em" }}
                   animate={{ opacity: 1, y: 0, letterSpacing: "0.2em" }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="flex flex-col items-center"
+                  className="flex flex-col items-center relative"
                 >
+                  {/* Decorative Background Circle */}
                   <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: "100%" }}
-                    transition={{ delay: 0.5, duration: 1 }}
-                    className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mb-4"
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 0.1, scale: 1 }}
+                    transition={{ delay: 0.3, duration: 1 }}
+                    className="absolute inset-0 m-auto w-40 h-40 border border-primary rounded-full z-0"
                   />
-                  <h2 className="font-headline text-4xl md:text-5xl font-black text-white tracking-widest text-center">
-                    SHAIKH <span className="text-primary italic">&</span> SONS
-                  </h2>
                   <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: "100%" }}
-                    transition={{ delay: 0.5, duration: 1 }}
-                    className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mt-4"
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 0.05, scale: 1.2 }}
+                    transition={{ delay: 0.5, duration: 1.2 }}
+                    className="absolute inset-0 m-auto w-40 h-40 bg-primary/20 rounded-full blur-2xl z-0"
                   />
+
+                  <div className="z-10 flex flex-col items-center">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: "100%" }}
+                      transition={{ delay: 0.5, duration: 1 }}
+                      className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mb-4"
+                    />
+                    <h2 className="font-headline text-4xl md:text-5xl font-black text-white tracking-widest text-center">
+                      SHAIKH <span className="text-primary italic">&</span> SONS
+                    </h2>
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: "100%" }}
+                      transition={{ delay: 0.5, duration: 1 }}
+                      className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mt-4"
+                    />
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

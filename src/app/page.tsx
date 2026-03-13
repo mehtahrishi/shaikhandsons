@@ -1,3 +1,5 @@
+"use client"
+
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -5,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { VehicleShowroom } from '@/components/vehicles/VehicleShowroom';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { ShieldCheck, Leaf, BatteryCharging, Cpu } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const BikeIcon = ({ className }: { className?: string }) => (
   <svg 
@@ -72,9 +75,15 @@ export default function Home() {
       <HeroSection />
 
       {/* Compact Category Bar */}
-      <nav className="bg-background border-y border-border/50 z-40 relative">
+      <nav className="bg-background border-y border-border/50 z-40 relative overflow-hidden">
         <div className="container mx-auto px-6">
-          <div className="flex justify-center divide-x divide-border/50">
+          <motion.div 
+            initial={{ x: -200, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true }}
+            className="flex justify-center divide-x divide-border/50"
+          >
             <Link 
               href="/category/bikes" 
               className="flex-1 py-6 flex items-center justify-center gap-4 group hover:bg-muted/30 transition-all duration-300"
@@ -93,7 +102,7 @@ export default function Home() {
               </div>
               <span className="font-bold uppercase tracking-[0.3em] text-[10px] group-hover:tracking-[0.4em] transition-all">Scooty</span>
             </Link>
-          </div>
+          </motion.div>
         </div>
       </nav>
 

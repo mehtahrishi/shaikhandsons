@@ -14,8 +14,8 @@
     },
     {
       "id": "model-lumina",
-      "description": "Minimalist white electric SUV. Save your file to /public/images/lumina.jpg and change imageUrl to '/images/lumina.jpg'",
-      "imageUrl": "https://picsum.photos/seed/ev3/800/600",
+      "description": "Primary hero image. Middle panel. Reference: public/images/image.png",
+      "imageUrl": "/images/image.png",
       "imageHint": "electric suv white"
     },
     {

@@ -229,18 +229,18 @@ export function InitialLoader() {
                   transition={{ duration: 0.8, ease: "easeOut" }}
                   className="flex flex-col items-center relative"
                 >
-                  {/* Decorative Background Circle */}
+                  {/* Decorative Background Circle - Center aligned */}
                   <motion.div 
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 0.1, scale: 1 }}
-                    transition={{ delay: 0.3, duration: 1 }}
-                    className="absolute inset-0 m-auto w-40 h-40 border border-primary rounded-full z-0"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 0.4, scale: 1 }}
+                    transition={{ delay: 0.4, duration: 1, ease: "easeOut" }}
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-2 border-primary/30 rounded-full z-0"
                   />
                   <motion.div 
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 0.05, scale: 1.2 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 0.15, scale: 1.2 }}
                     transition={{ delay: 0.5, duration: 1.2 }}
-                    className="absolute inset-0 m-auto w-40 h-40 bg-primary/20 rounded-full blur-2xl z-0"
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 bg-primary/20 rounded-full blur-3xl z-0"
                   />
 
                   <div className="z-10 flex flex-col items-center">

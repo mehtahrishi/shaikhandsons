@@ -5,8 +5,8 @@ import { Toaster } from '@/components/ui/toaster';
 import { InitialLoader } from '@/components/common/InitialLoader';
 
 export const metadata: Metadata = {
-  title: 'Veridian Noir | The Future of Electronic Luxury',
-  description: 'Curated luxury electronic vehicles for the modern era.',
+  title: 'Shaikh & Sons | High-Performance Electronic Mobility',
+  description: 'Uncompromising luxury and engineering excellence by Shaikh & Sons.',
 };
 
 export default function RootLayout({

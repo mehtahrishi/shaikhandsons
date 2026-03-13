@@ -2,10 +2,9 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Typewriter } from '@/components/ui/Typewriter';
 import { VehicleShowroom } from '@/components/vehicles/VehicleShowroom';
 import { HeroSection } from '@/components/sections/HeroSection';
-import { Zap, ShieldCheck, Leaf, ArrowRight, Gauge, Cpu, BatteryCharging } from 'lucide-react';
+import { ShieldCheck, Leaf, BatteryCharging, Cpu } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -50,7 +49,7 @@ export default function Home() {
                   Intelligence <br /> <span className="text-primary italic">In Every Fiber.</span>
                 </h2>
                 <p className="text-muted-foreground text-xl leading-relaxed font-light">
-                  Veridian Noir is more than a vehicle; it's a mobile sanctuary engineered with computational precision. Our solid-state battery architecture and neural-link interfaces redefine the boundary between driver and machine.
+                  Shaikh & Sons is more than a vehicle; it's a mobile sanctuary engineered with computational precision. Our solid-state battery architecture and neural-link interfaces redefine the boundary between driver and machine.
                 </p>
               </div>
               
@@ -111,16 +110,16 @@ export default function Home() {
 
       {/* Inquiry Section */}
       <section id="inquiry" className="py-32 bg-black text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(206,18,18,0.1)_0%,transparent_70%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--primary),0.1)_0%,transparent_70%)]"></div>
         <div className="container mx-auto px-6 max-w-4xl relative z-10">
           <h2 className="font-headline text-5xl md:text-8xl font-black mb-8 text-white tracking-tighter">
             The Future <br /> <span className="text-primary">Is An Inquiry Away</span>
           </h2>
           <p className="text-xl mb-12 text-white/60 font-light">
-            Each Veridian Noir is a bespoke commission. Join the waitlist for our next production cycle.
+            Each commission is a bespoke masterpiece by Shaikh & Sons. Join the waitlist for our next production cycle.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="rounded-full px-16 h-16 text-lg font-black uppercase tracking-tighter shadow-[0_0_20px_rgba(206,18,18,0.3)]">
+            <Button size="lg" className="rounded-full px-16 h-16 text-lg font-black uppercase tracking-tighter shadow-[0_0_20px_rgba(var(--primary),0.3)]">
               Begin Configuration
             </Button>
             <Button size="lg" variant="outline" className="rounded-full px-16 h-16 text-lg font-bold border-white/10 text-white hover:bg-white/5">
@@ -136,8 +135,8 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
             <div className="md:col-span-2">
               <Link href="/" className="flex items-center gap-2 mb-6">
-                <span className="font-headline text-3xl font-black text-primary">VERIDIAN</span>
-                <span className="font-headline text-3xl font-light tracking-widest text-foreground">NOIR</span>
+                <span className="font-headline text-3xl font-black text-primary">SHAIKH</span>
+                <span className="font-headline text-3xl font-light tracking-widest text-foreground">& SONS</span>
               </Link>
               <p className="text-muted-foreground max-w-xs text-sm leading-relaxed">
                 Defining the pinnacle of electronic luxury through transcendental engineering and uncompromising design.
@@ -163,7 +162,7 @@ export default function Home() {
           
           <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-muted gap-4">
             <p className="text-muted-foreground text-[10px] tracking-widest uppercase font-medium">
-              © 2025 Veridian Noir Automotive Group. All Rights Reserved.
+              © 2025 Shaikh & Sons Automotive Group. All Rights Reserved.
             </p>
             <div className="flex gap-8 text-[10px] uppercase tracking-widest font-bold">
               <Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link>

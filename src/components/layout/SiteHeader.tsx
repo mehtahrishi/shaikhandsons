@@ -1,9 +1,8 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Search, User, ShoppingBag, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sun, Moon, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -42,8 +41,8 @@ export function SiteHeader() {
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <span className="font-headline text-2xl font-black tracking-tighter text-primary">VERIDIAN</span>
-          <span className="font-headline text-2xl font-light tracking-widest text-foreground">NOIR</span>
+          <span className="font-headline text-2xl font-black tracking-tighter text-primary">SHAIKH</span>
+          <span className="font-headline text-2xl font-light tracking-widest text-foreground">& SONS</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -89,7 +88,7 @@ export function SiteHeader() {
             className="fixed inset-0 bg-background z-[60] flex flex-col p-8"
           >
             <div className="flex justify-between items-center mb-12">
-              <span className="font-headline text-2xl font-black text-primary">V | N</span>
+              <span className="font-headline text-2xl font-black text-primary">S | S</span>
               <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
                 <X className="h-8 w-8" />
               </Button>
@@ -106,7 +105,7 @@ export function SiteHeader() {
                 </Link>
               ))}
               <hr className="border-muted" />
-              <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="text-xl font-medium text-muted-foreground">Admin Portal</Link>
+              <Link href="/admin/ai-tools" onClick={() => setMobileMenuOpen(false)} className="text-xl font-medium text-muted-foreground">Admin Tools</Link>
               <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="text-xl font-medium text-muted-foreground">My Profile</Link>
             </nav>
             <div className="mt-auto">

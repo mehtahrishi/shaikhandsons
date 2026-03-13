@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -275,7 +274,7 @@ export function InitialLoader() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 1.2, duration: 0.8 }}
-                        className="mt-6 text-[9px] md:text-[11px] font-bold uppercase tracking-[0.4em] text-primary/80 text-center max-w-[280px] md:max-w-none leading-relaxed"
+                        className="mt-6 text-[10px] md:text-[12px] font-headline font-medium italic uppercase tracking-[0.3em] text-primary/90 text-center max-w-[280px] md:max-w-none leading-relaxed"
                       >
                         Ride The Future With Our EV Scooters!
                       </motion.p>

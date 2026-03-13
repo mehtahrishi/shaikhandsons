@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 export function HeroSection() {
   // Middle index (1) is selected by default for desktop
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(1);
-  const [activeMobileIndex, setActiveMobileIndex] = useState(0);
+  const [activeMobileIndex, setActiveMobileIndex] = useState(1);
   const mobileCarouselRef = useRef<HTMLDivElement>(null);
 
   const panels = [
@@ -45,6 +45,26 @@ export function HeroSection() {
     }
   ];
 
+  const scrollToPanel = (index: number) => {
+    if (mobileCarouselRef.current) {
+      mobileCarouselRef.current.scrollTo({
+        left: index * mobileCarouselRef.current.offsetWidth,
+        behavior: 'smooth'
+      });
+      setActiveMobileIndex(index);
+    }
+  };
+
+  // Initial scroll to middle on mobile
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (window.innerWidth < 768) {
+        scrollToPanel(1);
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Handle mobile scroll sync for dots
   useEffect(() => {
     const el = mobileCarouselRef.current;
@@ -52,23 +72,14 @@ export function HeroSection() {
 
     const handleScroll = () => {
       const index = Math.round(el.scrollLeft / el.offsetWidth);
-      if (!isNaN(index)) {
+      if (!isNaN(index) && index !== activeMobileIndex) {
         setActiveMobileIndex(index);
       }
     };
 
     el.addEventListener('scroll', handleScroll);
     return () => el.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToPanel = (index: number) => {
-    if (mobileCarouselRef.current) {
-      mobileCarouselRef.current.scrollTo({
-        left: index * mobileCarouselRef.current.offsetWidth,
-        behavior: 'smooth'
-      });
-    }
-  };
+  }, [activeMobileIndex]);
 
   return (
     <section className="relative h-[90vh] md:h-[85vh] min-h-[600px] w-full bg-black overflow-hidden pt-[72px]">
@@ -162,21 +173,21 @@ export function HeroSection() {
           {panels.map((panel) => (
             <div 
               key={panel.id} 
-              className="flex-shrink-0 w-full h-full snap-center relative"
+              className="flex-shrink-0 w-full h-full snap-center relative flex flex-col items-center justify-center bg-black"
             >
-              <Image
-                src={panel.image}
-                alt={panel.title}
-                fill
-                className="object-cover"
-                style={{ objectPosition: 'center' }}
-                data-ai-hint={panel.hint}
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
-              <div className="absolute inset-0 bg-black/20" />
+              <div className="relative w-full h-2/3 mt-10">
+                <Image
+                  src={panel.image}
+                  alt={panel.title}
+                  fill
+                  className="object-contain"
+                  data-ai-hint={panel.hint}
+                  priority
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-40" />
               
-              <div className="absolute inset-x-0 bottom-0 p-8 pb-24 flex flex-col items-center text-center">
+              <div className="absolute inset-x-0 bottom-0 p-8 pb-32 flex flex-col items-center text-center">
                 <motion.p 
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -210,14 +221,14 @@ export function HeroSection() {
         </div>
 
         {/* Mobile Navigation Indicators */}
-        <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-2 z-20">
+        <div className="absolute bottom-12 left-0 right-0 flex justify-center gap-3 z-20">
           {panels.map((_, idx) => (
             <button
               key={idx}
               onClick={() => scrollToPanel(idx)}
               className={cn(
-                "h-1 transition-all duration-300 rounded-full",
-                activeMobileIndex === idx ? "w-8 bg-primary" : "w-4 bg-white/30"
+                "h-1.5 transition-all duration-300 rounded-full",
+                activeMobileIndex === idx ? "w-10 bg-primary" : "w-4 bg-white/20"
               )}
               aria-label={`Go to slide ${idx + 1}`}
             />
@@ -230,23 +241,23 @@ export function HeroSection() {
             variant="ghost"
             size="icon"
             className={cn(
-              "rounded-full bg-black/10 backdrop-blur-sm text-white/50 hover:text-white pointer-events-auto",
+              "rounded-full bg-white/5 backdrop-blur-sm text-white/40 hover:text-white pointer-events-auto w-12 h-12",
               activeMobileIndex === 0 && "opacity-0 pointer-events-none"
             )}
             onClick={() => scrollToPanel(activeMobileIndex - 1)}
           >
-            <ChevronLeft className="h-8 w-8" />
+            <ChevronLeft className="h-10 w-10" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             className={cn(
-              "rounded-full bg-black/10 backdrop-blur-sm text-white/50 hover:text-white pointer-events-auto",
+              "rounded-full bg-white/5 backdrop-blur-sm text-white/40 hover:text-white pointer-events-auto w-12 h-12",
               activeMobileIndex === panels.length - 1 && "opacity-0 pointer-events-none"
             )}
             onClick={() => scrollToPanel(activeMobileIndex + 1)}
           >
-            <ChevronRight className="h-8 w-8" />
+            <ChevronRight className="h-10 w-10" />
           </Button>
         </div>
       </div>

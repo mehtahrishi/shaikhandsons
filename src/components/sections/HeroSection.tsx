@@ -39,14 +39,14 @@ export function HeroSection() {
   ];
 
   return (
-    <section className="relative h-screen w-full bg-black overflow-hidden">
+    <section className="relative h-[80vh] min-h-[600px] w-full bg-black overflow-hidden">
       {/* Desktop Layout: Hover Accordion */}
       <div className="hidden md:flex h-full w-full">
         {panels.map((panel, index) => {
           const isHovered = hoveredIndex === index;
           const isAnyHovered = hoveredIndex !== null;
           
-          // Default: Center is slightly wider. On hover: Hovered is 2x wider.
+          // Default: Center is slightly wider. On hover: Hovered is 2.5x wider.
           let flexValue = 1;
           if (isAnyHovered) {
             flexValue = isHovered ? 2.5 : 0.75;

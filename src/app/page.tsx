@@ -4,7 +4,36 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { VehicleShowroom } from '@/components/vehicles/VehicleShowroom';
 import { HeroSection } from '@/components/sections/HeroSection';
-import { ShieldCheck, Leaf, BatteryCharging, Cpu } from 'lucide-react';
+import { ShieldCheck, Leaf, BatteryCharging, Cpu, Car } from 'lucide-react';
+
+const BikeIcon = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 358.945 358.945" 
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g>
+      <path d="M307.633,172.984c-6.389,0-12.61,1.174-18.524,3.479l-2.822-4.597l33.765-4.5c0.456-0.063,11.241-1.459,12.688-9.508
+        c2.558-14.259-27.574-37.293-92.126-70.442c-5.915-2.747-10.227-4.086-13.181-4.086c-3.524,0-4.857,1.892-5.338,3.005
+        c-2.606,6.008,9.121,21.804,20.645,35.245c-12.677-6.737-33.339-15.783-52.885-15.783c-9.833,0-18.417,2.306-25.517,6.854
+        c-5.626,3.591-12.784,13.06-21.344,28.138c-0.375-0.597-0.987-1.015-1.684-1.132l-50.752-8.983l-7.071-21.227
+        c-0.282-0.864-1.009-1.486-1.907-1.672c-0.973-0.184-24.085-4.666-44.883-4.666c-22.902,0-35.218,5.338-36.62,15.853
+        c-3.278,24.761,99.893,57.601,121.84,64.294c-5.134,11.463-9.206,21.227-11.334,26.469c-6.395-21.432-26.667-36.74-49.146-36.74
+        c-28.286,0-51.314,23.031-51.314,51.332c0,28.288,23.028,51.299,51.314,51.299c22.638,0,42.763-15.084,49.164-36.756h121.27
+        c0.823,0,1.615-0.414,2.078-1.099l37.308-54.812l1.999,3.255c-10.778,9.733-16.939,23.574-16.939,38.106
+        c0,28.294,23.022,51.299,51.317,51.299s51.312-23.005,51.312-51.299C358.945,196.016,335.921,172.984,307.633,172.984z
+         M292.639,132.17c0.985-1.36,2.9-2.054,5.717-2.054c1.934,0,4.257,0.324,6.917,0.981c20.903,15.165,23.089,22.71,22.536,25.875
+        c-0.78,4.398-8.305,5.419-8.395,5.425l-16.213,2.165C297.557,155.669,288.466,138.072,292.639,132.17z M93.274,219.038
+        c-0.459,0.589-1.198,0.942-1.96,0.942H54.924v13.859h34.735c0.834,0,1.625,0.414,2.083,1.135c0.469,0.696,0.556,1.598,0.21,2.359
+        c-5.233,12.244-17.219,20.158-30.522,20.158c-18.306,0-33.194-14.892-33.194-33.176c0-18.32,14.889-33.201,33.194-33.201
+        c15.574,0,28.85,10.617,32.33,25.797C93.938,217.669,93.76,218.443,93.274,219.038z M307.633,257.492
+        c-18.297,0-33.183-14.892-33.183-33.182c0-8.972,3.531-17.391,9.968-23.695c0.559-0.553,1.321-0.841,2.108-0.703
+        c0.708,0.091,1.387,0.523,1.789,1.172l14.352,23.322l7.302-4.491l-14.346-23.323c-0.384-0.637-0.48-1.435-0.228-2.161
+        c0.258-0.721,0.834-1.285,1.555-1.525c3.482-1.189,7.08-1.802,10.688-1.802c18.291,0,33.183,14.893,33.183,33.201
+        C340.81,242.601,325.917,257.492,307.633,257.492z" fill="currentColor" />
+    </g>
+  </svg>
+);
 
 export default function Home() {
   return (
@@ -12,26 +41,37 @@ export default function Home() {
       {/* Dynamic Hover Accordion Hero Section */}
       <HeroSection />
 
-      {/* Tech Specs Bar */}
-      <section className="bg-card border-y py-12">
+      {/* Category Sections (Replaces Tech Specs Bar) */}
+      <section className="bg-card border-y py-20">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center space-y-2">
-              <p className="text-primary text-3xl font-black font-headline">1.8s</p>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">0-60 MPH</p>
-            </div>
-            <div className="text-center space-y-2">
-              <p className="text-primary text-3xl font-black font-headline">840km</p>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Max Range</p>
-            </div>
-            <div className="text-center space-y-2">
-              <p className="text-primary text-3xl font-black font-headline">15min</p>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">80% Charge</p>
-            </div>
-            <div className="text-center space-y-2">
-              <p className="text-primary text-3xl font-black font-headline">A.I.</p>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Level 4 Autonomy</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
+            {/* Bike Category */}
+            <Link href="/category/bikes" className="group block">
+              <div className="bg-background border rounded-3xl p-12 lg:p-16 flex flex-col items-center justify-center transition-all duration-500 hover:border-primary/50 hover:shadow-[0_0_40px_rgba(var(--primary),0.1)] relative overflow-hidden h-full">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl transition-opacity group-hover:opacity-100 opacity-0" />
+                <div className="w-48 h-48 lg:w-64 lg:h-64 mb-10 text-muted-foreground group-hover:text-primary transition-colors duration-500">
+                  <BikeIcon className="w-full h-full" />
+                </div>
+                <div className="text-center">
+                  <h3 className="font-headline text-5xl lg:text-6xl font-black uppercase tracking-tighter mb-2">Bikes</h3>
+                  <p className="text-muted-foreground uppercase tracking-[0.3em] text-[10px] font-bold">Two-Wheeled Transcendence</p>
+                </div>
+              </div>
+            </Link>
+
+            {/* Car Category */}
+            <Link href="/category/cars" className="group block">
+              <div className="bg-background border rounded-3xl p-12 lg:p-16 flex flex-col items-center justify-center transition-all duration-500 hover:border-primary/50 hover:shadow-[0_0_40px_rgba(var(--primary),0.1)] relative overflow-hidden h-full">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl transition-opacity group-hover:opacity-100 opacity-0" />
+                <div className="w-48 h-48 lg:w-64 lg:h-64 mb-10 text-muted-foreground group-hover:text-primary transition-colors duration-500 flex items-center justify-center">
+                  <Car className="w-full h-full stroke-[0.5]" />
+                </div>
+                <div className="text-center">
+                  <h3 className="font-headline text-5xl lg:text-6xl font-black uppercase tracking-tighter mb-2">Cars</h3>
+                  <p className="text-muted-foreground uppercase tracking-[0.3em] text-[10px] font-bold">Four-Wheeled Excellence</p>
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
       </section>

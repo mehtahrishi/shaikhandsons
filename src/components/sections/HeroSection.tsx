@@ -53,27 +53,27 @@ export function HeroSection() {
       >
         <CarouselContent className="-ml-0 h-full">
           {slides.map((slide) => (
-            <CarouselItem key={slide.id} className="pl-0 h-full relative">
-              <div className="relative w-full h-full min-h-[500px]">
+            <CarouselItem key={slide.id} className="pl-0 h-full relative group">
+              <div className="relative w-full h-full min-h-[500px] overflow-hidden">
                 <Image
                   src={slide.image}
                   alt={slide.title}
                   fill
-                  className="object-cover"
+                  className="object-cover grayscale transition-all duration-1000 ease-in-out group-hover:grayscale-0"
                   priority
                   data-ai-hint={slide.hint}
                 />
                 {/* Overlays */}
-                <div className="absolute inset-0 bg-black/40" />
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-1000" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
                 
-                {/* Content */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-10">
+                {/* Content - Moved down above indicators */}
+                <div className="absolute inset-0 flex flex-col items-center justify-end pb-24 md:pb-32 p-8 text-center z-10">
                   <motion.div
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="space-y-4 max-w-4xl"
+                    className="space-y-2 max-w-4xl"
                   >
                     <p className="text-primary font-bold tracking-[0.4em] text-[10px] md:text-xs uppercase">
                       {slide.subtitle}
@@ -89,10 +89,10 @@ export function HeroSection() {
         </CarouselContent>
         
         {/* Custom Progress Indicators */}
-        <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-3 z-20 pointer-events-none">
+        <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-3 z-20 pointer-events-none">
           {slides.map((_, i) => (
-            <div key={i} className="h-[2px] w-8 rounded-full bg-white/20 overflow-hidden">
-              {/* Visual indicator for current active slide is decorative */}
+            <div key={i} className="h-[2px] w-12 rounded-full bg-white/20 overflow-hidden relative">
+              {/* Visual indicator bar */}
             </div>
           ))}
         </div>

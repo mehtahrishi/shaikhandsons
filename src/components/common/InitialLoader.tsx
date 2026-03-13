@@ -229,13 +229,13 @@ export function InitialLoader() {
                   transition={{ duration: 0.8, ease: "easeOut" }}
                   className="flex flex-col items-center relative"
                 >
-                  {/* Circular Frame for Branding */}
+                  {/* Circular Frame for Branding - Reduced Size */}
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                     <motion.div 
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.4, duration: 1, ease: "easeOut" }}
-                      className="w-[380px] h-[380px] border-[4px] border-primary rounded-full z-0 flex items-center justify-center relative"
+                      className="w-[280px] h-[280px] border-[4px] border-primary rounded-full z-0 flex items-center justify-center relative -translate-y-4"
                     >
                       {/* Secondary Inner Glow */}
                       <motion.div 
@@ -247,21 +247,21 @@ export function InitialLoader() {
                     </motion.div>
                   </div>
 
-                  <div className="z-10 flex flex-col items-center justify-center py-20 px-24">
+                  <div className="z-10 flex flex-col items-center justify-center py-12 px-16 -translate-y-4">
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: "100%" }}
                       transition={{ delay: 0.5, duration: 1 }}
-                      className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mb-6"
+                      className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mb-4"
                     />
-                    <h2 className="font-headline text-4xl md:text-5xl font-black text-white tracking-widest text-center whitespace-nowrap">
+                    <h2 className="font-headline text-3xl md:text-4xl font-black text-white tracking-widest text-center whitespace-nowrap">
                       SHAIKH <span className="text-primary italic">&</span> SONS
                     </h2>
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: "100%" }}
                       transition={{ delay: 0.5, duration: 1 }}
-                      className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mt-6"
+                      className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mt-4"
                     />
                   </div>
                 </motion.div>

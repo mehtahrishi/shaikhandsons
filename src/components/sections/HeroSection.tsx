@@ -18,7 +18,7 @@ export function HeroSection() {
       id: 'aether',
       title: 'AETHER',
       subtitle: 'TRANSCENDENTAL SEDAN',
-      image: PlaceHolderImages.find(img => img.id === 'model-aether')?.imageUrl || '',
+      image: '/images/1.png',
       hint: 'electric sedan teal',
       href: '/vehicles/v1',
       objectPosition: 'left center'
@@ -27,7 +27,7 @@ export function HeroSection() {
       id: 'lumina',
       title: 'LUMINA',
       subtitle: 'INFINITE SUV',
-      image: PlaceHolderImages.find(img => img.id === 'model-lumina')?.imageUrl || '',
+      image: '/images/image.png',
       hint: 'electric suv white',
       href: '/vehicles/v2',
       objectPosition: 'center'
@@ -36,7 +36,7 @@ export function HeroSection() {
       id: 'spectre',
       title: 'SPECTRE',
       subtitle: 'MASTER THE DARK',
-      image: PlaceHolderImages.find(img => img.id === 'model-noir')?.imageUrl || '',
+      image: '/images/2.png',
       hint: 'electric sports car black',
       href: '/vehicles/v3',
       objectPosition: 'right center'

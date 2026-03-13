@@ -20,7 +20,7 @@ export function HeroSection() {
       image: '/images/1.png',
       hint: 'electric sedan teal',
       href: '/vehicles/v1',
-      objectPosition: 'center'
+      objectPosition: 'left center'
     },
     {
       id: 'lumina',
@@ -38,12 +38,12 @@ export function HeroSection() {
       image: '/images/2.png',
       hint: 'electric sports car black',
       href: '/vehicles/v3',
-      objectPosition: 'center'
+      objectPosition: 'right center'
     }
   ];
 
   return (
-    <section className="relative h-[85vh] min-h-[600px] w-full bg-black overflow-hidden pt-[64px] md:pt-[72px]">
+    <section className="relative h-[85vh] min-h-[600px] w-full bg-black overflow-hidden pt-20">
       {/* Desktop Layout: Reveal Accordion */}
       <div className="hidden md:flex h-full w-full">
         {panels.map((panel, index) => {
@@ -69,15 +69,18 @@ export function HeroSection() {
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(1)}
             >
-              {/* FIXED SCALE IMAGE CONTAINER: This container is always 100vw wide. 
-                  The parent motion.div (panel) crops it. 
-                  Because the image is always 100vw, it NEVER zooms or magnifies when the panel expands. */}
+              {/* 
+                THE SLIDING VIEWPORT:
+                The container below is ALWAYS 100vw wide. 
+                Because its width never changes, the image inside NEVER zooms or scales.
+                The parent motion.div (the panel) simply masks it.
+              */}
               <div className="absolute inset-0 w-[100vw] h-full left-1/2 -translate-x-1/2 pointer-events-none">
                 <motion.div
                   className="absolute inset-0 w-full h-full"
                   animate={{
                     opacity: isHovered ? 1 : 0.4,
-                    filter: isHovered ? 'grayscale(0)' : 'grayscale(1)',
+                    filter: isHovered ? 'grayscale(0)' : 'grayscale(0.5)',
                   }}
                   transition={{ duration: 0.6 }}
                 >
@@ -148,7 +151,7 @@ export function HeroSection() {
               alt={panel.title}
               fill
               className="object-cover"
-              style={{ objectPosition: panel.objectPosition }}
+              style={{ objectPosition: 'center' }}
               data-ai-hint={panel.hint}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />

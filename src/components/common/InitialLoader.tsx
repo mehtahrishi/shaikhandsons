@@ -229,35 +229,39 @@ export function InitialLoader() {
                   transition={{ duration: 0.8, ease: "easeOut" }}
                   className="flex flex-col items-center relative"
                 >
-                  {/* Decorative Branding Ring - Centered behind text, slightly higher */}
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 0.6, scale: 1 }}
-                    transition={{ delay: 0.4, duration: 1, ease: "easeOut" }}
-                    className="absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-[3px] border-primary/50 rounded-full z-0"
-                  />
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 0.2, scale: 1.1 }}
-                    transition={{ delay: 0.5, duration: 1.2 }}
-                    className="absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-primary/20 rounded-full blur-2xl z-0"
-                  />
+                  {/* Circular Frame for Branding */}
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.4, duration: 1, ease: "easeOut" }}
+                      className="w-[380px] h-[380px] border-[4px] border-primary rounded-full z-0 flex items-center justify-center relative"
+                    >
+                      {/* Secondary Inner Glow */}
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 0.15, scale: 1.1 }}
+                        transition={{ delay: 0.5, duration: 1.2 }}
+                        className="absolute inset-0 bg-primary/20 rounded-full blur-3xl z-0"
+                      />
+                    </motion.div>
+                  </div>
 
-                  <div className="z-10 flex flex-col items-center">
+                  <div className="z-10 flex flex-col items-center justify-center py-20 px-24">
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: "100%" }}
                       transition={{ delay: 0.5, duration: 1 }}
-                      className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mb-4"
+                      className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mb-6"
                     />
-                    <h2 className="font-headline text-4xl md:text-5xl font-black text-white tracking-widest text-center">
+                    <h2 className="font-headline text-4xl md:text-5xl font-black text-white tracking-widest text-center whitespace-nowrap">
                       SHAIKH <span className="text-primary italic">&</span> SONS
                     </h2>
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: "100%" }}
                       transition={{ delay: 0.5, duration: 1 }}
-                      className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mt-4"
+                      className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mt-6"
                     />
                   </div>
                 </motion.div>

@@ -8,19 +8,19 @@
     },
     {
       "id": "model-aether",
-      "description": "Left hero image (Veridian Aether). Reference: public/images/1.png",
+      "description": "Left hero image (Veridian Aether).",
       "imageUrl": "/images/1.png",
       "imageHint": "electric sedan teal"
     },
     {
       "id": "model-lumina",
-      "description": "Middle hero image (Veridian Lumina). Reference: public/images/image.png",
+      "description": "Middle hero image (Veridian Lumina).",
       "imageUrl": "/images/image.png",
       "imageHint": "electric suv white"
     },
     {
       "id": "model-noir",
-      "description": "Right hero image (Noir Spectre). Reference: public/images/2.png",
+      "description": "Right hero image (Noir Spectre).",
       "imageUrl": "/images/2.png",
       "imageHint": "electric sports car black"
     },

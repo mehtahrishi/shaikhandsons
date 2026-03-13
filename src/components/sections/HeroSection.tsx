@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -18,7 +19,8 @@ export function HeroSection() {
       subtitle: 'TRANSCENDENTAL SEDAN',
       image: PlaceHolderImages.find(img => img.id === 'model-aether')?.imageUrl || '',
       hint: 'electric sedan teal',
-      href: '/vehicles/v1'
+      href: '/vehicles/v1',
+      objectPosition: 'left center'
     },
     {
       id: 'lumina',
@@ -26,7 +28,8 @@ export function HeroSection() {
       subtitle: 'INFINITE SUV',
       image: PlaceHolderImages.find(img => img.id === 'model-lumina')?.imageUrl || '',
       hint: 'electric suv white',
-      href: '/vehicles/v2'
+      href: '/vehicles/v2',
+      objectPosition: 'center'
     },
     {
       id: 'spectre',
@@ -34,7 +37,8 @@ export function HeroSection() {
       subtitle: 'MASTER THE DARK',
       image: PlaceHolderImages.find(img => img.id === 'model-noir')?.imageUrl || '',
       hint: 'electric sports car black',
-      href: '/vehicles/v3'
+      href: '/vehicles/v3',
+      objectPosition: 'right center'
     }
   ];
 
@@ -46,7 +50,6 @@ export function HeroSection() {
           const isHovered = hoveredIndex === index;
           const isAnyHovered = hoveredIndex !== null;
           
-          // Default: Center is slightly wider. On hover: Hovered is 2.5x wider.
           let flexValue = 1;
           if (isAnyHovered) {
             flexValue = isHovered ? 2.5 : 0.75;
@@ -79,7 +82,8 @@ export function HeroSection() {
                   src={panel.image}
                   alt={panel.title}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-all duration-500"
+                  style={{ objectPosition: panel.objectPosition }}
                   priority
                   data-ai-hint={panel.hint}
                 />
@@ -148,6 +152,7 @@ export function HeroSection() {
                 alt={panel.title}
                 fill
                 className="object-cover"
+                style={{ objectPosition: panel.objectPosition }}
                 data-ai-hint={panel.hint}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />

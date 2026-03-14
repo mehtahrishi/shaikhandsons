@@ -81,7 +81,7 @@ export function HeroSection() {
                   alt={slides[currentIndex].title}
                   fill
                   sizes="(max-width: 768px) 100vw, 70vw"
-                  className="object-contain"
+                  className="object-cover"
                   priority
                   data-ai-hint={slides[currentIndex].hint}
                 />

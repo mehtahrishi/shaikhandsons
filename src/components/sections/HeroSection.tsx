@@ -43,13 +43,13 @@ export function HeroSection() {
 
   return (
     <section className="relative w-full bg-black overflow-hidden pt-12 md:pt-20 pb-12 md:pb-20">
-      <div className="container mx-auto px-6 md:px-0 flex justify-center">
-        {/* Carousel Wrapper - 70% width on Desktop, Full on Mobile */}
-        <div className="relative w-full md:w-[70%] flex items-stretch justify-center aspect-[3/2] overflow-hidden shadow-2xl bg-black group/hero">
+      <div className="w-full flex justify-center">
+        {/* Carousel Wrapper - Full screen width to eliminate gaps */}
+        <div className="relative w-full flex items-stretch justify-center aspect-[3/2] overflow-hidden bg-black group/hero">
           
-          {/* Left Side Strip Peek - Shows center of previous image */}
+          {/* Left Side Strip Peek (15% Width) */}
           <div 
-            className="hidden md:flex w-[12%] cursor-pointer overflow-hidden relative z-30 transition-all duration-500 hover:w-[15%]"
+            className="hidden md:flex w-[15%] cursor-pointer overflow-hidden relative z-30 transition-all duration-500 hover:brightness-110"
             onMouseEnter={() => setSlide(getSlideIndex(-1))}
           >
             <div className="relative w-full h-full">
@@ -65,14 +65,14 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Active Center Container (The "Window") */}
-          <div className="relative flex-1 z-20 overflow-hidden bg-black">
+          {/* Active Center Container (70% Width) */}
+          <div className="relative w-full md:w-[70%] z-20 overflow-hidden bg-black">
             <AnimatePresence mode="wait">
               <motion.div
                 key={slides[currentIndex].id}
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -20, opacity: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
                 className="relative w-full h-full"
               >
@@ -100,7 +100,7 @@ export function HeroSection() {
                     <p className="text-primary font-bold tracking-[0.4em] text-[7px] md:text-[9px] uppercase">
                       {slides[currentIndex].subtitle}
                     </p>
-                    <h2 className="font-headline text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tighter uppercase">
+                    <h2 className="font-headline text-xl sm:text-2xl md:text-4xl font-black text-white tracking-tighter uppercase">
                       {slides[currentIndex].title}
                     </h2>
                     <div className="mt-4 md:mt-8">
@@ -114,9 +114,9 @@ export function HeroSection() {
             </AnimatePresence>
           </div>
 
-          {/* Right Side Strip Peek - Shows center of next image */}
+          {/* Right Side Strip Peek (15% Width) */}
           <div 
-            className="hidden md:flex w-[12%] cursor-pointer overflow-hidden relative z-30 transition-all duration-500 hover:w-[15%]"
+            className="hidden md:flex w-[15%] cursor-pointer overflow-hidden relative z-30 transition-all duration-500 hover:brightness-110"
             onMouseEnter={() => setSlide(getSlideIndex(1))}
           >
             <div className="relative w-full h-full">

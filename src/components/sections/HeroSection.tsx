@@ -47,9 +47,9 @@ export function HeroSection() {
         {/* Carousel Wrapper - Full screen width to eliminate gaps */}
         <div className="relative w-full flex items-stretch justify-center aspect-[3/2] md:aspect-auto overflow-hidden bg-black group/hero">
           
-          {/* Left Side Strip Peek (15% Width) */}
+          {/* Left Side Strip Peek (25% Width) */}
           <div 
-            className="hidden md:flex w-[15%] cursor-pointer overflow-hidden relative z-30 transition-all duration-500 hover:brightness-110"
+            className="hidden md:flex w-[25%] cursor-pointer overflow-hidden relative z-30 transition-all duration-500 hover:brightness-110"
             onMouseEnter={() => setSlide(getSlideIndex(-1))}
           >
             <div className="relative w-full h-full">
@@ -57,7 +57,7 @@ export function HeroSection() {
                 src={slides[getSlideIndex(-1)].image}
                 alt="Previous"
                 fill
-                sizes="15vw"
+                sizes="25vw"
                 className="object-cover object-center grayscale brightness-50 contrast-125"
                 data-ai-hint={slides[getSlideIndex(-1)].hint}
               />
@@ -65,8 +65,8 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Active Center Container (70% Width) */}
-          <div className="relative w-full md:w-[70%] aspect-[3/2] z-20 overflow-hidden bg-black">
+          {/* Active Center Container (50% Width) */}
+          <div className="relative w-full md:w-[50%] aspect-[3/2] z-20 overflow-hidden bg-black">
             <AnimatePresence mode="wait">
               <motion.div
                 key={slides[currentIndex].id}
@@ -80,7 +80,7 @@ export function HeroSection() {
                   src={slides[currentIndex].image}
                   alt={slides[currentIndex].title}
                   fill
-                  sizes="(max-width: 768px) 100vw, 70vw"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
                   priority
                   data-ai-hint={slides[currentIndex].hint}
@@ -100,7 +100,7 @@ export function HeroSection() {
                     <p className="text-primary font-bold tracking-[0.4em] text-[7px] md:text-[9px] uppercase">
                       {slides[currentIndex].subtitle}
                     </p>
-                    <h2 className="font-headline text-xl sm:text-2xl md:text-4xl font-black text-white tracking-tighter uppercase">
+                    <h2 className="font-headline text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tighter uppercase">
                       {slides[currentIndex].title}
                     </h2>
                     <div className="mt-4 md:mt-8">
@@ -114,9 +114,9 @@ export function HeroSection() {
             </AnimatePresence>
           </div>
 
-          {/* Right Side Strip Peek (15% Width) */}
+          {/* Right Side Strip Peek (25% Width) */}
           <div 
-            className="hidden md:flex w-[15%] cursor-pointer overflow-hidden relative z-30 transition-all duration-500 hover:brightness-110"
+            className="hidden md:flex w-[25%] cursor-pointer overflow-hidden relative z-30 transition-all duration-500 hover:brightness-110"
             onMouseEnter={() => setSlide(getSlideIndex(1))}
           >
             <div className="relative w-full h-full">
@@ -124,7 +124,7 @@ export function HeroSection() {
                 src={slides[getSlideIndex(1)].image}
                 alt="Next"
                 fill
-                sizes="15vw"
+                sizes="25vw"
                 className="object-cover object-center grayscale brightness-50 contrast-125"
                 data-ai-hint={slides[getSlideIndex(1)].hint}
               />

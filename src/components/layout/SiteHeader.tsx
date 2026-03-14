@@ -109,8 +109,8 @@ export function SiteHeader() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] bg-background border-r-border/50 flex flex-col p-0 overflow-hidden [&>button]:hidden no-scrollbar">
-              <SheetHeader className="p-6 border-b border-border/50 flex flex-row items-center justify-between">
+            <SheetContent side="left" className="w-[300px] bg-background/95 backdrop-blur-md border-r-border/50 flex flex-col p-0 overflow-hidden [&>button]:hidden no-scrollbar">
+              <SheetHeader className="px-6 h-12 border-b border-border/50 flex flex-row items-center justify-between shrink-0">
                 <SheetTitle className="text-left">
                   <span className="font-headline text-sm md:text-lg font-black text-primary uppercase">SHAIKH</span>
                   <span className="font-headline text-sm md:text-lg font-light tracking-widest text-foreground uppercase"> & SONS</span>

@@ -46,7 +46,7 @@ export function HeroSection() {
   const prevSlide = () => setSlide(getSlideIndex(-1));
 
   return (
-    <section className="relative w-full bg-black overflow-hidden pt-12 md:pt-20 pb-12 md:pb-24">
+    <section className="relative w-full bg-black overflow-hidden pt-20 md:pt-24 pb-12 md:pb-24">
       <div className="w-full">
         {/* Desktop & Tablet View: Interactive Window Slide (50% center) */}
         <div className="hidden md:flex w-full items-stretch justify-center bg-black group/hero">
@@ -137,9 +137,9 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* Mobile View: Normal Carousel with Buttons */}
-        <div className="flex md:hidden flex-col items-center w-full px-6">
-          <div className="relative w-full aspect-[3/2] rounded-2xl overflow-hidden group/mobile shadow-2xl">
+        {/* Mobile View: Normal Carousel with Buttons - No horizontal gaps */}
+        <div className="flex md:hidden flex-col items-center w-full px-0">
+          <div className="relative w-full aspect-[3/2] overflow-hidden group/mobile shadow-2xl">
             <AnimatePresence mode="wait">
               <motion.div
                 key={slides[currentIndex].id}

@@ -3,10 +3,21 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Sun, Moon, User, LogIn } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Menu, X, Sun, Moon, User, LogIn, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useToast } from '@/hooks/use-toast';
 
 const CrownIcon = () => (
   <svg viewBox="0 0 512 512" fill="currentColor" className="w-full h-full">
@@ -25,14 +36,40 @@ export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('shaikh_auth_token');
+      setIsAuthenticated(!!token);
+    };
+
+    checkAuth();
+    // Listen for storage changes in other tabs
+    window.addEventListener('storage', checkAuth);
+    
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('shaikh_auth_token');
+    setIsAuthenticated(false);
+    toast({
+      title: "Signed Out",
+      description: "Secure session terminated.",
+    });
+    router.push('/');
+  };
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -85,16 +122,46 @@ export function SiteHeader() {
           <Button variant="ghost" size="icon" onClick={toggleTheme} className="hidden sm:inline-flex">
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
-          <Link href="/login">
-            <Button variant="ghost" size="sm" className="hidden md:flex gap-2 text-[10px] uppercase font-bold tracking-widest">
-              <LogIn className="h-4 w-4 text-primary" /> Sign In
-            </Button>
-          </Link>
-          <Link href="/profile" className="md:hidden">
-            <Button variant="ghost" size="icon">
-              <User className="h-4 w-4" />
-            </Button>
-          </Link>
+
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar className="h-10 w-10 border border-border">
+                    <AvatarImage src="https://picsum.photos/seed/user/100/100" alt="User" />
+                    <AvatarFallback>VN</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-black leading-none uppercase tracking-tight">Julian Vane</p>
+                    <p className="text-xs leading-none text-muted-foreground">julian.vane@example.com</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>My Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link href="/login">
+              <Button variant="ghost" size="sm" className="hidden md:flex gap-2 text-[10px] uppercase font-bold tracking-widest">
+                <LogIn className="h-4 w-4 text-primary" /> Sign In
+              </Button>
+            </Link>
+          )}
+
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(true)}>
             <Menu className="h-6 w-6" />
           </Button>
@@ -129,9 +196,15 @@ export function SiteHeader() {
                 </Link>
               ))}
               <hr className="border-muted" />
-              <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-sm font-bold tracking-widest text-primary uppercase">Sign In</Link>
+              {isAuthenticated ? (
+                <>
+                  <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="text-sm font-bold tracking-widest text-primary uppercase">My Profile</Link>
+                  <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="text-left text-sm font-bold tracking-widest text-destructive uppercase">Logout</button>
+                </>
+              ) : (
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-sm font-bold tracking-widest text-primary uppercase">Sign In</Link>
+              )}
               <Link href="/admin/ai-tools" onClick={() => setMobileMenuOpen(false)} className="text-sm font-bold tracking-widest text-muted-foreground uppercase">Admin AI Tools</Link>
-              <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="text-sm font-bold tracking-widest text-muted-foreground uppercase">My Profile</Link>
             </nav>
             <div className="mt-auto">
               <Button className="w-full rounded-full h-14 font-black uppercase tracking-widest" size="lg">Request Quote</Button>

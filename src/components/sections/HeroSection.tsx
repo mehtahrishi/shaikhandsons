@@ -178,30 +178,30 @@ export function HeroSection() {
             {/* Mobile Nav Arrows */}
             <button 
               onClick={prevSlide}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white z-20"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white z-20"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-4 w-4" />
             </button>
             <button 
               onClick={nextSlide}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white z-20"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white z-20"
             >
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="h-4 w-4" />
             </button>
-          </div>
 
-          {/* Mobile Indicators (Dots) - Tightened layout */}
-          <div className="flex justify-center gap-3 mt-4 mb-4">
-            {slides.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setSlide(idx)}
-                className={cn(
-                  "transition-all duration-300 rounded-full",
-                  currentIndex === idx ? "w-8 h-1.5 bg-primary" : "w-1.5 h-1.5 bg-white/20"
-                )}
-              />
-            ))}
+            {/* Mobile Indicators (Dots) - Now INSIDE and ABSOLUTE */}
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3 z-30">
+              {slides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setSlide(idx)}
+                  className={cn(
+                    "transition-all duration-300 rounded-full",
+                    currentIndex === idx ? "w-8 h-1 bg-primary" : "w-1.5 h-1.5 bg-white/40"
+                  )}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>

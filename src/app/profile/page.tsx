@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useEffect, useState } from 'react';
@@ -53,22 +54,22 @@ export default function ProfilePage() {
       <Card className="w-full max-w-sm border-white/10 bg-black/40 backdrop-blur-xl relative overflow-hidden shadow-2xl">
         <div className="absolute top-0 left-0 w-full h-16 bg-gradient-to-b from-primary/10 to-transparent"></div>
         
-        <CardHeader className="pt-10 flex flex-col items-center relative z-10">
-          <div className="relative mb-4">
-            <Avatar className="h-16 w-16 border-2 border-background shadow-2xl">
+        <CardHeader className="pt-8 flex flex-col items-center relative z-10">
+          <div className="relative mb-3">
+            <Avatar className="h-14 w-14 border-2 border-background shadow-2xl">
               <AvatarImage src="https://picsum.photos/seed/user/200/200" alt="Julian Vane" />
-              <AvatarFallback className="text-lg font-black">JV</AvatarFallback>
+              <AvatarFallback className="text-base font-black">JV</AvatarFallback>
             </Avatar>
-            <div className="absolute -bottom-0.5 -right-0.5 bg-primary text-primary-foreground p-1 rounded-full shadow-lg border-2 border-background">
-              <ShieldCheck className="h-3 w-3" />
+            <div className="absolute -bottom-0.5 -right-0.5 bg-primary text-primary-foreground p-0.5 rounded-full shadow-lg border-2 border-background">
+              <ShieldCheck className="h-2.5 w-2.5" />
             </div>
           </div>
           
           <div className="text-center space-y-1">
-            <CardTitle className="font-headline text-xl font-black uppercase tracking-tight">
+            <CardTitle className="font-headline text-lg font-black uppercase tracking-tight">
               Julian Vane
             </CardTitle>
-            <Badge variant="outline" className="text-primary border-primary bg-primary/5 px-2 py-0 uppercase tracking-widest text-[8px] font-bold">
+            <Badge variant="outline" className="text-primary border-primary bg-primary/5 px-1.5 py-0 uppercase tracking-widest text-[7px] font-bold">
               Elite Collector Member
             </Badge>
           </div>
@@ -76,27 +77,27 @@ export default function ProfilePage() {
 
         <CardContent className="space-y-4 pt-4 px-6">
           <div className="grid grid-cols-2 gap-2">
-            <div className="p-2.5 rounded-lg bg-white/5 border border-white/5 text-center">
-              <p className="text-[8px] uppercase tracking-widest text-muted-foreground mb-1">Status</p>
-              <p className="font-bold text-[10px]">Verified Agent</p>
+            <div className="p-2 rounded-lg bg-white/5 border border-white/5 text-center">
+              <p className="text-[7px] uppercase tracking-widest text-muted-foreground mb-0.5">Status</p>
+              <p className="font-bold text-[9px]">Verified Agent</p>
             </div>
-            <div className="p-2.5 rounded-lg bg-white/5 border border-white/5 text-center">
-              <p className="text-[8px] uppercase tracking-widest text-muted-foreground mb-1">Fleet Access</p>
-              <p className="font-bold text-[10px]">Priority Tier</p>
+            <div className="p-2 rounded-lg bg-white/5 border border-white/5 text-center">
+              <p className="text-[7px] uppercase tracking-widest text-muted-foreground mb-0.5">Fleet Access</p>
+              <p className="font-bold text-[9px]">Priority Tier</p>
             </div>
           </div>
         </CardContent>
 
         <CardFooter className="flex flex-col gap-2 pb-8 px-6">
-          <Button className="w-full h-9 font-bold uppercase tracking-widest gap-2 text-[9px]">
-            <Settings className="h-4 w-4" /> Account Configuration
+          <Button className="w-full h-8 font-bold uppercase tracking-widest gap-2 text-[8px]">
+            <Settings className="h-3.5 w-3.5" /> Account Configuration
           </Button>
           <Button 
             variant="ghost" 
-            className="w-full h-9 font-bold uppercase tracking-widest text-destructive hover:bg-destructive/10 gap-2 text-[9px]"
+            className="w-full h-8 font-bold uppercase tracking-widest text-destructive hover:bg-destructive/10 gap-2 text-[8px]"
             onClick={handleSignOut}
           >
-            <LogOut className="h-4 w-4" /> Terminate Session
+            <LogOut className="h-3.5 w-3.5" /> Terminate Session
           </Button>
         </CardFooter>
       </Card>

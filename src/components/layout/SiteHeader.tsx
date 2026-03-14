@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -111,8 +112,8 @@ export function SiteHeader() {
             <SheetContent side="left" className="w-full sm:max-w-md bg-background border-r-border/50 flex flex-col p-0 overflow-hidden [&>button]:hidden no-scrollbar">
               <SheetHeader className="p-6 border-b border-border/50 flex flex-row items-center justify-between">
                 <SheetTitle className="text-left">
-                  <span className="font-headline text-base md:text-xl font-black text-primary uppercase">SHAIKH</span>
-                  <span className="font-headline text-base md:text-xl font-light tracking-widest text-foreground uppercase"> & SONS</span>
+                  <span className="font-headline text-base md:text-lg font-black text-primary uppercase">SHAIKH</span>
+                  <span className="font-headline text-base md:text-lg font-light tracking-widest text-foreground uppercase"> & SONS</span>
                 </SheetTitle>
                 <Button 
                   variant="ghost" 
@@ -138,7 +139,7 @@ export function SiteHeader() {
                         onClick={() => setMobileMenuOpen(false)}
                         className="group flex items-center justify-between py-1"
                       >
-                        <span className="font-headline text-sm md:text-lg font-bold tracking-tight uppercase group-hover:text-primary transition-colors">
+                        <span className="font-headline text-sm md:text-base font-bold tracking-tight uppercase group-hover:text-primary transition-colors">
                           {link.name}
                         </span>
                         <ChevronRight className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
@@ -213,7 +214,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="shrink-0">
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="shrink-0 hidden md:flex">
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
 

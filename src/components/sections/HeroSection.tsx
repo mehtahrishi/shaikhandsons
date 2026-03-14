@@ -1,4 +1,3 @@
-
 "use client"
 
 import React from 'react';
@@ -49,12 +48,12 @@ export function HeroSection() {
           startIndex: 1, // Sets the middle slide (Lumina) as default
         }}
         plugins={[plugin.current]}
-        className="w-full h-[75vh] md:h-[85vh]"
+        className="w-full h-[60vh] sm:h-[70vh] md:h-[85vh]"
       >
         <CarouselContent className="-ml-0 h-full">
           {slides.map((slide) => (
             <CarouselItem key={slide.id} className="pl-0 h-full relative group">
-              <div className="relative w-full h-full min-h-[500px] overflow-hidden">
+              <div className="relative w-full h-full min-h-[300px] sm:min-h-[450px] md:min-h-[600px] overflow-hidden">
                 <Image
                   src={slide.image}
                   alt={slide.title}
@@ -67,8 +66,8 @@ export function HeroSection() {
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-1000" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
                 
-                {/* Content - Moved further down just above indicators */}
-                <div className="absolute inset-0 flex flex-col items-center justify-end pb-16 md:pb-20 p-8 text-center z-10">
+                {/* Content - Responsive positioning */}
+                <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 sm:pb-16 md:pb-20 p-6 sm:p-8 text-center z-10">
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -78,7 +77,7 @@ export function HeroSection() {
                     <p className="text-primary font-bold tracking-[0.4em] text-[10px] md:text-xs uppercase">
                       {slide.subtitle}
                     </p>
-                    <h2 className="font-headline text-5xl md:text-8xl font-black text-white tracking-tighter">
+                    <h2 className="font-headline text-4xl sm:text-6xl md:text-8xl font-black text-white tracking-tighter">
                       {slide.title}
                     </h2>
                   </motion.div>
@@ -89,11 +88,9 @@ export function HeroSection() {
         </CarouselContent>
         
         {/* Custom Progress Indicators */}
-        <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-3 z-20 pointer-events-none">
+        <div className="absolute bottom-6 sm:bottom-10 left-0 right-0 flex justify-center gap-3 z-20 pointer-events-none">
           {slides.map((_, i) => (
-            <div key={i} className="h-[2px] w-12 rounded-full bg-white/20 overflow-hidden relative">
-              {/* Visual indicator bar could be animated based on carousel api state if needed */}
-            </div>
+            <div key={i} className="h-[2px] w-8 sm:w-12 rounded-full bg-white/20 overflow-hidden relative" />
           ))}
         </div>
       </Carousel>

@@ -3,12 +3,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Settings, LogOut, Clock, Calendar, Car, Loader2 } from 'lucide-react';
+import { Settings, LogOut, Loader2, User, ShieldCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
 
 export default function ProfilePage() {
   const [isVerifying, setIsVerifying] = useState(true);
@@ -36,109 +36,72 @@ export default function ProfilePage() {
       description: "Secure session terminated.",
     });
     router.push('/');
+    // Trigger storage event for navbar update
+    window.dispatchEvent(new Event('storage'));
   };
 
   if (isVerifying) {
     return (
-      <div className="h-screen flex items-center justify-center">
+      <div className="h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 text-primary animate-spin" />
       </div>
     );
   }
 
-  const history = [
-    { id: '1', item: 'Veridian Aether', type: 'Reservation', date: '2025-02-15', status: 'Pending' },
-    { id: '2', item: 'Veridian Lumina', type: 'Test Drive', date: '2025-01-10', status: 'Completed' },
-    { id: '3', item: 'Noir Spectre', type: 'Inquiry', date: '2024-12-05', status: 'Quote Sent' },
-  ];
-
   return (
-    <div className="container mx-auto px-6 py-32 min-h-screen">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Sidebar */}
-        <div className="space-y-6">
-          <Card className="overflow-hidden">
-            <div className="h-24 bg-primary"></div>
-            <CardContent className="pt-0 -mt-10 flex flex-col items-center">
-              <Avatar className="h-20 w-20 border-4 border-background mb-4">
-                <AvatarImage src="https://picsum.photos/seed/user/100/100" />
-                <AvatarFallback>VN</AvatarFallback>
-              </Avatar>
-              <h2 className="font-headline text-2xl font-bold">Julian Vane</h2>
-              <p className="text-sm text-muted-foreground mb-4">Collector Level: Gold</p>
-              <Button variant="outline" size="sm" className="w-full">
-                <Settings className="mr-2 h-4 w-4" /> Edit Profile
-              </Button>
-            </CardContent>
-          </Card>
+    <div className="container mx-auto px-6 py-32 min-h-[calc(100vh-80px)] flex items-center justify-center">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] -z-10"></div>
+      
+      <Card className="w-full max-w-lg border-white/10 bg-black/40 backdrop-blur-xl relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-primary/20 to-transparent"></div>
+        
+        <CardHeader className="pt-16 flex flex-col items-center relative z-10">
+          <div className="relative mb-6">
+            <Avatar className="h-32 w-32 border-4 border-background shadow-2xl">
+              <AvatarImage src="https://picsum.photos/seed/user/200/200" alt="Julian Vane" />
+              <AvatarFallback className="text-3xl font-black">JV</AvatarFallback>
+            </Avatar>
+            <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground p-2 rounded-full shadow-lg border-2 border-background">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+          </div>
           
+          <div className="text-center space-y-2">
+            <CardTitle className="font-headline text-4xl font-black uppercase tracking-tight">
+              Julian Vane
+            </CardTitle>
+            <Badge variant="outline" className="text-primary border-primary bg-primary/5 px-4 py-1 uppercase tracking-widest text-[10px] font-bold">
+              Elite Collector Member
+            </Badge>
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-6 pt-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Status</p>
+              <p className="font-bold text-sm">Verified Agent</p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Fleet Access</p>
+              <p className="font-bold text-sm">Priority Tier</p>
+            </div>
+          </div>
+        </CardContent>
+
+        <CardFooter className="flex flex-col gap-3 pb-12">
+          <Button className="w-full h-12 font-bold uppercase tracking-widest gap-2">
+            <Settings className="h-4 w-4" /> Account Configuration
+          </Button>
           <Button 
             variant="ghost" 
-            className="w-full justify-start text-destructive hover:bg-destructive/10"
+            className="w-full h-12 font-bold uppercase tracking-widest text-destructive hover:bg-destructive/10 gap-2"
             onClick={handleSignOut}
           >
-            <LogOut className="mr-2 h-4 w-4" /> Sign Out
+            <LogOut className="h-4 w-4" /> Terminate Session
           </Button>
-        </div>
-
-        {/* Content */}
-        <div className="lg:col-span-3 space-y-8">
-          <div className="flex justify-between items-end">
-            <div>
-              <h1 className="font-headline text-4xl font-black mb-2">My Garage</h1>
-              <p className="text-muted-foreground">Manage your reservations and inquiries.</p>
-            </div>
-            <div className="hidden md:flex gap-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold">1</p>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Reservations</p>
-              </div>
-              <div className="w-[1px] h-8 bg-border my-auto"></div>
-              <div className="text-center">
-                <p className="text-2xl font-bold">2</p>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Inquiries</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            {history.map((item) => (
-              <Card key={item.id} className="hover:border-primary/50 transition-colors">
-                <CardContent className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                      {item.type === 'Reservation' ? <Car className="h-6 w-6" /> : <Clock className="h-6 w-6" />}
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg">{item.item}</h3>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {item.date}</span>
-                        <span className="h-1 w-1 rounded-full bg-border"></span>
-                        <span>{item.type}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto">
-                    <Badge variant={item.status === 'Completed' ? 'secondary' : 'outline'} className={item.status === 'Pending' ? 'text-primary border-primary' : ''}>
-                      {item.status}
-                    </Badge>
-                    <Button variant="ghost" size="sm">View Details</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <Card className="bg-primary/5 border-dashed">
-            <CardContent className="p-12 text-center">
-              <Car className="h-12 w-12 text-primary mx-auto mb-4 opacity-50" />
-              <h3 className="font-headline text-xl font-bold mb-2">Build Your Next Masterpiece</h3>
-              <p className="text-muted-foreground mb-6">Explore our latest models and configure your perfect electronic luxury vehicle.</p>
-              <Button className="bg-primary hover:bg-primary/90">Browse Showroom</Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

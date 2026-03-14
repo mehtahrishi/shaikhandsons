@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -142,7 +141,6 @@ export function SiteHeader() {
                 <DropdownMenuLabel className="font-normal p-4">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-black leading-none uppercase tracking-tight">Julian Vane</p>
-                    <p className="text-xs leading-none text-muted-foreground">julian.vane@example.com</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-border/50" />

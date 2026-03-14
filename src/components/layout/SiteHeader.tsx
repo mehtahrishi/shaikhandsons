@@ -101,7 +101,7 @@ export function SiteHeader() {
     >
       <div className="container mx-auto px-6 flex items-center justify-between h-12">
         <div className="flex items-center gap-4">
-          {/* Mobile Menu Trigger (Now on the Left) */}
+          {/* Mobile Menu Trigger */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden shrink-0">
@@ -115,9 +115,7 @@ export function SiteHeader() {
                     <span className="font-headline text-2xl font-black text-primary uppercase">SHAIKH</span>
                     <span className="font-headline text-2xl font-light tracking-widest text-foreground uppercase"> & SONS</span>
                   </SheetTitle>
-                  <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
-                    <X className="h-6 w-6" />
-                  </Button>
+                  {/* Default ShadCN close button is handled by SheetPrimitive.Close in ui/sheet.tsx */}
                 </div>
               </SheetHeader>
 
@@ -145,10 +143,10 @@ export function SiteHeader() {
                   ))}
                 </nav>
 
-                <div className="mt-auto space-y-8">
+                <div className="mt-auto space-y-8 pb-10">
                   <div className="h-[1px] bg-border/50 w-full" />
                   
-                  {/* Account Section for Mobile (Integrated in Sidebar) */}
+                  {/* Account Section for Mobile */}
                   {isAuthenticated ? (
                     <div className="space-y-6">
                       <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-2xl border border-white/5">
@@ -217,13 +215,14 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        {/* Actions (Desktop only for Auth) */}
+        {/* Actions */}
         <div className="flex items-center gap-4 min-w-[120px] justify-end">
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="shrink-0">
+          {/* Hide theme toggle on mobile as requested */}
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="shrink-0 hidden md:inline-flex">
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
 
-          {/* Hydration-safe Auth UI (Desktop only) */}
+          {/* Hydration-safe Auth UI */}
           <div className="hidden md:block">
             {!mounted ? (
               <div className="w-10 h-10" />

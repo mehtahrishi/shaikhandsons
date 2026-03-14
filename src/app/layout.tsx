@@ -1,10 +1,10 @@
-
 import type {Metadata} from 'next';
 import './globals.css';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { Toaster } from '@/components/ui/toaster';
 import { InitialLoader } from '@/components/common/InitialLoader';
+import { CookieConsent } from '@/components/common/CookieConsent';
 
 export const metadata: Metadata = {
   title: 'Shaikh & Sons | High-Performance Electronic Mobility',
@@ -30,6 +30,7 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
+        <CookieConsent />
         <Toaster />
       </body>
     </html>

@@ -32,7 +32,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="container mx-auto px-6 py-32 min-h-screen flex items-center justify-center relative overflow-hidden">
+    <div className="container mx-auto px-6 py-20 flex-1 flex items-center justify-center relative overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -z-10"></div>
       
       <Card className="w-full max-w-md border-white/10 bg-black/40 backdrop-blur-xl">

@@ -95,9 +95,6 @@ export function SiteHeader() {
               <User className="h-4 w-4" />
             </Button>
           </Link>
-          <Button className="hidden md:flex rounded-full px-6 font-bold uppercase text-[10px] tracking-widest" variant="default" size="sm">
-            Book Test Drive
-          </Button>
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(true)}>
             <Menu className="h-6 w-6" />
           </Button>

@@ -2,13 +2,13 @@
 "use client"
 
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { VehicleShowroom } from '@/components/vehicles/VehicleShowroom';
 import { HeroSection } from '@/components/sections/HeroSection';
+import { VehicleShowroom } from '@/components/vehicles/VehicleShowroom';
 import { ShieldCheck, Leaf, BatteryCharging, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 
 const BikeIcon = ({ className }: { className?: string }) => (
   <svg 
@@ -75,7 +75,7 @@ export default function Home() {
       {/* Hero Section */}
       <HeroSection />
 
-      {/* Compact Category Bar */}
+      {/* Compact Category Bar - No Top Space */}
       <nav className="bg-background border-y border-border/50 z-40 relative overflow-hidden">
         <div className="container mx-auto px-6">
           <motion.div 

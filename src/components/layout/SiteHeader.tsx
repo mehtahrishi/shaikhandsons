@@ -109,7 +109,7 @@ export function SiteHeader() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] sm:max-w-md bg-background border-r-border/50 flex flex-col p-0 overflow-hidden [&>button]:hidden no-scrollbar">
+            <SheetContent side="left" className="w-[300px] bg-background border-r-border/50 flex flex-col p-0 overflow-hidden [&>button]:hidden no-scrollbar">
               <SheetHeader className="p-6 border-b border-border/50 flex flex-row items-center justify-between">
                 <SheetTitle className="text-left">
                   <span className="font-headline text-sm md:text-lg font-black text-primary uppercase">SHAIKH</span>
@@ -139,7 +139,7 @@ export function SiteHeader() {
                         onClick={() => setMobileMenuOpen(false)}
                         className="group flex items-center justify-between py-1"
                       >
-                        <span className="font-headline text-sm md:text-base font-bold tracking-tight uppercase group-hover:text-primary transition-colors">
+                        <span className="font-headline text-xs md:text-sm font-bold tracking-tight uppercase group-hover:text-primary transition-colors">
                           {link.name}
                         </span>
                         <ChevronRight className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
@@ -184,8 +184,8 @@ export function SiteHeader() {
 
           {/* Centered Brand on Mobile */}
           <Link href="/" className="flex items-center gap-2 group mx-auto md:mx-0">
-            <span className="font-headline text-base md:text-lg font-black tracking-tighter text-primary uppercase">SHAIKH</span>
-            <span className="font-headline text-base md:text-lg font-light tracking-widest text-foreground uppercase flex items-center">
+            <span className="font-headline text-sm md:text-lg font-black tracking-tighter text-primary uppercase">SHAIKH</span>
+            <span className="font-headline text-sm md:text-lg font-light tracking-widest text-foreground uppercase flex items-center">
               <span className="relative inline-flex items-center justify-center mr-1">
                 <span className="text-primary font-bold italic">&</span>
                 <span className="absolute -top-1.5 -left-0.5 w-2.5 h-2.5 -rotate-[15deg] text-primary transition-transform group-hover:scale-110">

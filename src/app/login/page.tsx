@@ -1,7 +1,7 @@
 
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,13 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem('shaikh_auth_token');
+    if (isAuthenticated) {
+      router.push('/profile');
+    }
+  }, [router]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,10 +39,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="container mx-auto px-6 py-24 flex-1 flex items-center justify-center relative overflow-hidden">
+    <div className="container mx-auto px-6 py-24 flex-1 flex items-center justify-center relative overflow-hidden min-h-[calc(100vh-200px)]">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -z-10"></div>
       
-      <Card className="w-full max-w-md border-white/10 bg-black/40 backdrop-blur-xl">
+      <Card className="w-full max-w-md border-white/10 bg-black/40 backdrop-blur-xl mt-8">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="font-headline text-3xl font-black uppercase tracking-tighter">
             Sign <span className="text-primary">In</span>

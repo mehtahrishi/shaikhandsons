@@ -190,8 +190,8 @@ export function HeroSection() {
             </button>
           </div>
 
-          {/* Mobile Indicators (Dots) */}
-          <div className="flex justify-center gap-3 mt-8 mb-12">
+          {/* Mobile Indicators (Dots) - Tightened layout */}
+          <div className="flex justify-center gap-3 mt-4 mb-4">
             {slides.map((_, idx) => (
               <button
                 key={idx}

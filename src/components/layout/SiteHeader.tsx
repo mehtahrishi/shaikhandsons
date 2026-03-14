@@ -138,10 +138,10 @@ export function SiteHeader() {
                         onClick={() => setMobileMenuOpen(false)}
                         className="group flex items-center justify-between py-1"
                       >
-                        <span className="font-headline text-xl md:text-2xl font-bold tracking-tight uppercase group-hover:text-primary transition-colors">
+                        <span className="font-headline text-base md:text-lg font-bold tracking-tight uppercase group-hover:text-primary transition-colors">
                           {link.name}
                         </span>
-                        <ChevronRight className="h-5 w-5 text-primary opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
+                        <ChevronRight className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
                       </Link>
                     </motion.div>
                   ))}
@@ -158,21 +158,21 @@ export function SiteHeader() {
                           <AvatarFallback>VN</AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-black text-xs uppercase tracking-tight">Julian Vane</p>
-                          <p className="text-[9px] text-primary font-bold uppercase tracking-widest">Collector Member</p>
+                          <p className="font-black text-[10px] uppercase tracking-tight">Julian Vane</p>
+                          <p className="text-[8px] text-primary font-bold uppercase tracking-widest">Collector Member</p>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
-                        <Button asChild variant="outline" className="h-9 font-bold uppercase tracking-widest text-[9px]">
+                        <Button asChild variant="outline" className="h-8 font-bold uppercase tracking-widest text-[8px]">
                           <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>My Garage</Link>
                         </Button>
-                        <Button onClick={handleLogout} variant="destructive" className="h-9 font-bold uppercase tracking-widest text-[9px]">
+                        <Button onClick={handleLogout} variant="destructive" className="h-8 font-bold uppercase tracking-widest text-[8px]">
                           Secure Logout
                         </Button>
                       </div>
                     </div>
                   ) : (
-                    <Button asChild className="w-full h-11 rounded-full font-black uppercase tracking-[0.2em] text-[9px]">
+                    <Button asChild className="w-full h-10 rounded-full font-black uppercase tracking-[0.2em] text-[8px]">
                       <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Authorize Entry</Link>
                     </Button>
                   )}
@@ -215,10 +215,10 @@ export function SiteHeader() {
           <div className="block">
             {!mounted ? (
               <div className="w-8 h-8" />
-            ) : isAuthenticated ? (
+            ) : isAuthenticated && !mobileMenuOpen ? (
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 md:h-9 md:w-9 rounded-full p-0 overflow-hidden border border-border/50 focus-visible:ring-offset-0 focus-visible:ring-0">
+                  <Button variant="ghost" className="relative h-8 w-8 md:h-9 md:w-9 rounded-full p-0 overflow-hidden border border-border/50 focus-visible:ring-offset-0 focus-visible:ring-0 hidden md:flex">
                     <Avatar className="h-8 w-8 md:h-9 md:w-9">
                       <AvatarImage src="https://picsum.photos/seed/user/100/100" alt="User" />
                       <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">VN</AvatarFallback>
@@ -247,13 +247,13 @@ export function SiteHeader() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : (
+            ) : !isAuthenticated ? (
               <Link href="/login">
                 <Button variant="ghost" size="sm" className="flex gap-2 text-[9px] uppercase font-bold tracking-widest h-8 md:h-9 px-3">
                   <LogIn className="h-4 w-4 text-primary" /> Sign In
                 </Button>
               </Link>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

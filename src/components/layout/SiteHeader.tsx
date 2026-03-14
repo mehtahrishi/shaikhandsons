@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, Sun, Moon, User, LogIn, LogOut, ChevronRight, Globe, Phone, X } from 'lucide-react';
+import { Menu, Sun, Moon, User, LogIn, LogOut, ChevronRight, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -97,22 +97,22 @@ export function SiteHeader() {
     <header 
       className={cn(
         "fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-background/95 backdrop-blur-md border-b border-border/50",
-        isScrolled ? "py-3 shadow-sm" : "py-5"
+        isScrolled ? "py-2 shadow-sm" : "py-4"
       )}
     >
       <div className="container mx-auto px-6 flex items-center justify-between h-12">
-        <div className="flex items-center gap-4 w-full md:w-auto">
+        <div className="flex items-center gap-4">
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden shrink-0">
-                <Menu className="h-6 w-6" />
+                <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-full sm:max-w-md bg-background border-r-border/50 flex flex-col p-0 overflow-hidden [&>button]:hidden">
-              <SheetHeader className="p-8 border-b border-border/50 flex flex-row items-center justify-between">
+            <SheetContent side="left" className="w-full sm:max-w-md bg-background border-r-border/50 flex flex-col p-0 overflow-hidden [&>button]:hidden no-scrollbar">
+              <SheetHeader className="p-6 border-b border-border/50 flex flex-row items-center justify-between">
                 <SheetTitle className="text-left">
-                  <span className="font-headline text-2xl font-black text-primary uppercase">SHAIKH</span>
-                  <span className="font-headline text-2xl font-light tracking-widest text-foreground uppercase"> & SONS</span>
+                  <span className="font-headline text-xl font-black text-primary uppercase">SHAIKH</span>
+                  <span className="font-headline text-xl font-light tracking-widest text-foreground uppercase"> & SONS</span>
                 </SheetTitle>
                 <Button 
                   variant="ghost" 
@@ -120,59 +120,59 @@ export function SiteHeader() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="hover:bg-white/5"
                 >
-                  <X className="h-6 w-6" />
+                  <X className="h-5 w-5" />
                 </Button>
               </SheetHeader>
 
-              <div className="flex-1 overflow-y-auto px-8 py-12 flex flex-col gap-10 no-scrollbar">
-                <nav className="flex flex-col gap-8">
+              <div className="flex-1 overflow-y-auto px-8 py-10 flex flex-col gap-8 no-scrollbar">
+                <nav className="flex flex-col gap-6">
                   {navLinks.map((link, idx) => (
                     <motion.div
                       key={link.name}
-                      initial={{ opacity: 0, x: -20 }}
+                      initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.1 }}
                     >
                       <Link 
                         href={link.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className="group flex items-center justify-between py-2"
+                        className="group flex items-center justify-between py-1"
                       >
-                        <span className="font-headline text-4xl font-bold tracking-tighter uppercase group-hover:text-primary transition-colors">
+                        <span className="font-headline text-2xl font-bold tracking-tight uppercase group-hover:text-primary transition-colors">
                           {link.name}
                         </span>
-                        <ChevronRight className="h-6 w-6 text-primary opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
+                        <ChevronRight className="h-5 w-5 text-primary opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
                       </Link>
                     </motion.div>
                   ))}
                 </nav>
 
-                <div className="mt-auto space-y-8 pb-10">
+                <div className="mt-auto space-y-6 pb-8">
                   <div className="h-[1px] bg-border/50 w-full" />
                   
                   {isAuthenticated ? (
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-2xl border border-white/5">
-                        <Avatar className="h-12 w-12 border border-primary/20">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl border border-white/5">
+                        <Avatar className="h-10 w-10 border border-primary/20">
                           <AvatarImage src="https://picsum.photos/seed/user/100/100" />
                           <AvatarFallback>VN</AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-black text-sm uppercase tracking-tight">Julian Vane</p>
-                          <p className="text-[10px] text-primary font-bold uppercase tracking-widest">Collector Member</p>
+                          <p className="font-black text-xs uppercase tracking-tight">Julian Vane</p>
+                          <p className="text-[9px] text-primary font-bold uppercase tracking-widest">Collector Member</p>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <Button asChild variant="outline" className="h-12 font-bold uppercase tracking-widest text-[10px]">
+                      <div className="grid grid-cols-2 gap-3">
+                        <Button asChild variant="outline" className="h-10 font-bold uppercase tracking-widest text-[9px]">
                           <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>My Garage</Link>
                         </Button>
-                        <Button onClick={handleLogout} variant="destructive" className="h-12 font-bold uppercase tracking-widest text-[10px]">
+                        <Button onClick={handleLogout} variant="destructive" className="h-10 font-bold uppercase tracking-widest text-[9px]">
                           Secure Logout
                         </Button>
                       </div>
                     </div>
                   ) : (
-                    <Button asChild className="w-full h-16 rounded-full font-black uppercase tracking-[0.2em] text-xs">
+                    <Button asChild className="w-full h-12 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">
                       <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Authorize Entry</Link>
                     </Button>
                   )}
@@ -181,76 +181,75 @@ export function SiteHeader() {
             </SheetContent>
           </Sheet>
 
-          <Link href="/" className="flex items-center gap-2 group shrink-0 mx-auto md:mx-0">
-            <span className="font-headline text-2xl font-black tracking-tighter text-primary uppercase">SHAIKH</span>
-            <span className="font-headline text-2xl font-light tracking-widest text-foreground uppercase flex items-center">
-              <span className="relative inline-flex items-center justify-center mr-2">
+          <Link href="/" className="flex items-center gap-2 group shrink-0">
+            <span className="font-headline text-xl font-black tracking-tighter text-primary uppercase">SHAIKH</span>
+            <span className="font-headline text-xl font-light tracking-widest text-foreground uppercase flex items-center">
+              <span className="relative inline-flex items-center justify-center mr-1">
                 <span className="text-primary font-bold italic">&</span>
-                <span className="absolute -top-3 -left-1 w-4 h-4 -rotate-[15deg] text-primary transition-transform group-hover:scale-110">
+                <span className="absolute -top-2 -left-1 w-3 h-3 -rotate-[15deg] text-primary transition-transform group-hover:scale-110">
                   <CrownIcon />
                 </span>
               </span>
               <span>SONS</span>
             </span>
           </Link>
-          <div className="w-10 md:hidden" /> {/* Spacer for centering branding on mobile */}
         </div>
 
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <Link 
               key={link.name} 
               href={link.href}
-              className="text-[10px] font-bold tracking-[0.2em] hover:text-primary transition-colors uppercase"
+              className="text-[9px] font-bold tracking-[0.2em] hover:text-primary transition-colors uppercase"
             >
               {link.name}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-4 min-w-[120px] justify-end">
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="shrink-0">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="shrink-0 hidden md:flex">
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
 
           <div className="block">
             {!mounted ? (
-              <div className="w-10 h-10" />
+              <div className="w-8 h-8" />
             ) : isAuthenticated ? (
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 overflow-hidden border border-border/50 focus-visible:ring-offset-0 focus-visible:ring-0">
-                    <Avatar className="h-10 w-10">
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0 overflow-hidden border border-border/50 focus-visible:ring-offset-0 focus-visible:ring-0">
+                    <Avatar className="h-9 w-9">
                       <AvatarImage src="https://picsum.photos/seed/user/100/100" alt="User" />
-                      <AvatarFallback className="bg-primary/10 text-primary font-bold">VN</AvatarFallback>
+                      <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">VN</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 mt-2 bg-background/95 backdrop-blur-xl border-border/50" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal p-4">
+                <DropdownMenuContent className="w-48 mt-2 bg-background/95 backdrop-blur-xl border-border/50" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal p-3">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-black leading-none uppercase tracking-tight">Julian Vane</p>
+                      <p className="text-xs font-black leading-none uppercase tracking-tight">Julian Vane</p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-border/50" />
-                  <DropdownMenuItem asChild className="cursor-pointer focus:bg-primary/10 p-3">
+                  <DropdownMenuItem asChild className="cursor-pointer focus:bg-primary/10 p-2">
                     <Link href="/profile" className="flex w-full items-center">
-                      <User className="mr-3 h-4 w-4 text-primary" />
-                      <span className="text-xs font-bold uppercase tracking-widest">My Garage</span>
+                      <User className="mr-2 h-4 w-4 text-primary" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">My Garage</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-border/50" />
-                  <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer p-3">
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer p-2">
                     <div className="flex w-full items-center">
-                      <LogOut className="mr-3 h-4 w-4" />
-                      <span className="text-xs font-bold uppercase tracking-widest">Secure Logout</span>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Secure Logout</span>
                     </div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <Link href="/login">
-                <Button variant="ghost" size="sm" className="flex gap-2 text-[10px] uppercase font-bold tracking-widest h-10 px-4">
+                <Button variant="ghost" size="sm" className="flex gap-2 text-[9px] uppercase font-bold tracking-widest h-9 px-3">
                   <LogIn className="h-4 w-4 text-primary" /> Sign In
                 </Button>
               </Link>

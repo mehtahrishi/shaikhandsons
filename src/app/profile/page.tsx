@@ -42,59 +42,59 @@ export default function ProfilePage() {
   if (isVerifying) {
     return (
       <div className="h-screen flex items-center justify-center bg-background">
-        <Loader2 className="h-12 w-12 text-primary animate-spin" />
+        <Loader2 className="h-10 w-10 text-primary animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-6 py-12 md:py-24 min-h-[calc(100vh-80px)] flex items-center justify-center relative">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[600px] aspect-square bg-primary/5 rounded-full blur-[120px] -z-10"></div>
+    <div className="container mx-auto px-6 py-10 md:py-20 min-h-[calc(100vh-80px)] flex items-center justify-center relative">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[500px] aspect-square bg-primary/5 rounded-full blur-[100px] -z-10"></div>
       
-      <Card className="w-full max-w-lg border-white/10 bg-black/40 backdrop-blur-xl relative overflow-hidden shadow-2xl">
-        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-primary/20 to-transparent"></div>
+      <Card className="w-full max-w-md border-white/10 bg-black/40 backdrop-blur-xl relative overflow-hidden shadow-2xl">
+        <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-primary/20 to-transparent"></div>
         
-        <CardHeader className="pt-16 flex flex-col items-center relative z-10">
-          <div className="relative mb-6">
-            <Avatar className="h-24 w-24 md:h-32 md:w-32 border-4 border-background shadow-2xl">
+        <CardHeader className="pt-12 flex flex-col items-center relative z-10">
+          <div className="relative mb-4">
+            <Avatar className="h-20 w-20 md:h-24 md:w-24 border-3 border-background shadow-2xl">
               <AvatarImage src="https://picsum.photos/seed/user/200/200" alt="Julian Vane" />
-              <AvatarFallback className="text-2xl md:text-3xl font-black">JV</AvatarFallback>
+              <AvatarFallback className="text-xl md:text-2xl font-black">JV</AvatarFallback>
             </Avatar>
-            <div className="absolute -bottom-1 -right-1 md:-bottom-2 md:-right-2 bg-primary text-primary-foreground p-1.5 md:p-2 rounded-full shadow-lg border-2 border-background">
-              <ShieldCheck className="h-4 w-4 md:h-5 md:w-5" />
+            <div className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground p-1 rounded-full shadow-lg border-2 border-background">
+              <ShieldCheck className="h-3 w-3 md:h-4 md:w-4" />
             </div>
           </div>
           
-          <div className="text-center space-y-2">
-            <CardTitle className="font-headline text-3xl md:text-4xl font-black uppercase tracking-tight">
+          <div className="text-center space-y-1.5">
+            <CardTitle className="font-headline text-2xl md:text-3xl font-black uppercase tracking-tight">
               Julian Vane
             </CardTitle>
-            <Badge variant="outline" className="text-primary border-primary bg-primary/5 px-4 py-1 uppercase tracking-widest text-[10px] font-bold">
+            <Badge variant="outline" className="text-primary border-primary bg-primary/5 px-3 py-0.5 uppercase tracking-widest text-[9px] font-bold">
               Elite Collector Member
             </Badge>
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-6 pt-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Status</p>
-              <p className="font-bold text-xs md:text-sm">Verified Agent</p>
+        <CardContent className="space-y-4 pt-4 px-6">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3 rounded-lg bg-white/5 border border-white/5 text-center">
+              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Status</p>
+              <p className="font-bold text-[11px] md:text-xs">Verified Agent</p>
             </div>
-            <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Fleet Access</p>
-              <p className="font-bold text-xs md:text-sm">Priority Tier</p>
+            <div className="p-3 rounded-lg bg-white/5 border border-white/5 text-center">
+              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Fleet Access</p>
+              <p className="font-bold text-[11px] md:text-xs">Priority Tier</p>
             </div>
           </div>
         </CardContent>
 
-        <CardFooter className="flex flex-col gap-3 pb-12 px-6">
-          <Button className="w-full h-12 font-bold uppercase tracking-widest gap-2 text-[10px] md:text-xs">
+        <CardFooter className="flex flex-col gap-2 pb-10 px-6">
+          <Button className="w-full h-10 font-bold uppercase tracking-widest gap-2 text-[10px]">
             <Settings className="h-4 w-4" /> Account Configuration
           </Button>
           <Button 
             variant="ghost" 
-            className="w-full h-12 font-bold uppercase tracking-widest text-destructive hover:bg-destructive/10 gap-2 text-[10px] md:text-xs"
+            className="w-full h-10 font-bold uppercase tracking-widest text-destructive hover:bg-destructive/10 gap-2 text-[10px]"
             onClick={handleSignOut}
           >
             <LogOut className="h-4 w-4" /> Terminate Session

@@ -41,7 +41,7 @@ export function HeroSection() {
   );
 
   return (
-    <section className="relative w-full bg-black overflow-hidden pt-[72px]">
+    <section className="relative w-full bg-black overflow-hidden pt-[64px]">
       <Carousel 
         opts={{
           align: "start",
@@ -69,17 +69,17 @@ export function HeroSection() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
                 
                 {/* Content */}
-                <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 sm:pb-16 md:pb-20 p-6 sm:p-8 text-center z-10">
+                <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 sm:pb-12 md:pb-20 p-6 sm:p-8 text-center z-10">
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 15 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="space-y-2 max-w-4xl"
+                    className="space-y-1.5 max-w-4xl"
                   >
-                    <p className="text-primary font-bold tracking-[0.4em] text-[10px] md:text-xs uppercase">
+                    <p className="text-primary font-bold tracking-[0.4em] text-[9px] md:text-xs uppercase">
                       {slide.subtitle}
                     </p>
-                    <h2 className="font-headline text-4xl sm:text-6xl md:text-8xl font-black text-white tracking-tighter">
+                    <h2 className="font-headline text-3xl sm:text-5xl md:text-8xl font-black text-white tracking-tighter">
                       {slide.title}
                     </h2>
                   </motion.div>

@@ -48,20 +48,22 @@ export function HeroSection() {
           loop: true,
         }}
         plugins={[plugin.current]}
-        className="w-full h-[70vh]"
+        className="w-full h-[60vh] md:h-[70vh]"
       >
         <CarouselContent className="-ml-0 h-full">
           {slides.map((slide) => (
             <CarouselItem key={slide.id} className="pl-0 h-full relative group bg-black">
-              <div className="relative w-full h-full overflow-hidden flex items-center justify-center">
-                <Image
-                  src={slide.image}
-                  alt={slide.title}
-                  fill
-                  className="object-contain transition-all duration-1000 ease-in-out"
-                  priority
-                  data-ai-hint={slide.hint}
-                />
+              <div className="relative w-full h-full overflow-hidden flex items-center justify-center bg-black">
+                <div className="relative w-full h-full max-w-[1920px] mx-auto">
+                  <Image
+                    src={slide.image}
+                    alt={slide.title}
+                    fill
+                    className="object-contain transition-all duration-1000 ease-in-out"
+                    priority
+                    data-ai-hint={slide.hint}
+                  />
+                </div>
                 
                 {/* Overlays */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
@@ -86,15 +88,6 @@ export function HeroSection() {
             </CarouselItem>
           ))}
         </CarouselContent>
-        
-        {/* Custom Progress Indicators */}
-        <div className="absolute bottom-6 sm:bottom-10 left-0 right-0 flex justify-center gap-3 z-20 pointer-events-none">
-          {slides.map((_, i) => (
-            <div key={i} className="h-[2px] w-8 sm:w-12 rounded-full bg-white/20 overflow-hidden relative">
-              <div className="absolute inset-0 bg-primary/20" />
-            </div>
-          ))}
-        </div>
       </Carousel>
     </section>
   );

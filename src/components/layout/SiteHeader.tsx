@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Menu, Sun, Moon, User, LogIn, LogOut, ChevronRight, Globe, Phone, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -101,7 +101,7 @@ export function SiteHeader() {
       )}
     >
       <div className="container mx-auto px-6 flex items-center justify-between h-12">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 w-full md:w-auto">
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden shrink-0">
@@ -120,9 +120,7 @@ export function SiteHeader() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="hover:bg-white/5"
                 >
-                  <motion.div whileTap={{ scale: 0.9 }}>
-                    <X className="h-6 w-6" />
-                  </motion.div>
+                  <X className="h-6 w-6" />
                 </Button>
               </SheetHeader>
 
@@ -178,21 +176,12 @@ export function SiteHeader() {
                       <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Authorize Entry</Link>
                     </Button>
                   )}
-
-                  <div className="flex justify-between items-center text-[10px] uppercase tracking-widest font-bold text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Globe className="h-3 w-3" /> <span>Global Support</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-3 w-3" /> <span>Concierge</span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </SheetContent>
           </Sheet>
 
-          <Link href="/" className="flex items-center gap-2 group shrink-0">
+          <Link href="/" className="flex items-center gap-2 group shrink-0 mx-auto md:mx-0">
             <span className="font-headline text-2xl font-black tracking-tighter text-primary uppercase">SHAIKH</span>
             <span className="font-headline text-2xl font-light tracking-widest text-foreground uppercase flex items-center">
               <span className="relative inline-flex items-center justify-center mr-2">
@@ -204,6 +193,7 @@ export function SiteHeader() {
               <span>SONS</span>
             </span>
           </Link>
+          <div className="w-10 md:hidden" /> {/* Spacer for centering branding on mobile */}
         </div>
 
         <nav className="hidden md:flex items-center gap-8">
@@ -218,12 +208,12 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-4 min-w-[120px] justify-end">
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="shrink-0 hidden md:inline-flex">
+        <div className="hidden md:flex items-center gap-4 min-w-[120px] justify-end">
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="shrink-0">
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
 
-          <div className="hidden md:block">
+          <div className="block">
             {!mounted ? (
               <div className="w-10 h-10" />
             ) : isAuthenticated ? (

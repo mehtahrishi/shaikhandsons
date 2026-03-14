@@ -100,7 +100,7 @@ export function SiteHeader() {
         isScrolled ? "py-2 shadow-sm" : "py-4"
       )}
     >
-      <div className="container mx-auto px-6 flex items-center justify-between h-12">
+      <div className="container mx-auto px-6 flex items-center justify-between h-10 md:h-12">
         <div className="flex items-center gap-4">
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
@@ -111,8 +111,8 @@ export function SiteHeader() {
             <SheetContent side="left" className="w-full sm:max-w-md bg-background border-r-border/50 flex flex-col p-0 overflow-hidden [&>button]:hidden no-scrollbar">
               <SheetHeader className="p-6 border-b border-border/50 flex flex-row items-center justify-between">
                 <SheetTitle className="text-left">
-                  <span className="font-headline text-xl font-black text-primary uppercase">SHAIKH</span>
-                  <span className="font-headline text-xl font-light tracking-widest text-foreground uppercase"> & SONS</span>
+                  <span className="font-headline text-lg md:text-xl font-black text-primary uppercase">SHAIKH</span>
+                  <span className="font-headline text-lg md:text-xl font-light tracking-widest text-foreground uppercase"> & SONS</span>
                 </SheetTitle>
                 <Button 
                   variant="ghost" 
@@ -138,7 +138,7 @@ export function SiteHeader() {
                         onClick={() => setMobileMenuOpen(false)}
                         className="group flex items-center justify-between py-1"
                       >
-                        <span className="font-headline text-2xl font-bold tracking-tight uppercase group-hover:text-primary transition-colors">
+                        <span className="font-headline text-xl md:text-2xl font-bold tracking-tight uppercase group-hover:text-primary transition-colors">
                           {link.name}
                         </span>
                         <ChevronRight className="h-5 w-5 text-primary opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
@@ -163,16 +163,16 @@ export function SiteHeader() {
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
-                        <Button asChild variant="outline" className="h-10 font-bold uppercase tracking-widest text-[9px]">
+                        <Button asChild variant="outline" className="h-9 font-bold uppercase tracking-widest text-[9px]">
                           <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>My Garage</Link>
                         </Button>
-                        <Button onClick={handleLogout} variant="destructive" className="h-10 font-bold uppercase tracking-widest text-[9px]">
+                        <Button onClick={handleLogout} variant="destructive" className="h-9 font-bold uppercase tracking-widest text-[9px]">
                           Secure Logout
                         </Button>
                       </div>
                     </div>
                   ) : (
-                    <Button asChild className="w-full h-12 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">
+                    <Button asChild className="w-full h-11 rounded-full font-black uppercase tracking-[0.2em] text-[9px]">
                       <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Authorize Entry</Link>
                     </Button>
                   )}
@@ -182,11 +182,11 @@ export function SiteHeader() {
           </Sheet>
 
           <Link href="/" className="flex items-center gap-2 group shrink-0">
-            <span className="font-headline text-xl font-black tracking-tighter text-primary uppercase">SHAIKH</span>
-            <span className="font-headline text-xl font-light tracking-widest text-foreground uppercase flex items-center">
+            <span className="font-headline text-lg md:text-xl font-black tracking-tighter text-primary uppercase">SHAIKH</span>
+            <span className="font-headline text-lg md:text-xl font-light tracking-widest text-foreground uppercase flex items-center">
               <span className="relative inline-flex items-center justify-center mr-1">
                 <span className="text-primary font-bold italic">&</span>
-                <span className="absolute -top-2 -left-1 w-3 h-3 -rotate-[15deg] text-primary transition-transform group-hover:scale-110">
+                <span className="absolute -top-1.5 -left-0.5 w-2.5 h-2.5 -rotate-[15deg] text-primary transition-transform group-hover:scale-110">
                   <CrownIcon />
                 </span>
               </span>
@@ -218,8 +218,8 @@ export function SiteHeader() {
             ) : isAuthenticated ? (
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0 overflow-hidden border border-border/50 focus-visible:ring-offset-0 focus-visible:ring-0">
-                    <Avatar className="h-9 w-9">
+                  <Button variant="ghost" className="relative h-8 w-8 md:h-9 md:w-9 rounded-full p-0 overflow-hidden border border-border/50 focus-visible:ring-offset-0 focus-visible:ring-0">
+                    <Avatar className="h-8 w-8 md:h-9 md:w-9">
                       <AvatarImage src="https://picsum.photos/seed/user/100/100" alt="User" />
                       <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">VN</AvatarFallback>
                     </Avatar>
@@ -249,7 +249,7 @@ export function SiteHeader() {
               </DropdownMenu>
             ) : (
               <Link href="/login">
-                <Button variant="ghost" size="sm" className="flex gap-2 text-[9px] uppercase font-bold tracking-widest h-9 px-3">
+                <Button variant="ghost" size="sm" className="flex gap-2 text-[9px] uppercase font-bold tracking-widest h-8 md:h-9 px-3">
                   <LogIn className="h-4 w-4 text-primary" /> Sign In
                 </Button>
               </Link>

@@ -42,53 +42,55 @@ export function HeroSection() {
 
   return (
     <section className="relative w-full bg-black overflow-hidden pt-[64px]">
-      <Carousel 
-        opts={{
-          align: "start",
-          loop: true,
-        }}
-        plugins={[plugin.current]}
-        className="w-full h-[60vh] md:h-[70vh]"
-      >
-        <CarouselContent className="-ml-0 h-full">
-          {slides.map((slide) => (
-            <CarouselItem key={slide.id} className="pl-0 h-full relative group bg-black">
-              <div className="relative w-full h-full overflow-hidden flex items-center justify-center bg-black">
-                <div className="relative w-full h-full max-w-[1920px] mx-auto">
+      <div className="container mx-auto px-0 md:px-6">
+        <Carousel 
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          plugins={[plugin.current]}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-0">
+            {slides.map((slide) => (
+              <CarouselItem key={slide.id} className="pl-0 relative group bg-black">
+                {/* 3:2 Aspect Ratio Container to prevent CLS and ensure zero cropping */}
+                <div className="relative w-full aspect-[3/2] overflow-hidden bg-black">
                   <Image
                     src={slide.image}
                     alt={slide.title}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1536px"
                     className="object-contain transition-all duration-1000 ease-in-out"
                     priority
                     data-ai-hint={slide.hint}
                   />
+                  
+                  {/* Overlays */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
+                  
+                  {/* Content */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-end pb-8 md:pb-16 p-6 text-center z-10">
+                    <motion.div
+                      initial={{ opacity: 0, y: 15 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      className="space-y-1.5 max-w-4xl"
+                    >
+                      <p className="text-primary font-bold tracking-[0.4em] text-[9px] md:text-xs uppercase">
+                        {slide.subtitle}
+                      </p>
+                      <h2 className="font-headline text-2xl sm:text-4xl md:text-7xl font-black text-white tracking-tighter">
+                        {slide.title}
+                      </h2>
+                    </motion.div>
+                  </div>
                 </div>
-                
-                {/* Overlays */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
-                
-                {/* Content */}
-                <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 sm:pb-12 md:pb-20 p-6 sm:p-8 text-center z-10">
-                  <motion.div
-                    initial={{ opacity: 0, y: 15 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="space-y-1.5 max-w-4xl"
-                  >
-                    <p className="text-primary font-bold tracking-[0.4em] text-[9px] md:text-xs uppercase">
-                      {slide.subtitle}
-                    </p>
-                    <h2 className="font-headline text-3xl sm:text-5xl md:text-8xl font-black text-white tracking-tighter">
-                      {slide.title}
-                    </h2>
-                  </motion.div>
-                </div>
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </div>
     </section>
   );
 }

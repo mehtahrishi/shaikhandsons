@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from 'react';
@@ -19,19 +20,19 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     
-    // Dummy login logic
+    // Step 1 of Auth: Credential Check
     setTimeout(() => {
       setLoading(false);
       toast({
-        title: "Welcome Back",
-        description: "Successfully signed into your Veridian account.",
+        title: "Credentials Validated",
+        description: "Please complete the security handshake.",
       });
-      router.push('/profile');
-    }, 1500);
+      router.push('/verify-otp');
+    }, 1200);
   };
 
   return (
-    <div className="container mx-auto px-6 pt-28 pb-20 flex-1 flex items-center justify-center relative overflow-hidden">
+    <div className="container mx-auto px-6 py-24 flex-1 flex items-center justify-center relative overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -z-10"></div>
       
       <Card className="w-full max-w-md border-white/10 bg-black/40 backdrop-blur-xl">

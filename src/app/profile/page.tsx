@@ -1,14 +1,51 @@
 
 "use client"
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Settings, LogOut, Clock, Calendar, Car } from 'lucide-react';
+import { Settings, LogOut, Clock, Calendar, Car, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProfilePage() {
+  const [isVerifying, setIsVerifying] = useState(true);
+  const router = useRouter();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem('shaikh_auth_token');
+    if (!isAuthenticated) {
+      toast({
+        title: "Unauthorized Access",
+        description: "Please sign in to access your garage.",
+        variant: "destructive"
+      });
+      router.push('/login');
+    } else {
+      setIsVerifying(false);
+    }
+  }, [router, toast]);
+
+  const handleSignOut = () => {
+    localStorage.removeItem('shaikh_auth_token');
+    toast({
+      title: "Signed Out",
+      description: "Secure session terminated.",
+    });
+    router.push('/');
+  };
+
+  if (isVerifying) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Loader2 className="h-12 w-12 text-primary animate-spin" />
+      </div>
+    );
+  }
+
   const history = [
     { id: '1', item: 'Veridian Aether', type: 'Reservation', date: '2025-02-15', status: 'Pending' },
     { id: '2', item: 'Veridian Lumina', type: 'Test Drive', date: '2025-01-10', status: 'Completed' },
@@ -35,7 +72,11 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
           
-          <Button variant="ghost" className="w-full justify-start text-destructive hover:bg-destructive/10">
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start text-destructive hover:bg-destructive/10"
+            onClick={handleSignOut}
+          >
             <LogOut className="mr-2 h-4 w-4" /> Sign Out
           </Button>
         </div>

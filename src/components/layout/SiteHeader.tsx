@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, X, Sun, Moon, User, LogIn, LogOut, Settings } from 'lucide-react';
+import { Menu, X, Sun, Moon, User, LogIn, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -37,17 +37,19 @@ export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  
   const router = useRouter();
   const { toast } = useToast();
 
   useEffect(() => {
+    setMounted(true);
     const checkAuth = () => {
-      const token = localStorage.getItem('shaikh_auth_token');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('shaikh_auth_token') : null;
       setIsAuthenticated(!!token);
     };
 
     checkAuth();
-    // Listen for storage changes in other tabs
     window.addEventListener('storage', checkAuth);
     
     const handleScroll = () => {
@@ -90,8 +92,8 @@ export function SiteHeader() {
         isScrolled ? "py-3 shadow-sm" : "py-5"
       )}
     >
-      <div className="container mx-auto px-6 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
+      <div className="container mx-auto px-6 flex items-center justify-between h-12">
+        <Link href="/" className="flex items-center gap-2 group shrink-0">
           <span className="font-headline text-2xl font-black tracking-tighter text-primary uppercase">SHAIKH</span>
           <span className="font-headline text-2xl font-light tracking-widest text-foreground uppercase flex items-center">
             <span className="relative inline-flex items-center justify-center mr-2">
@@ -118,51 +120,56 @@ export function SiteHeader() {
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="hidden sm:inline-flex">
+        <div className="flex items-center gap-4 min-w-[120px] justify-end">
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="hidden sm:inline-flex shrink-0">
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
 
-          {isAuthenticated ? (
-            <DropdownMenu>
+          {/* Hydration-safe Auth UI */}
+          {!mounted ? (
+            <div className="w-10 h-10" /> // Placeholder to maintain layout
+          ) : isAuthenticated ? (
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <Avatar className="h-10 w-10 border border-border">
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 overflow-hidden border border-border/50 focus-visible:ring-offset-0 focus-visible:ring-0">
+                  <Avatar className="h-10 w-10">
                     <AvatarImage src="https://picsum.photos/seed/user/100/100" alt="User" />
-                    <AvatarFallback>VN</AvatarFallback>
+                    <AvatarFallback className="bg-primary/10 text-primary font-bold">VN</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
+              <DropdownMenuContent className="w-56 mt-2 bg-background/95 backdrop-blur-xl border-border/50" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal p-4">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-black leading-none uppercase tracking-tight">Julian Vane</p>
                     <p className="text-xs leading-none text-muted-foreground">julian.vane@example.com</p>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/profile" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>My Profile</span>
+                <DropdownMenuSeparator className="bg-border/50" />
+                <DropdownMenuItem asChild className="cursor-pointer focus:bg-primary/10 p-3">
+                  <Link href="/profile" className="flex w-full items-center">
+                    <User className="mr-3 h-4 w-4 text-primary" />
+                    <span className="text-xs font-bold uppercase tracking-widest">My Garage</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Logout</span>
+                <DropdownMenuSeparator className="bg-border/50" />
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer p-3">
+                  <div className="flex w-full items-center">
+                    <LogOut className="mr-3 h-4 w-4" />
+                    <span className="text-xs font-bold uppercase tracking-widest">Secure Logout</span>
+                  </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Link href="/login">
-              <Button variant="ghost" size="sm" className="hidden md:flex gap-2 text-[10px] uppercase font-bold tracking-widest">
+              <Button variant="ghost" size="sm" className="hidden md:flex gap-2 text-[10px] uppercase font-bold tracking-widest h-10 px-4">
                 <LogIn className="h-4 w-4 text-primary" /> Sign In
               </Button>
             </Link>
           )}
 
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(true)}>
+          <Button variant="ghost" size="icon" className="md:hidden shrink-0" onClick={() => setMobileMenuOpen(true)}>
             <Menu className="h-6 w-6" />
           </Button>
         </div>

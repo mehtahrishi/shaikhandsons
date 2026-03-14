@@ -52,7 +52,7 @@ export default function ProfilePage() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[400px] aspect-square bg-primary/5 rounded-full blur-[80px] -z-10"></div>
       
       <Card className="w-full max-w-sm border-white/10 bg-black/40 backdrop-blur-xl relative overflow-hidden shadow-2xl">
-        <div className="absolute top-0 left-0 w-full h-16 bg-gradient-to-b from-primary/10 to-transparent"></div>
+        <div className="absolute top-0 left-0 w-full h-12 bg-gradient-to-b from-primary/10 to-transparent"></div>
         
         <CardHeader className="pt-8 flex flex-col items-center relative z-10">
           <div className="relative mb-3">

@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -107,15 +108,25 @@ export function SiteHeader() {
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-full sm:max-w-md bg-background border-r-border/50 flex flex-col p-0">
-              <SheetHeader className="p-8 border-b border-border/50 text-left">
+            <SheetContent side="left" className="w-full sm:max-w-md bg-background border-r-border/50 flex flex-col p-0 overflow-hidden [&>button]:hidden">
+              <SheetHeader className="p-8 border-b border-border/50 flex flex-row items-center justify-between">
                 <SheetTitle className="text-left">
                   <span className="font-headline text-2xl font-black text-primary uppercase">SHAIKH</span>
                   <span className="font-headline text-2xl font-light tracking-widest text-foreground uppercase"> & SONS</span>
                 </SheetTitle>
+                {/* Custom Close Icon positioned far right */}
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="hover:bg-white/5"
+                >
+                  <motion.div whileTap={{ scale: 0.9 }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  </motion.div>
+                </Button>
               </SheetHeader>
 
-              {/* Scrollbar hidden with no-scrollbar utility */}
               <div className="flex-1 overflow-y-auto px-8 py-12 flex flex-col gap-10 no-scrollbar">
                 <nav className="flex flex-col gap-8">
                   {navLinks.map((link, idx) => (

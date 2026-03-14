@@ -1,3 +1,4 @@
+
 "use client"
 
 import React from 'react';
@@ -48,12 +49,12 @@ export function HeroSection() {
           startIndex: 1, // Sets the middle slide (Lumina) as default
         }}
         plugins={[plugin.current]}
-        className="w-full h-[60vh] sm:h-[70vh] md:h-[85vh]"
+        className="w-full h-[65vh] md:h-[70vh]"
       >
         <CarouselContent className="-ml-0 h-full">
           {slides.map((slide) => (
             <CarouselItem key={slide.id} className="pl-0 h-full relative group">
-              <div className="relative w-full h-full min-h-[300px] sm:min-h-[450px] md:min-h-[600px] overflow-hidden">
+              <div className="relative w-full h-full min-h-[400px] overflow-hidden">
                 <Image
                   src={slide.image}
                   alt={slide.title}

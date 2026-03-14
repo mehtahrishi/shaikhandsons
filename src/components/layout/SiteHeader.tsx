@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Sun, Moon, User } from 'lucide-react';
+import { Menu, X, Sun, Moon, User, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -85,7 +85,12 @@ export function SiteHeader() {
           <Button variant="ghost" size="icon" onClick={toggleTheme} className="hidden sm:inline-flex">
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
-          <Link href="/profile">
+          <Link href="/login">
+            <Button variant="ghost" size="sm" className="hidden md:flex gap-2 text-[10px] uppercase font-bold tracking-widest">
+              <LogIn className="h-4 w-4 text-primary" /> Sign In
+            </Button>
+          </Link>
+          <Link href="/profile" className="md:hidden">
             <Button variant="ghost" size="icon">
               <User className="h-4 w-4" />
             </Button>
@@ -127,6 +132,7 @@ export function SiteHeader() {
                 </Link>
               ))}
               <hr className="border-muted" />
+              <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-sm font-bold tracking-widest text-primary uppercase">Sign In</Link>
               <Link href="/admin/ai-tools" onClick={() => setMobileMenuOpen(false)} className="text-sm font-bold tracking-widest text-muted-foreground uppercase">Admin AI Tools</Link>
               <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="text-sm font-bold tracking-widest text-muted-foreground uppercase">My Profile</Link>
             </nav>

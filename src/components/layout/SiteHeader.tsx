@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, X, Sun, Moon, User, LogIn, LogOut, ChevronRight, Globe, Phone } from 'lucide-react';
+import { Menu, Sun, Moon, User, LogIn, LogOut, ChevronRight, Globe, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -101,7 +101,6 @@ export function SiteHeader() {
     >
       <div className="container mx-auto px-6 flex items-center justify-between h-12">
         <div className="flex items-center gap-4">
-          {/* Mobile Menu Trigger */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden shrink-0">
@@ -109,18 +108,14 @@ export function SiteHeader() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-full sm:max-w-md bg-background border-r-border/50 flex flex-col p-0">
-              <SheetHeader className="p-8 border-b border-border/50">
-                <div className="flex items-center justify-between">
-                  <SheetTitle className="text-left">
-                    <span className="font-headline text-2xl font-black text-primary uppercase">SHAIKH</span>
-                    <span className="font-headline text-2xl font-light tracking-widest text-foreground uppercase"> & SONS</span>
-                  </SheetTitle>
-                  {/* Default ShadCN close button is handled by SheetPrimitive.Close in ui/sheet.tsx */}
-                </div>
+              <SheetHeader className="p-8 border-b border-border/50 text-left">
+                <SheetTitle className="text-left">
+                  <span className="font-headline text-2xl font-black text-primary uppercase">SHAIKH</span>
+                  <span className="font-headline text-2xl font-light tracking-widest text-foreground uppercase"> & SONS</span>
+                </SheetTitle>
               </SheetHeader>
 
               <div className="flex-1 overflow-y-auto px-8 py-12 flex flex-col gap-10">
-                {/* Navigation Links */}
                 <nav className="flex flex-col gap-8">
                   {navLinks.map((link, idx) => (
                     <motion.div
@@ -146,7 +141,6 @@ export function SiteHeader() {
                 <div className="mt-auto space-y-8 pb-10">
                   <div className="h-[1px] bg-border/50 w-full" />
                   
-                  {/* Account Section for Mobile */}
                   {isAuthenticated ? (
                     <div className="space-y-6">
                       <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-2xl border border-white/5">
@@ -174,7 +168,6 @@ export function SiteHeader() {
                     </Button>
                   )}
 
-                  {/* Footer Info in Mobile Menu */}
                   <div className="flex justify-between items-center text-[10px] uppercase tracking-widest font-bold text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Globe className="h-3 w-3" /> <span>Global Support</span>
@@ -202,7 +195,6 @@ export function SiteHeader() {
           </Link>
         </div>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <Link 
@@ -215,14 +207,11 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        {/* Actions */}
         <div className="flex items-center gap-4 min-w-[120px] justify-end">
-          {/* Hide theme toggle on mobile as requested */}
           <Button variant="ghost" size="icon" onClick={toggleTheme} className="shrink-0 hidden md:inline-flex">
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
 
-          {/* Hydration-safe Auth UI */}
           <div className="hidden md:block">
             {!mounted ? (
               <div className="w-10 h-10" />

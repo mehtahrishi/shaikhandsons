@@ -45,7 +45,7 @@ export function HeroSection() {
     <section className="relative w-full bg-black overflow-hidden pt-12 md:pt-20 pb-12 md:pb-20">
       <div className="w-full flex justify-center">
         {/* Carousel Wrapper - Full screen width to eliminate gaps */}
-        <div className="relative w-full flex items-stretch justify-center aspect-[3/2] overflow-hidden bg-black group/hero">
+        <div className="relative w-full flex items-stretch justify-center aspect-[3/2] md:aspect-auto overflow-hidden bg-black group/hero">
           
           {/* Left Side Strip Peek (15% Width) */}
           <div 
@@ -66,7 +66,7 @@ export function HeroSection() {
           </div>
 
           {/* Active Center Container (70% Width) */}
-          <div className="relative w-full md:w-[70%] z-20 overflow-hidden bg-black">
+          <div className="relative w-full md:w-[70%] aspect-[3/2] z-20 overflow-hidden bg-black">
             <AnimatePresence mode="wait">
               <motion.div
                 key={slides[currentIndex].id}

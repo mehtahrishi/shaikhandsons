@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useEffect, useState } from 'react';
@@ -48,17 +47,17 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="container mx-auto px-6 py-12 md:py-24 min-h-[calc(100vh-140px)] flex items-center justify-center relative">
+    <div className="container mx-auto px-6 py-12 min-h-[calc(100vh-140px)] flex items-center justify-center relative">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[400px] aspect-square bg-primary/5 rounded-full blur-[80px] -z-10"></div>
       
       <Card className="w-full max-w-sm border-white/10 bg-black/40 backdrop-blur-xl relative overflow-hidden shadow-2xl">
-        <div className="absolute top-0 left-0 w-full h-16 md:h-20 bg-gradient-to-b from-primary/10 to-transparent"></div>
+        <div className="absolute top-0 left-0 w-full h-16 bg-gradient-to-b from-primary/10 to-transparent"></div>
         
-        <CardHeader className="pt-10 md:pt-12 flex flex-col items-center relative z-10">
+        <CardHeader className="pt-10 flex flex-col items-center relative z-10">
           <div className="relative mb-4">
-            <Avatar className="h-16 w-16 md:h-20 md:w-20 border-2 border-background shadow-2xl">
+            <Avatar className="h-16 w-16 border-2 border-background shadow-2xl">
               <AvatarImage src="https://picsum.photos/seed/user/200/200" alt="Julian Vane" />
-              <AvatarFallback className="text-lg md:text-xl font-black">JV</AvatarFallback>
+              <AvatarFallback className="text-lg font-black">JV</AvatarFallback>
             </Avatar>
             <div className="absolute -bottom-0.5 -right-0.5 bg-primary text-primary-foreground p-1 rounded-full shadow-lg border-2 border-background">
               <ShieldCheck className="h-3 w-3" />
@@ -66,7 +65,7 @@ export default function ProfilePage() {
           </div>
           
           <div className="text-center space-y-1">
-            <CardTitle className="font-headline text-xl md:text-2xl font-black uppercase tracking-tight">
+            <CardTitle className="font-headline text-xl font-black uppercase tracking-tight">
               Julian Vane
             </CardTitle>
             <Badge variant="outline" className="text-primary border-primary bg-primary/5 px-2 py-0 uppercase tracking-widest text-[8px] font-bold">

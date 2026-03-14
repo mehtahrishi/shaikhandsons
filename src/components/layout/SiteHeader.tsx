@@ -115,7 +115,8 @@ export function SiteHeader() {
                 </SheetTitle>
               </SheetHeader>
 
-              <div className="flex-1 overflow-y-auto px-8 py-12 flex flex-col gap-10">
+              {/* Scrollbar hidden with no-scrollbar utility */}
+              <div className="flex-1 overflow-y-auto px-8 py-12 flex flex-col gap-10 no-scrollbar">
                 <nav className="flex flex-col gap-8">
                   {navLinks.map((link, idx) => (
                     <motion.div

@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -9,12 +10,11 @@ export function CookieConsent() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Check if user has already accepted cookies
     const hasAccepted = localStorage.getItem('shaikh_cookies_accepted');
     if (!hasAccepted) {
       const timer = setTimeout(() => {
         setIsVisible(true);
-      }, 2000); // Delay appearance for better UX
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, []);
@@ -34,7 +34,6 @@ export function CookieConsent() {
           className="fixed bottom-6 left-6 right-6 md:left-auto md:right-6 md:max-w-md z-[60]"
         >
           <div className="bg-background/80 backdrop-blur-2xl border border-white/10 p-6 rounded-2xl shadow-2xl relative overflow-hidden group">
-            {/* Subtle Gradient Glow */}
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-[80px] group-hover:bg-primary/20 transition-colors duration-700" />
             
             <div className="flex gap-4 relative z-10">

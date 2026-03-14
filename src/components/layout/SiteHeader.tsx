@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, Sun, Moon, User, LogIn, LogOut, ChevronRight, Globe, Phone } from 'lucide-react';
+import { Menu, Sun, Moon, User, LogIn, LogOut, ChevronRight, Globe, Phone, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -114,7 +114,6 @@ export function SiteHeader() {
                   <span className="font-headline text-2xl font-black text-primary uppercase">SHAIKH</span>
                   <span className="font-headline text-2xl font-light tracking-widest text-foreground uppercase"> & SONS</span>
                 </SheetTitle>
-                {/* Custom Close Icon positioned far right */}
                 <Button 
                   variant="ghost" 
                   size="icon" 
@@ -122,7 +121,7 @@ export function SiteHeader() {
                   className="hover:bg-white/5"
                 >
                   <motion.div whileTap={{ scale: 0.9 }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    <X className="h-6 w-6" />
                   </motion.div>
                 </Button>
               </SheetHeader>

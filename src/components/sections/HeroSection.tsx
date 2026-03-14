@@ -17,21 +17,21 @@ export function HeroSection() {
       id: 'aether',
       title: 'AETHER',
       subtitle: 'TRANSCENDENTAL SEDAN',
-      image: 'https://picsum.photos/seed/ev1/1920/1080', // Using dynamic placeholders as fallback
+      image: '/images/1.png',
       hint: 'electric luxury sedan teal',
     },
     {
       id: 'lumina',
       title: 'LUMINA',
       subtitle: 'INFINITE SUV',
-      image: 'https://picsum.photos/seed/ev2/1920/1080',
+      image: '/images/image.png',
       hint: 'electric luxury suv white',
     },
     {
       id: 'spectre',
       title: 'SPECTRE',
       subtitle: 'MASTER THE DARK',
-      image: 'https://picsum.photos/seed/ev3/1920/1080',
+      image: '/images/2.png',
       hint: 'electric sports car black',
     }
   ];
@@ -48,23 +48,23 @@ export function HeroSection() {
           loop: true,
         }}
         plugins={[plugin.current]}
-        className="w-full h-[60vh] md:h-[70vh]"
+        className="w-full h-[70vh]"
       >
         <CarouselContent className="-ml-0 h-full">
           {slides.map((slide) => (
-            <CarouselItem key={slide.id} className="pl-0 h-full relative group">
-              <div className="relative w-full h-full overflow-hidden">
+            <CarouselItem key={slide.id} className="pl-0 h-full relative group bg-black">
+              <div className="relative w-full h-full overflow-hidden flex items-center justify-center">
                 <Image
                   src={slide.image}
                   alt={slide.title}
                   fill
-                  className="object-cover object-center grayscale transition-all duration-1000 ease-in-out group-hover:grayscale-0"
+                  className="object-contain transition-all duration-1000 ease-in-out"
                   priority
                   data-ai-hint={slide.hint}
                 />
+                
                 {/* Overlays */}
-                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-1000" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
                 
                 {/* Content */}
                 <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 sm:pb-16 md:pb-20 p-6 sm:p-8 text-center z-10">

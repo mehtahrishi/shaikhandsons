@@ -36,7 +36,6 @@ export default function ProfilePage() {
       description: "Secure session terminated.",
     });
     router.push('/');
-    // Trigger storage event for navbar update
     window.dispatchEvent(new Event('storage'));
   };
 
@@ -49,12 +48,10 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="container mx-auto px-6 pt-24 pb-12 md:py-32 min-h-[calc(100vh-80px)] flex items-center justify-center relative">
-      {/* Background Glow */}
+    <div className="container mx-auto px-6 py-12 md:py-24 min-h-[calc(100vh-80px)] flex items-center justify-center relative">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[600px] aspect-square bg-primary/5 rounded-full blur-[120px] -z-10"></div>
       
       <Card className="w-full max-w-lg border-white/10 bg-black/40 backdrop-blur-xl relative overflow-hidden shadow-2xl">
-        {/* Visual Accent */}
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-primary/20 to-transparent"></div>
         
         <CardHeader className="pt-16 flex flex-col items-center relative z-10">

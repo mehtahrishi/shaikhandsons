@@ -8,21 +8,17 @@ import {
   Settings, 
   LogOut, 
   Loader2, 
-  ShieldCheck, 
-  Zap, 
-  Car, 
-  Clock, 
+  ShieldCheck,
   ChevronRight,
   ShieldAlert,
-  Crown
+  User as UserIcon
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAuth } from '@/context/AuthContext';
-import { vehicles } from '@/lib/mock-data';
 
 const CrownIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 512 512" fill="currentColor" className={className}>
@@ -46,7 +42,7 @@ export default function ProfilePage() {
     if (!loading && !user) {
       toast({
         title: "Unauthorized Access",
-        description: "Please sign in to access your garage.",
+        description: "Please sign in to access your profile.",
         variant: "destructive"
       });
       router.push('/login');
@@ -57,7 +53,7 @@ export default function ProfilePage() {
     await logout();
     toast({
       title: "Secure Logout",
-      description: "Encrypted session terminated successfully.",
+      description: "Identity session terminated successfully.",
     });
     router.push('/');
   };
@@ -67,206 +63,94 @@ export default function ProfilePage() {
       <div className="h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-10 w-10 text-primary animate-spin" />
-          <p className="font-headline text-xs uppercase tracking-[0.4em] text-muted-foreground">Initializing Garage...</p>
+          <p className="font-headline text-xs uppercase tracking-[0.4em] text-muted-foreground">Confirming Identity...</p>
         </div>
       </div>
     );
   }
 
-  // Mock Active Reservation
-  const activeReservation = vehicles[0];
-
   return (
-    <div className="min-h-screen bg-[#020202] pt-32 pb-24 relative overflow-hidden">
+    <div className="min-h-screen bg-[#020202] pt-32 pb-24 relative overflow-hidden flex items-center">
       {/* Cinematic Background Elements */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1200px] h-[600px] bg-primary/5 rounded-full blur-[160px] opacity-40 pointer-events-none" />
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[800px] h-[800px] bg-primary/5 rounded-full blur-[160px] opacity-40 pointer-events-none" />
       
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* LEFT COLUMN: Profile & Identity */}
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="lg:col-span-4 space-y-8"
-          >
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
-              
-              <div className="flex flex-col items-center text-center space-y-6">
-                <div className="relative">
-                  <motion.div 
-                    whileHover={{ scale: 1.05 }}
-                    className="relative z-10"
-                  >
-                    <Avatar className="h-28 w-28 border-2 border-primary/20 p-1 bg-black/40 shadow-[0_0_30px_rgba(239,68,68,0.15)]">
-                      <AvatarImage src={`https://picsum.photos/seed/${user.email}/200/200`} />
-                      <AvatarFallback className="text-2xl font-black bg-primary/10">{user.name?.slice(0, 2).toUpperCase() || 'CP'}</AvatarFallback>
-                    </Avatar>
-                  </motion.div>
-                  <div className="absolute -bottom-1 -right-1 bg-primary text-white p-1.5 rounded-full shadow-lg border-2 border-[#020202] z-20">
-                    <CrownIcon className="h-4 w-4" />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <h1 className="font-headline text-3xl font-black uppercase tracking-tighter text-white">
-                    {user.name || "Elite Collector"}
-                  </h1>
-                  <div className="flex flex-col items-center gap-2">
-                    <Badge variant="outline" className="text-primary border-primary bg-primary/5 px-3 py-0.5 uppercase tracking-[0.2em] text-[8px] font-black">
-                      Elite Member <span className="mx-1 text-white">|</span> Tier Alpha
-                    </Badge>
-                    <p className="text-[10px] text-muted-foreground font-mono tracking-widest">{user.email.toLowerCase()}</p>
-                  </div>
-                </div>
-
-                <div className="w-full pt-6 border-t border-white/5 grid grid-cols-2 gap-4">
-                  <div className="text-center">
-                    <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Fleet Access</p>
-                    <p className="font-black text-white">PRIORITY</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Agent ID</p>
-                    <p className="font-black text-white">#{user.$id.slice(-6).toUpperCase()}</p>
-                  </div>
+      <div className="container mx-auto px-6 relative z-10 flex justify-center">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-xl"
+        >
+          <Card className="bg-white/5 backdrop-blur-2xl border-white/10 rounded-[2rem] overflow-hidden shadow-2xl">
+            <CardHeader className="text-center pt-12 pb-8 space-y-6">
+              <div className="relative mx-auto w-fit">
+                <motion.div 
+                  whileHover={{ scale: 1.05 }}
+                  className="relative z-10"
+                >
+                  <Avatar className="h-32 w-32 border-2 border-primary/20 p-1 bg-black/40 shadow-[0_0_40px_rgba(239,68,68,0.15)]">
+                    <AvatarImage src={`https://picsum.photos/seed/${user.email}/200/200`} />
+                    <AvatarFallback className="text-3xl font-black bg-primary/10 text-white">
+                      {user.name?.slice(0, 2).toUpperCase() || 'CP'}
+                    </AvatarFallback>
+                  </Avatar>
+                </motion.div>
+                <div className="absolute -bottom-1 -right-1 bg-primary text-white p-2 rounded-full shadow-lg border-2 border-[#020202] z-20">
+                  <CrownIcon className="h-5 w-5" />
                 </div>
               </div>
-            </div>
 
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 space-y-4">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2">
-                <ShieldCheck className="h-3 w-3" /> Security Protocol
-              </h3>
+              <div className="space-y-2">
+                <CardTitle className="font-headline text-4xl font-black uppercase tracking-tighter text-white">
+                  {user.name || "Elite Collector"}
+                </CardTitle>
+                <CardDescription className="flex flex-col items-center gap-3">
+                  <Badge variant="outline" className="text-primary border-primary bg-primary/5 px-4 py-1 uppercase tracking-[0.2em] text-[10px] font-black">
+                    Elite Member <span className="mx-2 text-white/40">|</span> Tier Alpha
+                  </Badge>
+                  <span className="font-mono text-xs text-muted-foreground tracking-widest">{user.email.toLowerCase()}</span>
+                </CardDescription>
+              </div>
+            </CardHeader>
+
+            <CardContent className="px-10 pb-12 space-y-8">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-6 bg-white/5 rounded-3xl border border-white/5 text-center">
+                  <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Access Level</p>
+                  <p className="font-black text-white text-sm uppercase">Priority</p>
+                </div>
+                <div className="p-6 bg-white/5 rounded-3xl border border-white/5 text-center">
+                  <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Agent ID</p>
+                  <p className="font-black text-white text-sm">#{user.$id.slice(-6).toUpperCase()}</p>
+                </div>
+              </div>
+
               <div className="space-y-3">
-                <Button variant="ghost" className="w-full justify-between h-12 bg-white/5 hover:bg-white/10 text-xs font-bold uppercase tracking-widest px-4 rounded-xl border border-white/5">
-                  <span className="flex items-center gap-3"><Settings className="h-4 w-4 text-primary" /> Configuration</span>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2 mb-4">
+                  <ShieldCheck className="h-3 w-3" /> Identity Control
+                </h3>
+                
+                <Button variant="ghost" className="w-full justify-between h-14 bg-white/5 hover:bg-white/10 text-xs font-bold uppercase tracking-widest px-6 rounded-2xl border border-white/5">
+                  <span className="flex items-center gap-4"><Settings className="h-4 w-4 text-primary" /> Security Configuration</span>
                   <ChevronRight className="h-4 w-4 opacity-30" />
                 </Button>
-                <Button variant="ghost" className="w-full justify-between h-12 bg-white/5 hover:bg-white/10 text-xs font-bold uppercase tracking-widest px-4 rounded-xl border border-white/5">
-                  <span className="flex items-center gap-3"><ShieldAlert className="h-4 w-4 text-primary" /> Encryption Keys</span>
+
+                <Button variant="ghost" className="w-full justify-between h-14 bg-white/5 hover:bg-white/10 text-xs font-bold uppercase tracking-widest px-6 rounded-2xl border border-white/5">
+                  <span className="flex items-center gap-4"><ShieldAlert className="h-4 w-4 text-primary" /> Key Management</span>
                   <ChevronRight className="h-4 w-4 opacity-30" />
                 </Button>
+
                 <Button 
                   variant="ghost" 
                   onClick={handleSignOut}
-                  className="w-full justify-between h-12 bg-red-500/5 hover:bg-red-500/10 text-red-500 text-xs font-bold uppercase tracking-widest px-4 rounded-xl border border-red-500/10"
+                  className="w-full justify-between h-14 bg-red-500/5 hover:bg-red-500/10 text-red-500 text-xs font-bold uppercase tracking-widest px-6 rounded-2xl border border-red-500/10 mt-4"
                 >
-                  <span className="flex items-center gap-3"><LogOut className="h-4 w-4" /> Terminate Session</span>
+                  <span className="flex items-center gap-4"><LogOut className="h-4 w-4" /> Terminate Session</span>
                 </Button>
               </div>
-            </div>
-          </motion.div>
-
-          {/* RIGHT COLUMN: Fleet & Dashboard */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:col-span-8 space-y-8"
-          >
-            {/* Active Reservation Section */}
-            <div className="space-y-4">
-              <h2 className="font-headline text-xl font-bold uppercase tracking-widest text-white/90">Your Fleet Status</h2>
-              <Card className="bg-white/5 backdrop-blur-xl border-white/10 rounded-3xl overflow-hidden group">
-                <CardContent className="p-0">
-                  <div className="grid grid-cols-1 md:grid-cols-5 h-full">
-                    <div className="md:col-span-2 relative h-48 md:h-auto overflow-hidden">
-                      <img 
-                        src={activeReservation.image} 
-                        alt={activeReservation.model} 
-                        className="object-cover w-full h-full grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
-                      <div className="absolute bottom-4 left-4">
-                        <Badge className="bg-primary text-white text-[8px] font-black uppercase tracking-widest border-none px-3">Reserved</Badge>
-                      </div>
-                    </div>
-                    <div className="md:col-span-3 p-8 flex flex-col justify-between space-y-6">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="text-[10px] uppercase tracking-[0.4em] text-primary font-black mb-1">Current Commission</p>
-                          <h3 className="font-headline text-4xl font-black text-white">{activeReservation.model}</h3>
-                          <p className="text-xs text-muted-foreground uppercase tracking-widest">{activeReservation.trim} Edition</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[9px] uppercase tracking-widest text-muted-foreground">Est. Delivery</p>
-                          <p className="text-lg font-bold text-white">Q4 2025</p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-1.5 text-primary">
-                            <Zap className="h-3 w-3" />
-                            <span className="text-[8px] font-black uppercase tracking-widest">Range</span>
-                          </div>
-                          <p className="text-sm font-bold text-white">{activeReservation.batteryRangeKm}km</p>
-                        </div>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-1.5 text-primary">
-                            <Car className="h-3 w-3" />
-                            <span className="text-[8px] font-black uppercase tracking-widest">Power</span>
-                          </div>
-                          <p className="text-sm font-bold text-white">{activeReservation.horsepower}hp</p>
-                        </div>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-1.5 text-primary">
-                            <Clock className="h-3 w-3" />
-                            <span className="text-[8px] font-black uppercase tracking-widest">0-60</span>
-                          </div>
-                          <p className="text-sm font-bold text-white">{activeReservation.zeroToSixtySeconds}s</p>
-                        </div>
-                      </div>
-
-                      <Button className="w-full rounded-full h-12 bg-white text-black hover:bg-white/90 font-black uppercase tracking-[0.2em] text-[10px]">
-                        Track Production
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Quick Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white/5 border border-white/10 rounded-3xl p-8 space-y-6">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Technical Support</h4>
-                  <Badge variant="outline" className="border-green-500/30 text-green-500 text-[8px] uppercase font-black">Connected</Badge>
-                </div>
-                <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground leading-relaxed italic">
-                    "Your personal concierge is on standby for configuration adjustments or logistical inquiries."
-                  </p>
-                  <Button variant="outline" className="w-full rounded-xl h-12 border-white/10 bg-transparent hover:bg-white/5 font-bold uppercase tracking-widest text-[10px]">
-                    Open Concierge Channel
-                  </Button>
-                </div>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 rounded-3xl p-8 space-y-6">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Digital Assets</h4>
-                  <Crown className="h-4 w-4 text-primary" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-white/5 rounded-2xl text-center border border-white/5">
-                    <p className="text-2xl font-black text-white">03</p>
-                    <p className="text-[8px] uppercase tracking-widest text-muted-foreground mt-1">Saved Builds</p>
-                  </div>
-                  <div className="p-4 bg-white/5 rounded-2xl text-center border border-white/5">
-                    <p className="text-2xl font-black text-white">12</p>
-                    <p className="text-[8px] uppercase tracking-widest text-muted-foreground mt-1">Invites Sent</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </motion.div>
-        </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );

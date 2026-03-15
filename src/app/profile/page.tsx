@@ -101,10 +101,8 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-background pt-32 pb-24 relative overflow-hidden flex items-center">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        {/* Deep mesh texture for light mode */}
-        <div className="absolute inset-0 bg-muted/20 opacity-40 dark:opacity-0" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[160px] opacity-30 dark:opacity-40" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,hsl(var(--background))_100%)] opacity-60" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--primary),0.05)_0%,transparent_100%)] opacity-30" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[160px] opacity-20" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10 flex justify-center">
@@ -114,10 +112,10 @@ export default function ProfilePage() {
           transition={{ duration: 0.6 }}
           className="w-full max-w-lg"
         >
-          <Card className="bg-card/80 backdrop-blur-3xl border border-border/60 rounded-[2.5rem] overflow-hidden shadow-2xl">
+          <Card className="bg-card/40 backdrop-blur-3xl border border-border/50 rounded-[2.5rem] overflow-hidden shadow-xl">
             <CardHeader className="text-center pt-12 pb-8 space-y-6">
               <div className="mx-auto">
-                <Avatar className="h-28 w-28 border border-border/50 bg-muted/50 pointer-events-none shadow-sm">
+                <Avatar className="h-28 w-28 border-2 border-primary/20 bg-muted/50 pointer-events-none">
                   <AvatarFallback className="text-5xl font-black bg-foreground text-background">
                     {userInitial}
                   </AvatarFallback>
@@ -125,7 +123,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-3">
-                <CardTitle className="font-headline text-4xl font-bold tracking-tight text-foreground">
+                <CardTitle className="font-headline text-3xl font-bold tracking-tight text-foreground">
                   {user.name || "Collector"}
                 </CardTitle>
                 <div className="flex flex-col items-center gap-2">
@@ -141,7 +139,7 @@ export default function ProfilePage() {
             <CardContent className="px-6 md:px-12 pb-12 space-y-10">
               <div className="space-y-6">
                 <div className="flex items-center justify-between border-b border-border/50 pb-4">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Identity Credentials</h3>
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Identity Details</h3>
                   {!isEditing && (
                     <Button 
                       variant="ghost" 
@@ -175,7 +173,7 @@ export default function ProfilePage() {
                   {/* Address Field */}
                   <div className="space-y-3">
                     <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                      <MapPin className="h-3 w-3" /> Residence Address
+                      <MapPin className="h-3 w-3" /> Bespoke Address
                     </Label>
                     {isEditing ? (
                       <Input 
@@ -199,7 +197,7 @@ export default function ProfilePage() {
                       className="flex gap-4 pt-4"
                     >
                       <Button onClick={handleSave} disabled={saving} className="flex-1 font-bold uppercase tracking-widest h-14 text-xs">
-                        {saving ? <Loader2 className="animate-spin h-4 w-4" /> : <><Check className="h-4 w-4 mr-2" /> Save Protocol</>}
+                        {saving ? <Loader2 className="animate-spin h-4 w-4" /> : <><Check className="h-4 w-4 mr-2" /> Save Changes</>}
                       </Button>
                       <Button variant="ghost" onClick={() => setIsEditing(false)} className="px-6 hover:bg-destructive/10 hover:text-destructive border border-border h-14">
                         <X className="h-4 w-4" />
@@ -216,24 +214,20 @@ export default function ProfilePage() {
                       <Shield className="h-4 w-4" />
                       <span className="text-[10px] font-black uppercase tracking-[0.4em]">Privacy Manifest</span>
                     </div>
-                    <ul className="grid grid-cols-1 gap-4">
-                      <li className="flex items-start gap-4 bg-muted/20 dark:bg-muted/30 p-4 rounded-2xl border border-border/50 group transition-colors hover:border-primary/20">
-                        <Lock className="h-4 w-4 text-muted-foreground mt-0.5 group-hover:text-primary transition-colors" />
-                        <div>
-                          <p className="text-[10px] font-bold text-foreground uppercase tracking-widest mb-1">Encrypted Persistence</p>
-                          <p className="text-[10px] text-muted-foreground leading-relaxed">
-                            Bespoke credentials are protected via AES-256 cloud encryption layers.
-                          </p>
-                        </div>
+                    <ul className="space-y-4">
+                      <li className="flex items-start gap-4 p-4 rounded-2xl bg-muted/20 border border-border/50">
+                        <Lock className="h-4 w-4 text-primary mt-1 shrink-0" />
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
+                          <strong className="text-foreground uppercase tracking-widest block mb-1">Encrypted Persistence</strong>
+                          Your bespoke credentials are protected via AES-256 cloud encryption layers within our production servers.
+                        </p>
                       </li>
-                      <li className="flex items-start gap-4 bg-muted/20 dark:bg-muted/30 p-4 rounded-2xl border border-border/50 group transition-colors hover:border-primary/20">
-                        <EyeOff className="h-4 w-4 text-muted-foreground mt-0.5 group-hover:text-primary transition-colors" />
-                        <div>
-                          <p className="text-[10px] font-bold text-foreground uppercase tracking-widest mb-1">Confidential Liaison</p>
-                          <p className="text-[10px] text-muted-foreground leading-relaxed">
-                            Residence data is accessible only to authorized fleet production managers.
-                          </p>
-                        </div>
+                      <li className="flex items-start gap-4 p-4 rounded-2xl bg-muted/20 border border-border/50">
+                        <EyeOff className="h-4 w-4 text-primary mt-1 shrink-0" />
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
+                          <strong className="text-foreground uppercase tracking-widest block mb-1">Confidential Liaison</strong>
+                          Residence data is accessible only to authorized fleet production managers during the commission process.
+                        </p>
                       </li>
                     </ul>
                   </div>

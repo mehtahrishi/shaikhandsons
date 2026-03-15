@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useEffect, useState } from 'react';
@@ -10,7 +11,8 @@ import {
   MapPin,
   Edit3,
   Check,
-  X
+  X,
+  CheckCircle2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -115,9 +117,9 @@ export default function ProfilePage() {
           <Card className="bg-white/5 backdrop-blur-2xl border-white/10 rounded-[2rem] overflow-hidden shadow-2xl">
             <CardHeader className="text-center pt-12 pb-8 space-y-6">
               <div className="mx-auto">
-                {/* Minimalist Avatar - No bg hover or effects */}
-                <Avatar className="h-24 w-24 border-2 border-primary/20 bg-black/60 pointer-events-none">
-                  <AvatarFallback className="text-4xl font-black bg-primary/10 text-white">
+                {/* Clean, static avatar icon - no bg hover or effects */}
+                <Avatar className="h-24 w-24 border-2 border-primary/20 bg-black/60 pointer-events-none ring-0">
+                  <AvatarFallback className="text-4xl font-black bg-primary/10 text-white border-none shadow-none">
                     {userInitial}
                   </AvatarFallback>
                 </Avatar>
@@ -125,11 +127,12 @@ export default function ProfilePage() {
 
               <div className="space-y-2">
                 <CardTitle className="font-headline text-4xl font-black uppercase tracking-tighter text-white">
-                  {user.name || "Elite Collector"}
+                  {user.name || "Collector"}
                 </CardTitle>
                 <CardDescription className="flex flex-col items-center gap-3">
-                  <Badge variant="outline" className="text-primary border-primary bg-primary/5 px-4 py-1 uppercase tracking-[0.2em] text-[10px] font-black">
-                    Elite Member
+                  <Badge variant="outline" className="text-primary border-primary bg-primary/5 px-4 py-1 uppercase tracking-[0.2em] text-[10px] font-black flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Verified User
                   </Badge>
                   <span className="font-mono text-xs text-muted-foreground tracking-widest">{user.email.toLowerCase()}</span>
                 </CardDescription>
@@ -163,7 +166,7 @@ export default function ProfilePage() {
                         value={phone} 
                         onChange={(e) => setPhone(e.target.value)} 
                         placeholder="+1 (555) 000-0000"
-                        className="bg-white/5 border-white/10 h-12 font-bold"
+                        className="bg-white/5 border-white/10 h-12 font-bold focus:border-primary transition-colors"
                       />
                     ) : (
                       <p className="text-sm font-bold text-white pl-1">{phone || "Not specified"}</p>
@@ -180,7 +183,7 @@ export default function ProfilePage() {
                         value={address} 
                         onChange={(e) => setAddress(e.target.value)} 
                         placeholder="123 Elite Drive, Monaco"
-                        className="bg-white/5 border-white/10 h-12 font-bold"
+                        className="bg-white/5 border-white/10 h-12 font-bold focus:border-primary transition-colors"
                       />
                     ) : (
                       <p className="text-sm font-bold text-white pl-1">{address || "Not specified"}</p>

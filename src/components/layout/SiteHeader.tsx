@@ -242,7 +242,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-muted-foreground hover:text-primary transition-colors shrink-0 hidden md:flex">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleTheme} 
+            className="text-foreground hover:text-primary transition-colors shrink-0 hidden md:flex"
+          >
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
 
@@ -252,8 +257,8 @@ export function SiteHeader() {
             ) : isAuthenticated ? (
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-9 w-9 p-0 overflow-visible focus-visible:ring-offset-0 focus-visible:ring-0 hover:bg-transparent">
-                    <span className="text-3xl font-headline font-black text-primary select-none">
+                  <Button variant="ghost" className="relative h-9 w-9 p-0 overflow-visible focus-visible:ring-offset-0 focus-visible:ring-0 hover:bg-transparent group">
+                    <span className="text-3xl font-headline font-black text-foreground group-hover:text-primary transition-colors select-none">
                       {userInitial}
                     </span>
                   </Button>

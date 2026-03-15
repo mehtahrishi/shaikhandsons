@@ -122,15 +122,20 @@ export function AdminHeader() {
       <div className="flex-1" />
 
       <div className="flex items-center gap-6">
-        <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-muted-foreground hover:text-primary transition-colors">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={toggleTheme} 
+          className="text-foreground hover:text-primary transition-colors"
+        >
           {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </Button>
 
         {user && (
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-12 w-12 p-0 overflow-visible hover:bg-transparent focus-visible:ring-0">
-                <span className="text-5xl font-headline font-black text-primary select-none leading-none">
+              <Button variant="ghost" className="relative h-12 w-12 p-0 overflow-visible hover:bg-transparent focus-visible:ring-0 group">
+                <span className="text-5xl font-headline font-black text-foreground group-hover:text-primary transition-colors select-none leading-none">
                   A
                 </span>
               </Button>

@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -125,7 +126,7 @@ export function AdminHeader() {
           variant="ghost" 
           size="icon" 
           onClick={toggleTheme} 
-          className="text-foreground hover:bg-transparent hover:text-foreground focus-visible:ring-0"
+          className="text-foreground hover:bg-muted focus-visible:ring-0"
         >
           {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </Button>

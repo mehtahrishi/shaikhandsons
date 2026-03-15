@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -26,7 +27,6 @@ export function InitialLoader() {
   useEffect(() => {
     setMounted(true);
 
-    // Generate paths on client only to avoid hydration mismatch
     const generatePath = (startX: number, startY: number, endX: number, endY: number, segments: number = 8, jitter: number = 30) => {
       let path = `M ${startX} ${startY}`;
       const dx = (endX - startX) / segments;
@@ -55,12 +55,10 @@ export function InitialLoader() {
     }));
     setSparkleValues(sparkles);
 
-    // Phase 1: Total duration
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 5500);
 
-    // Phase 2: Transition from Icon to Text
     const textTimer = setTimeout(() => {
       setShowText(true);
     }, 2800);
@@ -90,7 +88,6 @@ export function InitialLoader() {
           transition={{ duration: 0.8, ease: "easeInOut" }}
           className="fixed inset-0 z-[100] bg-background flex items-center justify-center overflow-hidden text-foreground"
         >
-          {/* Lightning Strikes SVG */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
             <defs>
               <filter id="lightning-glow">
@@ -146,7 +143,6 @@ export function InitialLoader() {
             ))}
           </svg>
 
-          {/* Central Content Area */}
           <div className="relative flex items-center justify-center scale-90 md:scale-100 min-w-[300px] h-[400px]">
             <AnimatePresence mode="wait">
               {!showText ? (
@@ -158,7 +154,6 @@ export function InitialLoader() {
                   transition={{ duration: 0.5 }}
                   className="relative flex items-center justify-center"
                 >
-                  {/* Impact Sparkles */}
                   {lightningBolts.map((bolt) => (
                     <div key={`sparkles-${bolt.id}`} className="absolute inset-0 pointer-events-none">
                       {sparkleValues.map((sparkle, i) => (
@@ -248,7 +243,6 @@ export function InitialLoader() {
                     transition={{ duration: 0.8, ease: "easeOut" }}
                     className="flex flex-col items-center relative"
                   >
-                    {/* Circular Frame for Branding */}
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                       <motion.div 
                         initial={{ opacity: 0, scale: 0.8 }}
@@ -289,7 +283,6 @@ export function InitialLoader() {
                         className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mt-4"
                       />
                       
-                      {/* Responsive Slogan */}
                       <motion.p
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}

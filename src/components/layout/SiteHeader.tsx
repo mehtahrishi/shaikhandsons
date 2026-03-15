@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -245,7 +246,7 @@ export function SiteHeader() {
             variant="ghost" 
             size="icon" 
             onClick={toggleTheme} 
-            className="text-foreground shrink-0 hidden md:flex hover:bg-transparent hover:text-foreground focus-visible:ring-0"
+            className="text-foreground shrink-0 hidden md:flex hover:bg-muted focus-visible:ring-0"
           >
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
@@ -257,7 +258,7 @@ export function SiteHeader() {
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-9 w-9 p-0 overflow-visible focus-visible:ring-offset-0 focus-visible:ring-0 hover:bg-transparent group">
-                    <span className="text-3xl font-headline font-black text-foreground group-hover:text-primary transition-colors select-none">
+                    <span className="text-3xl font-headline font-black text-foreground group-hover:text-primary transition-colors select-none leading-none">
                       {userInitial}
                     </span>
                   </Button>

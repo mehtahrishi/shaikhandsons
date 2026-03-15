@@ -86,6 +86,8 @@ export function SiteHeader() {
     { name: 'Inquiry', href: '/#inquiry' },
   ];
 
+  const userInitial = user?.name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "C";
+
   const BrandIdentity = ({ className, size = "md" }: { className?: string, size?: "sm" | "md" | "lg" }) => (
     <div className={cn("flex items-center gap-2 group", className)}>
       <span className={cn(
@@ -167,10 +169,11 @@ export function SiteHeader() {
                   {isAuthenticated ? (
                     <div className="space-y-4">
                       <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-xl border border-white/5">
-                        <Avatar className="h-12 w-12 border border-primary/20">
-                          <AvatarImage src="https://picsum.photos/seed/user/100/100" />
-                          <AvatarFallback>VN</AvatarFallback>
-                        </Avatar>
+                        <div className="h-12 w-12 flex items-center justify-center">
+                          <span className="text-3xl font-headline font-black text-primary select-none">
+                            {userInitial}
+                          </span>
+                        </div>
                         <div>
                           <p className="font-black text-xs uppercase tracking-tight">{user?.name || "Collector"}</p>
                           <p className="text-[10px] text-primary font-bold uppercase tracking-widest">Collector Member</p>
@@ -228,11 +231,10 @@ export function SiteHeader() {
             ) : isAuthenticated ? (
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 md:h-9 md:w-9 rounded-full p-0 overflow-hidden border border-border/50 focus-visible:ring-offset-0 focus-visible:ring-0">
-                    <Avatar className="h-8 w-8 md:h-9 md:w-9">
-                      <AvatarImage src="https://picsum.photos/seed/user/100/100" alt="User" />
-                      <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">VN</AvatarFallback>
-                    </Avatar>
+                  <Button variant="ghost" className="relative h-9 w-9 p-0 overflow-visible focus-visible:ring-offset-0 focus-visible:ring-0">
+                    <span className="text-2xl font-headline font-black text-primary select-none">
+                      {userInitial}
+                    </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-48 mt-2 bg-background/95 backdrop-blur-xl border-border/50" align="end" forceMount>

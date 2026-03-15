@@ -27,19 +27,6 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
 import { updateUserProfile } from '@/lib/appwrite/auth';
 
-const CrownIcon = () => (
-  <svg viewBox="0 0 512 512" fill="currentColor" className="w-full h-full">
-    <g>
-      <path d="M124.536,178.991c12.892,0,23.33-10.438,23.33-23.322s-10.438-23.322-23.33-23.322 c-12.876,0-23.314,10.438-23.314,23.322S111.66,178.991,124.536,178.991z"/>
-      <path d="M46.66,211.508c0-12.883-10.454-23.321-23.33-23.321C10.454,188.187,0,198.625,0,211.508 c0,12.884,10.454,23.322,23.33,23.322C36.206,234.83,46.66,224.392,46.66,211.508z"/>
-      <path d="M387.464,178.991c12.892,0,23.33-10.438,23.33-23.322s-10.438-23.322-23.33-23.322 c-12.876,0-23.314,10.438-23.314,23.322S374.588,178.991,387.464,178.991z"/>
-      <path d="M488.686,188.187c-12.892,0-23.33,10.438-23.33,23.321c0,12.884,10.454,23.322,23.33,23.322 c12.876,0,23.314-10.438,23.314-23.322C512,198.625,501.562,188.187,488.686,188.187z"/>
-      <rect x="80.101" y="399.236" width="351.815" height="36.296"/>
-      <path d="M400.193,272.999c-33.932-23.322-14.839-82.694-14.839-82.694l-19.388-5.661 c-40.721,77.385-100.608,73.761-95.937-12.728v-27.715h33.686v-28.05h-33.686V76.468h-28.058v39.682h-33.702v28.05h33.702v27.715 c4.679,86.49-55.2,90.113-95.938,12.728l-19.371,5.661c0,0,19.076,59.372-14.839,82.694 c-33.932,23.321-63.626-33.923-63.626-33.923l-19.076,8.474L82.13,374.777H429.87l53.008-127.226l-19.076-8.474 C463.802,239.076,434.125,296.32,400.193,272.999z M170.852,321.058c-9.26,0-16.77-7.501-16.77-16.762 c0-9.252,7.51-16.753,16.77-16.753c9.244,0,16.753,7.501,16.753,16.753C187.606,313.557,180.096,321.058,170.852,321.058z M256.008,312.681c-9.26,0-16.762-7.501-16.762-16.762c0-9.252,7.501-16.753,16.762-16.753c9.252,0,16.753,7.501,16.753,16.753 C272.762,305.18,256.008,312.681,256.008,312.681z M341.164,321.058c-9.26,0-16.753-7.501-16.753-16.762 c0-9.252,7.493-16.753,16.753-16.753c9.26,0,16.753,7.501,16.753,16.753C357.918,313.557,350.425,321.058,341.164,321.058z"/>
-    </g>
-  </svg>
-);
-
 export default function ProfilePage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -70,7 +57,7 @@ export default function ProfilePage() {
       if (!savedPhone || !savedAddress) {
         toast({
           title: "Profile Incomplete",
-          description: "Please complete your phone and address to ensure a seamless commission process.",
+          description: "Please complete your bespoke details to ensure a seamless commission process.",
           variant: "default",
         });
       }
@@ -104,7 +91,7 @@ export default function ProfilePage() {
       <div className="h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-10 w-10 text-primary animate-spin" />
-          <p className="font-headline text-xs uppercase tracking-[0.4em] text-muted-foreground">Verifying Status...</p>
+          <p className="font-headline text-xs uppercase tracking-[0.4em] text-muted-foreground">Authenticating Access...</p>
         </div>
       </div>
     );
@@ -114,41 +101,46 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#020202] pt-32 pb-24 relative overflow-hidden flex items-center">
-      <div className="container mx-auto px-6 relative z-10 flex justify-center">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] opacity-50" />
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10 flex justify-center">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-full max-w-xl"
+          className="w-full max-w-lg"
         >
-          <Card className="bg-white/5 backdrop-blur-2xl border-white/10 rounded-[2rem] overflow-hidden shadow-2xl">
+          <Card className="bg-white/5 backdrop-blur-3xl border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
             <CardHeader className="text-center pt-12 pb-8 space-y-6">
               <div className="mx-auto">
-                <Avatar className="h-24 w-24 border-2 border-primary/20 bg-black/40 pointer-events-none ring-0">
-                  <AvatarFallback className="text-4xl font-black bg-black text-white border-none shadow-none">
+                <Avatar className="h-28 w-28 border border-white/10 bg-black/40 pointer-events-none">
+                  <AvatarFallback className="text-5xl font-black bg-black text-white">
                     {userInitial}
                   </AvatarFallback>
                 </Avatar>
               </div>
 
-              <div className="space-y-2">
-                <CardTitle className="font-headline text-4xl font-bold tracking-tight text-white capitalize">
+              <div className="space-y-3">
+                <CardTitle className="font-headline text-4xl font-bold tracking-tight text-white">
                   {user.name || "Collector"}
                 </CardTitle>
-                <CardDescription className="flex flex-col items-center gap-3">
-                  <Badge variant="outline" className="text-primary border-primary bg-primary/5 px-4 py-1 uppercase tracking-[0.2em] text-[10px] font-black flex items-center gap-1.5">
+                <div className="flex flex-col items-center gap-2">
+                  <Badge variant="outline" className="text-primary border-primary bg-primary/5 px-4 py-1 uppercase tracking-[0.2em] text-[10px] font-black flex items-center gap-2">
                     <CheckCircle2 className="h-3 w-3" />
                     Verified User
                   </Badge>
-                  <span className="font-mono text-xs text-muted-foreground tracking-widest">{user.email.toLowerCase()}</span>
-                </CardDescription>
+                  <span className="font-mono text-[10px] text-muted-foreground tracking-widest uppercase">{user.email.toLowerCase()}</span>
+                </div>
               </div>
             </CardHeader>
 
-            <CardContent className="px-10 pb-12 space-y-8">
+            <CardContent className="px-6 md:px-12 pb-12 space-y-10">
               <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Core Credentials</h3>
+                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Identity Credentials</h3>
                   {!isEditing && (
                     <Button 
                       variant="ghost" 
@@ -156,14 +148,14 @@ export default function ProfilePage() {
                       onClick={() => setIsEditing(true)}
                       className="text-[10px] font-bold uppercase tracking-widest h-8 px-4 hover:bg-white/5"
                     >
-                      <Edit3 className="h-3 w-3 mr-2" /> Modify Identity
+                      <Edit3 className="h-3 w-3 mr-2" /> Modify
                     </Button>
                   )}
                 </div>
 
-                <div className="grid gap-6">
+                <div className="grid gap-8">
                   {/* Phone Field */}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                       <Phone className="h-3 w-3" /> Phone Number
                     </Label>
@@ -172,27 +164,27 @@ export default function ProfilePage() {
                         value={phone} 
                         onChange={(e) => setPhone(e.target.value)} 
                         placeholder="+1 (555) 000-0000"
-                        className="bg-white/5 border-white/10 h-12 font-bold focus:border-primary transition-colors"
+                        className="bg-white/5 border-white/10 h-14 font-bold focus:border-primary transition-all text-sm"
                       />
                     ) : (
-                      <p className="text-sm font-bold text-white pl-1">{phone || "Not specified"}</p>
+                      <p className="text-base font-medium text-white/90">{phone || "No phone registered"}</p>
                     )}
                   </div>
 
                   {/* Address Field */}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                      <MapPin className="h-3 w-3" /> Delivery Residence
+                      <MapPin className="h-3 w-3" /> Residence Address
                     </Label>
                     {isEditing ? (
                       <Input 
                         value={address} 
                         onChange={(e) => setAddress(e.target.value)} 
-                        placeholder="123 Elite Drive, Monaco"
-                        className="bg-white/5 border-white/10 h-12 font-bold focus:border-primary transition-colors"
+                        placeholder="123 Elite Avenue, Dubai"
+                        className="bg-white/5 border-white/10 h-14 font-bold focus:border-primary transition-all text-sm"
                       />
                     ) : (
-                      <p className="text-sm font-bold text-white pl-1">{address || "Not specified"}</p>
+                      <p className="text-base font-medium text-white/90 leading-relaxed">{address || "No address registered"}</p>
                     )}
                   </div>
                 </div>
@@ -203,12 +195,12 @@ export default function ProfilePage() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="flex gap-3 pt-4"
+                      className="flex gap-4 pt-4"
                     >
-                      <Button onClick={handleSave} disabled={saving} className="flex-1 font-bold uppercase tracking-widest h-12">
-                        {saving ? <Loader2 className="animate-spin h-4 w-4" /> : <><Check className="h-4 w-4 mr-2" /> Save Changes</>}
+                      <Button onClick={handleSave} disabled={saving} className="flex-1 font-bold uppercase tracking-widest h-14 text-xs">
+                        {saving ? <Loader2 className="animate-spin h-4 w-4" /> : <><Check className="h-4 w-4 mr-2" /> Save Protocol</>}
                       </Button>
-                      <Button variant="ghost" onClick={() => setIsEditing(false)} className="px-6 hover:bg-red-500/10 hover:text-red-500 border border-white/5 h-12">
+                      <Button variant="ghost" onClick={() => setIsEditing(false)} className="px-6 hover:bg-red-500/10 hover:text-red-500 border border-white/5 h-14">
                         <X className="h-4 w-4" />
                       </Button>
                     </motion.div>
@@ -217,33 +209,30 @@ export default function ProfilePage() {
               </div>
 
               {!isEditing && (
-                <div className="pt-8 border-t border-white/5">
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="flex items-center gap-2 text-primary">
+                <div className="pt-10 border-t border-white/5">
+                  <div className="flex flex-col gap-6">
+                    <div className="flex items-center gap-3 text-primary">
                       <Shield className="h-4 w-4" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.3em]">Privacy Manifest</span>
+                      <span className="text-[10px] font-black uppercase tracking-[0.4em]">Privacy Manifest</span>
                     </div>
-                    <ul className="grid grid-cols-1 gap-3 w-full max-w-[320px]">
-                      <li className="flex items-start gap-3 bg-white/[0.02] p-3 rounded-lg border border-white/5">
-                        <Lock className="h-3 w-3 text-muted-foreground mt-0.5" />
-                        <p className="text-[9px] text-muted-foreground font-medium leading-relaxed">
-                          <strong className="text-white block mb-0.5 uppercase tracking-wider">Encrypted Handshake</strong>
-                          All identity details are managed via SHA-256 encrypted protocols.
-                        </p>
+                    <ul className="grid grid-cols-1 gap-4">
+                      <li className="flex items-start gap-4 bg-white/[0.03] p-4 rounded-2xl border border-white/5 group transition-colors hover:border-primary/20">
+                        <Lock className="h-4 w-4 text-muted-foreground mt-0.5 group-hover:text-primary transition-colors" />
+                        <div>
+                          <p className="text-[10px] font-bold text-white uppercase tracking-widest mb-1">Encrypted Persistence</p>
+                          <p className="text-[10px] text-muted-foreground leading-relaxed">
+                            Bespoke credentials are protected via AES-256 cloud encryption layers.
+                          </p>
+                        </div>
                       </li>
-                      <li className="flex items-start gap-3 bg-white/[0.02] p-3 rounded-lg border border-white/5">
-                        <EyeOff className="h-3 w-3 text-muted-foreground mt-0.5" />
-                        <p className="text-[9px] text-muted-foreground font-medium leading-relaxed">
-                          <strong className="text-white block mb-0.5 uppercase tracking-wider">Bespoke Privacy</strong>
-                          Your residence and contact data remain strictly between you and the fleet manager.
-                        </p>
-                      </li>
-                      <li className="flex items-start gap-3 bg-white/[0.02] p-3 rounded-lg border border-white/5">
-                        <Server className="h-3 w-3 text-muted-foreground mt-0.5" />
-                        <p className="text-[9px] text-muted-foreground font-medium leading-relaxed">
-                          <strong className="text-white block mb-0.5 uppercase tracking-wider">Secure Commissions</strong>
-                          Data persistence is localized to facilitate future vehicle production cycles.
-                        </p>
+                      <li className="flex items-start gap-4 bg-white/[0.03] p-4 rounded-2xl border border-white/5 group transition-colors hover:border-primary/20">
+                        <EyeOff className="h-4 w-4 text-muted-foreground mt-0.5 group-hover:text-primary transition-colors" />
+                        <div>
+                          <p className="text-[10px] font-bold text-white uppercase tracking-widest mb-1">Confidential Liaison</p>
+                          <p className="text-[10px] text-muted-foreground leading-relaxed">
+                            Residence data is accessible only to authorized fleet production managers.
+                          </p>
+                        </div>
                       </li>
                     </ul>
                   </div>

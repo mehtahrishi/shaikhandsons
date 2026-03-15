@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -8,8 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, ShieldCheck, Lock, Mail, ChevronLeft } from 'lucide-react';
-import { createSessionFromCredentials, getCurrentUser } from '@/lib/appwrite/auth';
-import { useAuth } from '@/context/AuthContext';
+import { useAdminAuth } from '@/context/AdminAuthContext';
 import Link from 'next/link';
 
 export default function AdminLoginPage() {
@@ -18,7 +18,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
-  const { refresh, user } = useAuth();
+  const { login, user } = useAdminAuth();
 
   useEffect(() => {
     if (user) {
@@ -31,8 +31,7 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      await createSessionFromCredentials(email, password);
-      await refresh();
+      await login(email, password);
       
       toast({
         title: "Command Authorized",
@@ -41,9 +40,9 @@ export default function AdminLoginPage() {
 
       router.push('/admin');
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Login failed.';
+      const message = err instanceof Error ? err.message : 'Authorization failed.';
       toast({
-        title: "Authorization Denied",
+        title: "Access Denied",
         description: message,
         variant: "destructive",
       });
@@ -66,8 +65,8 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-10 space-y-2">
           <div className="inline-flex items-center gap-3 mb-2">
-            <span className="font-headline font-black text-3xl text-foreground uppercase tracking-tight">SHAIKH</span>
-            <span className="font-headline font-light tracking-[0.3em] text-foreground text-3xl uppercase">& SONS</span>
+            <span className="font-headline font-black text-3xl text-foreground uppercase tracking-tight" style={{ fontFamily: 'Playfair Display' }}>SHAIKH</span>
+            <span className="font-headline font-light tracking-[0.3em] text-foreground text-3xl uppercase" style={{ fontFamily: 'Playfair Display' }}>& SONS</span>
           </div>
           <p className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">Fleet Command Core</p>
         </div>

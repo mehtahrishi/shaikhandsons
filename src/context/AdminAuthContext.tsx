@@ -2,45 +2,71 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { getCurrentUser, signOut, type AuthUser } from '@/lib/appwrite/auth';
+import { useRouter } from 'next/navigation';
+
+interface AdminUser {
+  name: string;
+  email: string;
+  role: string;
+}
 
 interface AdminAuthContextValue {
-  user: AuthUser | null;
+  user: AdminUser | null;
   loading: boolean;
-  refresh: () => Promise<void>;
-  logout: () => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextValue>({
   user: null,
   loading: true,
-  refresh: async () => {},
-  logout: async () => {},
+  login: async () => {},
+  logout: () => {},
 });
 
 export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
-    const currentUser = await getCurrentUser();
-    // In a real app, you might check for an 'admin' label here
-    setUser(currentUser);
+  useEffect(() => {
+    const savedUser = localStorage.getItem('shaikh_admin_session');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
     setLoading(false);
   }, []);
 
-  const logout = useCallback(async () => {
-    await signOut();
-    setUser(null);
-  }, []);
+  const login = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Authentication failed');
+      }
+
+      setUser(data.user);
+      localStorage.setItem('shaikh_admin_session', JSON.stringify(data.user));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = useCallback(() => {
+    setUser(null);
+    localStorage.removeItem('shaikh_admin_session');
+    router.push('/admin/login');
+  }, [router]);
 
   return (
-    <AdminAuthContext.Provider value={{ user, loading, refresh, logout }}>
+    <AdminAuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AdminAuthContext.Provider>
   );

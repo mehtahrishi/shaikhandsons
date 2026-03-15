@@ -3,15 +3,14 @@
 
 import React, { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
-import { AdminNavbar } from "@/components/admin/AdminNavbar";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminFooter } from "@/components/admin/AdminFooter";
-import { useAuth } from '@/context/AuthContext';
+import { AdminAuthProvider, useAdminAuth } from '@/context/AdminAuthContext';
 import { Toaster } from '@/components/ui/toaster';
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+function AdminLayoutContent({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAdminAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -37,25 +36,34 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="flex flex-col min-h-screen w-full bg-background text-foreground">
-        {/* Full-width Top Navbar - Sticky but doesn't overlap */}
-        <AdminNavbar />
+    <div className="flex min-h-screen bg-background text-foreground overflow-x-hidden">
+      {/* 1. Sidebar (Desktop) */}
+      <AdminSidebar />
+      
+      {/* Right Column (Header + Content + Footer) */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* 2. Header */}
+        <AdminHeader />
         
-        <div className="flex flex-1 w-full">
-          {/* Sidebar on the Left - Scrolls with page */}
-          <AdminSidebar />
-          
-          {/* Main Content on the Right - Scrolls with page */}
-          <main className="flex-1 p-6 md:p-10 bg-background relative z-0">
-            {children}
-          </main>
-        </div>
+        {/* 3. Main Content Area */}
+        <main className="flex-1 p-6 md:p-10 flex flex-col gap-10">
+          {children}
+        </main>
 
-        {/* Full-width Bottom Footer - At the end of the scroll */}
+        {/* Footer sits at the bottom of the content column */}
         <AdminFooter />
-        <Toaster />
       </div>
-    </SidebarProvider>
+      <Toaster />
+    </div>
+  );
+}
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AdminAuthProvider>
+      <AdminLayoutContent>
+        {children}
+      </AdminLayoutContent>
+    </AdminAuthProvider>
   );
 }

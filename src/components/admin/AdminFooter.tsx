@@ -5,13 +5,13 @@ import React from 'react';
 
 export function AdminFooter() {
   return (
-    <footer className="w-full h-16 border-t border-border/50 bg-background/50 backdrop-blur-md px-10 flex items-center justify-between relative z-[60]">
-      <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-bold">
-        © 2025 Shaikh & Sons — Fleet Command Core v2.4.0
+    <footer className="w-full h-20 border-t bg-muted/20 px-6 md:px-10 flex flex-col md:flex-row items-center justify-between gap-4 py-6">
+      <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-bold text-center md:text-left">
+        © 2025 Shaikh & Sons — Fleet Command Core v2.5.0
       </p>
-      <div className="flex gap-6">
-        <span className="text-[8px] text-primary font-black uppercase tracking-[0.3em]">AES-256 Encrypted</span>
-        <span className="text-[8px] text-muted-foreground uppercase tracking-widest font-bold">System Health: 98.2%</span>
+      <div className="flex items-center gap-6">
+        <span className="text-[8px] text-primary font-black uppercase tracking-[0.3em]">AES-256 Cloud Encrypted</span>
+        <span className="text-[8px] text-muted-foreground uppercase tracking-widest font-bold">Latency: 24ms</span>
       </div>
     </footer>
   );

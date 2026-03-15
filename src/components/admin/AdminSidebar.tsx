@@ -6,95 +6,86 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { 
   LayoutDashboard, 
-  Car, 
-  Users, 
-  Settings, 
-  Sparkles, 
-  LogOut,
+  ShoppingCart, 
+  Package, 
+  Users,
+  Sparkles,
   Zap
 } from "lucide-react"
-
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarRail,
-  useSidebar,
-} from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-import { useAuth } from "@/context/AuthContext"
 import { cn } from "@/lib/utils"
 
 const navItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { name: "Fleet Inventory", href: "/admin/inventory", icon: Car },
-  { name: "AI Tools", href: "/admin/ai-tools", icon: Sparkles },
-  { name: "Collectors", href: "/admin/users", icon: Users },
-  { name: "System Settings", href: "/admin/settings", icon: Settings },
+  { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
+  { name: "Products", href: "/admin/inventory", icon: Package },
+  { name: "Customers", href: "/admin/users", icon: Users },
+  { name: "AI synthesis", href: "/admin/ai-tools", icon: Sparkles },
 ]
 
-export function AdminSidebar() {
-  const pathname = usePathname()
-  const { logout } = useAuth()
-  const { state } = useSidebar()
+const CrownIcon = () => (
+  <svg viewBox="0 0 512 512" fill="currentColor" className="w-full h-full">
+    <path d="M124.536,178.991c12.892,0,23.33-10.438,23.33-23.322s-10.438-23.322-23.33-23.322 c-12.876,0-23.314,10.438-23.314,23.322S111.66,178.991,124.536,178.991z"/>
+    <path d="M46.66,211.508c0-12.883-10.454-23.321-23.33-23.321C10.454,188.187,0,198.625,0,211.508 c0,12.884,10.454,23.322,23.33,23.322C36.206,234.83,46.66,224.392,46.66,211.508z"/>
+    <path d="M387.464,178.991c12.892,0,23.33-10.438,23.33-23.322s-10.438-23.322-23.33-23.322 c-12.876,0-23.314,10.438-23.314,23.322S374.588,178.991,387.464,178.991z"/>
+    <path d="M488.686,188.187c-12.892,0-23.33,10.438-23.33,23.321c0,12.884,10.454,23.322,23.33,23.322 c12.876,0,23.314-10.438,23.314-23.322C512,198.625,501.562,188.187,488.686,188.187z"/>
+    <rect x="80.101" y="399.236" width="351.815" height="36.296"/>
+    <path d="M400.193,272.999c-33.932-23.322-14.839-82.694-14.839-82.694l-19.388-5.661 c-40.721,77.385-100.608,73.761-95.937-12.728v-27.715h33.686v-28.05h-33.686V76.468h-28.058v39.682h-33.702v28.05h33.702v27.715 c4.679,86.49-55.2,90.113-95.938,12.728l-19.371,5.661c0,0,19.076,59.372-14.839,82.694 c-33.932,23.321-63.626-33.923-63.626-33.923l-19.076,8.474L82.13,374.777H429.87l53.008-127.226l-19.076-8.474 C463.802,239.076,434.125,296.32,400.193,272.999z"/>
+  </svg>
+);
+
+export function AdminSidebar({ className }: { className?: string }) {
+  const pathname = usePathname();
 
   return (
-    <Sidebar 
-      collapsible="icon" 
-      className="border-r border-border/50 bg-card/40 backdrop-blur-xl h-auto min-h-screen relative"
-    >
-      <SidebarContent className="px-4 py-8">
-        <div className="mb-8">
-           <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-4 px-2", state === "collapsed" && "hidden")}>
-             Operations
-           </p>
-           <SidebarMenu className="gap-1">
-            {navItems.map((item) => (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton 
-                  asChild 
-                  isActive={pathname === item.href}
-                  tooltip={item.name}
-                  className="h-11 rounded-lg hover:bg-primary/10 hover:text-primary transition-all group px-3"
-                >
-                  <Link href={item.href} className="flex items-center gap-3">
-                    <item.icon className={cn("h-4 w-4 shrink-0 transition-colors", pathname === item.href ? 'text-primary' : 'text-muted-foreground group-hover:text-primary')} />
-                    <span className="font-bold text-[10px] uppercase tracking-widest whitespace-nowrap">
-                      {item.name}
-                    </span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </div>
+    <aside className={cn("hidden md:flex flex-col w-64 lg:w-72 bg-muted/40 border-r min-h-screen", className)}>
+      <div className="p-8">
+        <Link href="/" className="flex flex-col gap-1 group">
+          <span className="font-headline font-black text-xl tracking-tighter text-foreground uppercase">SHAIKH</span>
+          <span className="font-headline font-light text-xl tracking-widest text-foreground uppercase flex items-center">
+            <span className="relative inline-flex items-center justify-center mr-1">
+              <span className="text-primary font-bold italic">&</span>
+              <span className="absolute -top-1.5 -left-0.5 w-2.5 h-2.5 -rotate-[15deg] text-primary">
+                <CrownIcon />
+              </span>
+            </span>
+            SONS
+          </span>
+        </Link>
+      </div>
 
-        <div className={cn("p-4 bg-primary/5 rounded-xl border border-primary/10 mt-auto", state === "collapsed" && "hidden")}>
+      <nav className="flex-1 px-4 py-4 space-y-1">
+        <p className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-4 px-4">
+          Fleet Command
+        </p>
+        {navItems.map((item) => (
+          <Link
+            key={item.name}
+            href={item.href}
+            className={cn(
+              "flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all group",
+              pathname === item.href 
+                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            )}
+          >
+            <item.icon className={cn("h-4 w-4 shrink-0", pathname === item.href ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary")} />
+            {item.name}
+          </Link>
+        ))}
+      </nav>
+
+      <div className="p-6 mt-auto">
+        <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
           <div className="flex items-center gap-2 mb-2">
             <Zap className="h-3 w-3 text-primary" />
             <span className="text-[9px] font-black uppercase tracking-widest text-primary">System Health</span>
           </div>
-          <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+          <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
             <div className="h-full w-[94%] bg-primary" />
           </div>
           <p className="text-[8px] text-muted-foreground mt-2 uppercase tracking-widest">Efficiency: 98.2%</p>
         </div>
-      </SidebarContent>
-
-      <SidebarFooter className="p-4 border-t border-border/50">
-        <Button 
-          variant="ghost" 
-          onClick={logout}
-          className="w-full justify-start gap-3 h-10 rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive group px-3"
-        >
-          <LogOut className="h-4 w-4 shrink-0" />
-          <span className="font-bold text-[10px] uppercase tracking-widest group-data-[collapsible=icon]:hidden">Terminate Session</span>
-        </Button>
-      </SidebarFooter>
-      <SidebarRail />
-    </Sidebar>
-  )
+      </div>
+    </aside>
+  );
 }

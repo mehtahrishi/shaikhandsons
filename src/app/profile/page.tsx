@@ -12,7 +12,10 @@ import {
   Check,
   X,
   CheckCircle2,
-  Shield
+  Shield,
+  Lock,
+  EyeOff,
+  Server
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -108,15 +111,15 @@ export default function ProfilePage() {
           <Card className="bg-white/5 backdrop-blur-2xl border-white/10 rounded-[2rem] overflow-hidden shadow-2xl">
             <CardHeader className="text-center pt-12 pb-8 space-y-6">
               <div className="mx-auto">
-                <Avatar className="h-24 w-24 border-2 border-primary/20 bg-black/60 pointer-events-none ring-0">
-                  <AvatarFallback className="text-4xl font-black bg-primary/10 text-white border-none shadow-none">
+                <Avatar className="h-24 w-24 border-2 border-primary/20 bg-black/40 pointer-events-none ring-0">
+                  <AvatarFallback className="text-4xl font-black bg-black text-white border-none shadow-none">
                     {userInitial}
                   </AvatarFallback>
                 </Avatar>
               </div>
 
               <div className="space-y-2">
-                <CardTitle className="font-headline text-4xl font-black tracking-tighter text-white">
+                <CardTitle className="font-headline text-4xl font-bold tracking-tight text-white capitalize">
                   {user.name || "Collector"}
                 </CardTitle>
                 <CardDescription className="flex flex-col items-center gap-3">
@@ -201,12 +204,35 @@ export default function ProfilePage() {
               </div>
 
               {!isEditing && (
-                <div className="pt-8 border-t border-white/5 text-center">
-                  <div className="flex flex-col items-center gap-2">
-                    <Shield className="h-4 w-4 text-primary opacity-50 mb-1" />
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold max-w-[280px] mx-auto leading-relaxed">
-                      Shaikh & Sons ensures your bespoke credentials remain private. Data is handled via encrypted protocols to facilitate your future commissions.
-                    </p>
+                <div className="pt-8 border-t border-white/5">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="flex items-center gap-2 text-primary">
+                      <Shield className="h-4 w-4" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.3em]">Privacy Manifest</span>
+                    </div>
+                    <ul className="grid grid-cols-1 gap-3 w-full max-w-[320px]">
+                      <li className="flex items-start gap-3 bg-white/[0.02] p-3 rounded-lg border border-white/5">
+                        <Lock className="h-3 w-3 text-muted-foreground mt-0.5" />
+                        <p className="text-[9px] text-muted-foreground font-medium leading-relaxed">
+                          <strong className="text-white block mb-0.5 uppercase tracking-wider">Encrypted Handshake</strong>
+                          All identity details are managed via SHA-256 encrypted protocols.
+                        </p>
+                      </li>
+                      <li className="flex items-start gap-3 bg-white/[0.02] p-3 rounded-lg border border-white/5">
+                        <EyeOff className="h-3 w-3 text-muted-foreground mt-0.5" />
+                        <p className="text-[9px] text-muted-foreground font-medium leading-relaxed">
+                          <strong className="text-white block mb-0.5 uppercase tracking-wider">Bespoke Privacy</strong>
+                          Your residence and contact data remain strictly between you and the fleet manager.
+                        </p>
+                      </li>
+                      <li className="flex items-start gap-3 bg-white/[0.02] p-3 rounded-lg border border-white/5">
+                        <Server className="h-3 w-3 text-muted-foreground mt-0.5" />
+                        <p className="text-[9px] text-muted-foreground font-medium leading-relaxed">
+                          <strong className="text-white block mb-0.5 uppercase tracking-wider">Secure Commissions</strong>
+                          Data persistence is localized to facilitate future vehicle production cycles.
+                        </p>
+                      </li>
+                    </ul>
                   </div>
                 </div>
               )}

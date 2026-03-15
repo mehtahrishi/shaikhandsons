@@ -14,14 +14,13 @@ import {
   CheckCircle2,
   Shield,
   Lock,
-  EyeOff,
-  Server
+  EyeOff
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
@@ -100,10 +99,10 @@ export default function ProfilePage() {
   const userInitial = user.name?.charAt(0).toUpperCase() || user.email.charAt(0).toUpperCase();
 
   return (
-    <div className="min-h-screen bg-[#020202] pt-32 pb-24 relative overflow-hidden flex items-center">
+    <div className="min-h-screen bg-background pt-32 pb-24 relative overflow-hidden flex items-center">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] opacity-50" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] opacity-30" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10 flex justify-center">
@@ -113,18 +112,18 @@ export default function ProfilePage() {
           transition={{ duration: 0.6 }}
           className="w-full max-w-lg"
         >
-          <Card className="bg-white/5 backdrop-blur-3xl border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
+          <Card className="bg-card/50 backdrop-blur-3xl border-border rounded-[2.5rem] overflow-hidden shadow-2xl">
             <CardHeader className="text-center pt-12 pb-8 space-y-6">
               <div className="mx-auto">
-                <Avatar className="h-28 w-28 border border-white/10 bg-black/40 pointer-events-none">
-                  <AvatarFallback className="text-5xl font-black bg-black text-white">
+                <Avatar className="h-28 w-28 border border-border bg-muted pointer-events-none">
+                  <AvatarFallback className="text-5xl font-black bg-foreground text-background">
                     {userInitial}
                   </AvatarFallback>
                 </Avatar>
               </div>
 
               <div className="space-y-3">
-                <CardTitle className="font-headline text-4xl font-bold tracking-tight text-white">
+                <CardTitle className="font-headline text-4xl font-bold tracking-tight text-foreground">
                   {user.name || "Collector"}
                 </CardTitle>
                 <div className="flex flex-col items-center gap-2">
@@ -139,14 +138,14 @@ export default function ProfilePage() {
 
             <CardContent className="px-6 md:px-12 pb-12 space-y-10">
               <div className="space-y-6">
-                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                <div className="flex items-center justify-between border-b border-border pb-4">
                   <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Identity Credentials</h3>
                   {!isEditing && (
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       onClick={() => setIsEditing(true)}
-                      className="text-[10px] font-bold uppercase tracking-widest h-8 px-4 hover:bg-white/5"
+                      className="text-[10px] font-bold uppercase tracking-widest h-8 px-4 hover:bg-accent"
                     >
                       <Edit3 className="h-3 w-3 mr-2" /> Modify
                     </Button>
@@ -164,10 +163,10 @@ export default function ProfilePage() {
                         value={phone} 
                         onChange={(e) => setPhone(e.target.value)} 
                         placeholder="+1 (555) 000-0000"
-                        className="bg-white/5 border-white/10 h-14 font-bold focus:border-primary transition-all text-sm"
+                        className="bg-muted border-border h-14 font-bold focus:border-primary transition-all text-sm"
                       />
                     ) : (
-                      <p className="text-base font-medium text-white/90">{phone || "No phone registered"}</p>
+                      <p className="text-base font-medium text-foreground/90">{phone || "No phone registered"}</p>
                     )}
                   </div>
 
@@ -181,10 +180,10 @@ export default function ProfilePage() {
                         value={address} 
                         onChange={(e) => setAddress(e.target.value)} 
                         placeholder="123 Elite Avenue, Dubai"
-                        className="bg-white/5 border-white/10 h-14 font-bold focus:border-primary transition-all text-sm"
+                        className="bg-muted border-border h-14 font-bold focus:border-primary transition-all text-sm"
                       />
                     ) : (
-                      <p className="text-base font-medium text-white/90 leading-relaxed">{address || "No address registered"}</p>
+                      <p className="text-base font-medium text-foreground/90 leading-relaxed">{address || "No address registered"}</p>
                     )}
                   </div>
                 </div>
@@ -200,7 +199,7 @@ export default function ProfilePage() {
                       <Button onClick={handleSave} disabled={saving} className="flex-1 font-bold uppercase tracking-widest h-14 text-xs">
                         {saving ? <Loader2 className="animate-spin h-4 w-4" /> : <><Check className="h-4 w-4 mr-2" /> Save Protocol</>}
                       </Button>
-                      <Button variant="ghost" onClick={() => setIsEditing(false)} className="px-6 hover:bg-red-500/10 hover:text-red-500 border border-white/5 h-14">
+                      <Button variant="ghost" onClick={() => setIsEditing(false)} className="px-6 hover:bg-destructive/10 hover:text-destructive border border-border h-14">
                         <X className="h-4 w-4" />
                       </Button>
                     </motion.div>
@@ -209,26 +208,26 @@ export default function ProfilePage() {
               </div>
 
               {!isEditing && (
-                <div className="pt-10 border-t border-white/5">
+                <div className="pt-10 border-t border-border">
                   <div className="flex flex-col gap-6">
                     <div className="flex items-center gap-3 text-primary">
                       <Shield className="h-4 w-4" />
                       <span className="text-[10px] font-black uppercase tracking-[0.4em]">Privacy Manifest</span>
                     </div>
                     <ul className="grid grid-cols-1 gap-4">
-                      <li className="flex items-start gap-4 bg-white/[0.03] p-4 rounded-2xl border border-white/5 group transition-colors hover:border-primary/20">
+                      <li className="flex items-start gap-4 bg-muted/30 p-4 rounded-2xl border border-border group transition-colors hover:border-primary/20">
                         <Lock className="h-4 w-4 text-muted-foreground mt-0.5 group-hover:text-primary transition-colors" />
                         <div>
-                          <p className="text-[10px] font-bold text-white uppercase tracking-widest mb-1">Encrypted Persistence</p>
+                          <p className="text-[10px] font-bold text-foreground uppercase tracking-widest mb-1">Encrypted Persistence</p>
                           <p className="text-[10px] text-muted-foreground leading-relaxed">
                             Bespoke credentials are protected via AES-256 cloud encryption layers.
                           </p>
                         </div>
                       </li>
-                      <li className="flex items-start gap-4 bg-white/[0.03] p-4 rounded-2xl border border-white/5 group transition-colors hover:border-primary/20">
+                      <li className="flex items-start gap-4 bg-muted/30 p-4 rounded-2xl border border-border group transition-colors hover:border-primary/20">
                         <EyeOff className="h-4 w-4 text-muted-foreground mt-0.5 group-hover:text-primary transition-colors" />
                         <div>
-                          <p className="text-[10px] font-bold text-white uppercase tracking-widest mb-1">Confidential Liaison</p>
+                          <p className="text-[10px] font-bold text-foreground uppercase tracking-widest mb-1">Confidential Liaison</p>
                           <p className="text-[10px] text-muted-foreground leading-relaxed">
                             Residence data is accessible only to authorized fleet production managers.
                           </p>

@@ -6,15 +6,49 @@ import {
   Car, 
   Users, 
   TrendingUp, 
-  ChevronRight,
-  ShieldAlert,
   Zap,
   Cpu,
-  Sparkles
+  Mail,
+  ArrowUpRight
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+import { 
+  ChartContainer, 
+  ChartTooltip, 
+  ChartTooltipContent 
+} from "@/components/ui/chart";
+import { Area, AreaChart, CartesianGrid, XAxis, ResponsiveContainer } from "recharts";
+
+const chartData = [
+  { month: "Jan", reservations: 186 },
+  { month: "Feb", reservations: 305 },
+  { month: "Mar", reservations: 237 },
+  { month: "Apr", reservations: 273 },
+  { month: "May", reservations: 409 },
+  { month: "Jun", reservations: 514 },
+];
+
+const chartConfig = {
+  reservations: {
+    label: "Reservations",
+    color: "hsl(var(--primary))",
+  },
+};
+
+const recentEnquiries = [
+  { id: "ENQ-101", user: "Alexander Vance", model: "Veridian Aether", region: "London", status: "New" },
+  { id: "ENQ-102", user: "Sarah Jenkins", model: "Noir Spectre", region: "Dubai", status: "In Progress" },
+  { id: "ENQ-103", user: "Michael Chen", model: "Veridian Lumina", region: "Singapore", status: "Pending" },
+  { id: "ENQ-104", user: "Elena Rodriguez", model: "Veridian Aether", region: "New York", status: "Contacted" },
+];
 
 export default function AdminDashboardPage() {
   const stats = [
@@ -74,67 +108,105 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
-      {/* Action Grid */}
+      {/* Analytics Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Reservation Chart */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
           className="lg:col-span-2"
         >
-          <Card className="h-full border-primary/10 bg-gradient-to-br from-card to-background">
+          <Card className="border-border/50 bg-card/40 backdrop-blur-xl h-full">
             <CardHeader>
-              <CardTitle className="font-headline text-xl font-bold flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" /> AI Synthesis Core
-              </CardTitle>
-              <CardDescription className="text-xs uppercase tracking-widest opacity-60">
-                Harness generative models for the Veridian brand.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Link href="/admin/ai-tools">
-                  <div className="p-5 rounded-xl bg-muted/20 border border-border/50 hover:border-primary/50 transition-all group cursor-pointer h-full">
-                    <h4 className="text-xs font-black uppercase tracking-widest mb-2 flex items-center justify-between">
-                      Marketing Suite
-                      <ChevronRight className="h-3 w-3 text-primary group-hover:translate-x-1 transition-transform" />
-                    </h4>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed uppercase tracking-wider">
-                      Luxury descriptions & bespoke package configuration.
-                    </p>
-                  </div>
-                </Link>
-                <div className="p-5 rounded-xl bg-muted/5 border border-dashed border-border flex flex-col items-center justify-center text-center opacity-40">
-                  <ShieldAlert className="h-5 w-5 mb-2 text-muted-foreground" />
-                  <h4 className="text-[9px] font-black uppercase tracking-widest mb-1">Coming Soon</h4>
-                  <p className="text-[9px] text-muted-foreground uppercase tracking-widest">Neural Route Logistics</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="font-headline text-xl font-bold">Reservation Trends</CardTitle>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Global fleet acquisition data.</CardDescription>
+                </div>
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <ArrowUpRight className="h-4 w-4" />
                 </div>
               </div>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig} className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={chartData}
+                    margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient id="fillReservations" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--color-reservations)" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="var(--color-reservations)" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="month" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fontSize: 10, fontWeight: 700 }}
+                      dy={10}
+                    />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Area
+                      type="monotone"
+                      dataKey="reservations"
+                      stroke="var(--color-reservations)"
+                      strokeWidth={3}
+                      fillOpacity={1}
+                      fill="url(#fillReservations)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ChartContainer>
             </CardContent>
           </Card>
         </motion.div>
 
+        {/* Recent Enquiries */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <Card className="h-full">
+          <Card className="border-border/50 bg-card/40 backdrop-blur-xl h-full">
             <CardHeader>
-              <CardTitle className="font-headline text-xl font-bold">Quick Actions</CardTitle>
+              <CardTitle className="font-headline text-xl font-bold flex items-center gap-2">
+                <Mail className="h-5 w-5 text-primary" /> Recent Enquiries
+              </CardTitle>
+              <CardDescription className="text-[10px] uppercase tracking-widest">Latest concierge requests.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <Button variant="outline" className="w-full justify-between h-12 group text-[10px] font-black uppercase tracking-widest">
-                <span>Fleet Mgmt</span>
-                <ChevronRight className="h-3 w-3 text-primary" />
-              </Button>
-              <Button variant="outline" className="w-full justify-between h-12 group text-[10px] font-black uppercase tracking-widest">
-                <span>Inquiries</span>
-                <ChevronRight className="h-3 w-3 text-primary" />
-              </Button>
-              <Button asChild className="w-full h-12 font-black uppercase tracking-widest text-[10px] mt-4">
-                <Link href="/admin/ai-tools">Launch AI Hub</Link>
-              </Button>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-border/50 hover:bg-transparent">
+                    <TableHead className="text-[9px] font-black uppercase tracking-widest h-8">User</TableHead>
+                    <TableHead className="text-[9px] font-black uppercase tracking-widest h-8">Model</TableHead>
+                    <TableHead className="text-[9px] font-black uppercase tracking-widest h-8 text-right">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentEnquiries.map((enq) => (
+                    <TableRow key={enq.id} className="border-border/50 hover:bg-primary/5 transition-colors">
+                      <TableCell className="py-4">
+                        <p className="text-xs font-bold leading-none mb-1">{enq.user}</p>
+                        <p className="text-[8px] text-muted-foreground uppercase tracking-widest">{enq.region}</p>
+                      </TableCell>
+                      <TableCell className="py-4 text-[10px] font-medium italic opacity-70">
+                        {enq.model.split(' ')[1]}
+                      </TableCell>
+                      <TableCell className="py-4 text-right">
+                        <span className="text-[8px] font-black uppercase tracking-[0.2em] px-2 py-1 bg-primary/10 text-primary rounded-full">
+                          {enq.status}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         </motion.div>

@@ -16,6 +16,11 @@ export type AuthUser = {
   emailVerification: boolean;
   phone?: string;
   labels?: string[];
+  prefs: {
+    phone?: string;
+    address?: string;
+    [key: string]: any;
+  };
 };
 
 // ─── Sign Up ─────────────────────────────────────────────────────────────────
@@ -81,6 +86,23 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     return user as unknown as AuthUser;
   } catch {
     return null;
+  }
+}
+
+// ─── Update User Profile ─────────────────────────────────────────────────────
+
+/**
+ * Updates the user's bespoke details using Appwrite Preferences.
+ */
+export async function updateUserProfile(phone: string, address: string): Promise<void> {
+  try {
+    await account.updatePrefs({
+      phone,
+      address
+    });
+  } catch (err) {
+    const e = err as AppwriteException;
+    throw new Error(e.message ?? 'Failed to update profile details.');
   }
 }
 

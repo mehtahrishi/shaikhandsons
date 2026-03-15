@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useEffect, useState } from 'react';
@@ -7,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LogOut, 
   Loader2, 
-  User as UserIcon,
   Phone,
   MapPin,
   Edit3,
@@ -22,11 +20,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
+import { updateUserProfile } from '@/lib/appwrite/auth';
 
 export default function ProfilePage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout, refresh } = useAuth();
 
   // Local state for editability
   const [isEditing, setIsEditing] = useState(false);
@@ -42,14 +41,18 @@ export default function ProfilePage() {
     }
 
     if (user) {
-      // Logic for toast if fields are missing
-      const hasPhone = !!phone;
-      const hasAddress = !!address;
+      // Sync local state with Appwrite Prefs
+      const savedPhone = user.prefs?.phone || "";
+      const savedAddress = user.prefs?.address || "";
       
-      if (!hasPhone || !hasAddress) {
+      setPhone(savedPhone);
+      setAddress(savedAddress);
+
+      // Notify if profile is incomplete
+      if (!savedPhone || !savedAddress) {
         toast({
           title: "Profile Incomplete",
-          description: "Please fill in your phone and address to make the commission process easier.",
+          description: "Please complete your phone and address to ensure a seamless commission process.",
           variant: "default",
         });
       }
@@ -66,16 +69,25 @@ export default function ProfilePage() {
   };
 
   const handleSave = async () => {
+    if (!user) return;
     setSaving(true);
-    // Simulate API call for persistence
-    setTimeout(() => {
-      setSaving(false);
+    try {
+      await updateUserProfile(phone, address);
+      await refresh(); // Force refresh context to get latest prefs
       setIsEditing(false);
       toast({
         title: "Identity Updated",
-        description: "Your credentials have been securely saved.",
+        description: "Your bespoke details have been securely saved.",
       });
-    }, 1000);
+    } catch (err: any) {
+      toast({
+        title: "Update Failed",
+        description: err.message || "Failed to save profile details.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading || !user) {
@@ -103,7 +115,8 @@ export default function ProfilePage() {
           <Card className="bg-white/5 backdrop-blur-2xl border-white/10 rounded-[2rem] overflow-hidden shadow-2xl">
             <CardHeader className="text-center pt-12 pb-8 space-y-6">
               <div className="mx-auto">
-                <Avatar className="h-24 w-24 border-2 border-primary/20 bg-black/40">
+                {/* Minimalist Avatar - No bg hover or effects */}
+                <Avatar className="h-24 w-24 border-2 border-primary/20 bg-black/60 pointer-events-none">
                   <AvatarFallback className="text-4xl font-black bg-primary/10 text-white">
                     {userInitial}
                   </AvatarFallback>

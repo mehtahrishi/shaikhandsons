@@ -99,10 +99,12 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background pt-32 pb-24 relative overflow-hidden flex items-center">
-      {/* Background Decor - Subtle for Light/Dark Mode compatibility */}
+      {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] opacity-20 dark:opacity-30" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,hsl(var(--background))_100%)] opacity-40" />
+        {/* Deep mesh texture for light mode */}
+        <div className="absolute inset-0 bg-muted/20 opacity-40 dark:opacity-0" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[160px] opacity-30 dark:opacity-40" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,hsl(var(--background))_100%)] opacity-60" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10 flex justify-center">
@@ -112,10 +114,10 @@ export default function ProfilePage() {
           transition={{ duration: 0.6 }}
           className="w-full max-w-lg"
         >
-          <Card className="bg-card/70 backdrop-blur-3xl border border-border/50 rounded-[2.5rem] overflow-hidden shadow-2xl">
+          <Card className="bg-card/80 backdrop-blur-3xl border border-border/60 rounded-[2.5rem] overflow-hidden shadow-2xl">
             <CardHeader className="text-center pt-12 pb-8 space-y-6">
               <div className="mx-auto">
-                <Avatar className="h-28 w-28 border border-border bg-muted pointer-events-none">
+                <Avatar className="h-28 w-28 border border-border/50 bg-muted/50 pointer-events-none shadow-sm">
                   <AvatarFallback className="text-5xl font-black bg-foreground text-background">
                     {userInitial}
                   </AvatarFallback>
@@ -163,7 +165,7 @@ export default function ProfilePage() {
                         value={phone} 
                         onChange={(e) => setPhone(e.target.value)} 
                         placeholder="+1 (555) 000-0000"
-                        className="bg-muted/50 border-border h-14 font-bold focus:border-primary transition-all text-sm"
+                        className="bg-muted/30 border-border h-14 font-bold focus:border-primary transition-all text-sm"
                       />
                     ) : (
                       <p className="text-base font-medium text-foreground/90">{phone || "No phone registered"}</p>
@@ -180,7 +182,7 @@ export default function ProfilePage() {
                         value={address} 
                         onChange={(e) => setAddress(e.target.value)} 
                         placeholder="123 Elite Avenue, Dubai"
-                        className="bg-muted/50 border-border h-14 font-bold focus:border-primary transition-all text-sm"
+                        className="bg-muted/30 border-border h-14 font-bold focus:border-primary transition-all text-sm"
                       />
                     ) : (
                       <p className="text-base font-medium text-foreground/90 leading-relaxed">{address || "No address registered"}</p>

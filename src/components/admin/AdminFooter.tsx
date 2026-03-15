@@ -5,7 +5,7 @@ import React from 'react';
 
 export function AdminFooter() {
   return (
-    <footer className="h-16 border-t border-border/50 bg-background/50 backdrop-blur-md px-10 flex items-center justify-between">
+    <footer className="w-full h-16 border-t border-border/50 bg-background/50 backdrop-blur-md px-10 flex items-center justify-between relative z-[60]">
       <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-bold">
         © 2025 Shaikh & Sons — Fleet Command Core v2.4.0
       </p>

@@ -18,7 +18,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -39,14 +38,15 @@ const navItems = [
 
 export function AdminSidebar() {
   const pathname = usePathname()
-  const { logout, user } = useAuth()
+  const { logout } = useAuth()
   const { state } = useSidebar()
 
-  const userInitial = user?.name?.charAt(0).toUpperCase() || "A";
-
   return (
-    <Sidebar collapsible="icon" className="border-r border-border/50 bg-card/40 backdrop-blur-xl h-full">
-      <SidebarContent className="px-4 py-6">
+    <Sidebar 
+      collapsible="icon" 
+      className="border-r border-border/50 bg-card/40 backdrop-blur-xl h-auto min-h-screen"
+    >
+      <SidebarContent className="px-4 py-8">
         <div className="mb-8">
            <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-4 px-2", state === "collapsed" && "hidden")}>
              Operations

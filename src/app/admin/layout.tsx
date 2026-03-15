@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useEffect } from 'react';
@@ -26,7 +27,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (loading || !user) {
     return (
-      <div className="h-screen flex items-center justify-center bg-background">
+      <div className="h-screen flex items-center justify-center bg-background text-foreground">
         <div className="flex flex-col items-center gap-4">
           <div className="h-10 w-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           <p className="font-headline text-[10px] uppercase tracking-[0.4em] text-muted-foreground">Initializing Command...</p>
@@ -36,21 +37,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <SidebarProvider 
-      defaultOpen={true}
-      style={{ "--sidebar-top": "5rem" } as React.CSSProperties}
-    >
-      <div className="flex flex-col min-h-screen bg-background overflow-hidden">
+    <SidebarProvider defaultOpen={true}>
+      <div className="flex flex-col min-h-screen w-full bg-background text-foreground">
+        {/* Full-width Top Navbar */}
         <AdminNavbar />
-        <div className="flex flex-1 overflow-hidden relative">
+        
+        <div className="flex flex-1 w-full">
+          {/* Sidebar on the Left */}
           <AdminSidebar />
-          <div className="flex flex-col flex-1 relative overflow-hidden bg-background">
-            <main className="flex-1 p-6 md:p-10 overflow-y-auto no-scrollbar relative z-0">
-              {children}
-            </main>
-            <AdminFooter />
-          </div>
+          
+          {/* Main Content on the Right - Scrollable with page */}
+          <main className="flex-1 p-6 md:p-10 bg-background relative z-0 min-h-screen">
+            {children}
+          </main>
         </div>
+
+        {/* Full-width Bottom Footer */}
+        <AdminFooter />
         <Toaster />
       </div>
     </SidebarProvider>

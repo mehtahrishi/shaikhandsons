@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -9,8 +8,7 @@ import {
   ShoppingCart, 
   Package, 
   Users,
-  Sparkles,
-  Zap
+  Sparkles
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -74,19 +72,6 @@ export function AdminSidebar({ className }: { className?: string }) {
           </Link>
         ))}
       </nav>
-
-      <div className="p-6 mt-auto border-t">
-        <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
-          <div className="flex items-center gap-2 mb-2">
-            <Zap className="h-3 w-3 text-primary" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-primary">System Health</span>
-          </div>
-          <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-            <div className="h-full w-[94%] bg-primary" />
-          </div>
-          <p className="text-[8px] text-muted-foreground mt-2 uppercase tracking-widest">Efficiency: 98.2%</p>
-        </div>
-      </div>
     </aside>
   );
 }

@@ -9,37 +9,35 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Settings, LogOut, Loader2, ShieldCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/context/AuthContext';
 
 export default function ProfilePage() {
-  const [isVerifying, setIsVerifying] = useState(true);
   const router = useRouter();
   const { toast } = useToast();
+  const { user, loading, logout } = useAuth();
 
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('shaikh_auth_token');
-    if (!isAuthenticated) {
+    // Only redirect if we're entirely done loading and there is undeniably no user
+    if (!loading && !user) {
       toast({
         title: "Unauthorized Access",
         description: "Please sign in to access your garage.",
         variant: "destructive"
       });
       router.push('/login');
-    } else {
-      setIsVerifying(false);
     }
-  }, [router, toast]);
+  }, [user, loading, router, toast]);
 
-  const handleSignOut = () => {
-    localStorage.removeItem('shaikh_auth_token');
+  const handleSignOut = async () => {
+    await logout();
     toast({
       title: "Signed Out",
       description: "Secure session terminated.",
     });
     router.push('/');
-    window.dispatchEvent(new Event('storage'));
   };
 
-  if (isVerifying) {
+  if (loading || !user) {
     return (
       <div className="h-[calc(100vh-80px)] flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 text-primary animate-spin" />
@@ -67,11 +65,12 @@ export default function ProfilePage() {
           
           <div className="text-center space-y-1">
             <CardTitle className="font-headline text-lg font-black uppercase tracking-tight">
-              Julian Vane
+              {user.name || "Collector"}
             </CardTitle>
             <Badge variant="outline" className="text-primary border-primary bg-primary/5 px-1.5 py-0 uppercase tracking-widest text-[7px] font-bold">
               Elite Collector Member
             </Badge>
+            <p className="text-[10px] text-muted-foreground">{user.email}</p>
           </div>
         </CardHeader>
 

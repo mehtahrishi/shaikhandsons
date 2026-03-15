@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
 
 const CrownIcon = () => (
   <svg viewBox="0 0 512 512" fill="currentColor" className="w-full h-full">
@@ -41,22 +42,17 @@ const CrownIcon = () => (
 export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDark, setIsDark] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const router = useRouter();
   const { toast } = useToast();
+  const { user, loading, logout } = useAuth();
+  
+  const isAuthenticated = !!user;
 
   useEffect(() => {
     setMounted(true);
-    const checkAuth = () => {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('shaikh_auth_token') : null;
-      setIsAuthenticated(!!token);
-    };
-
-    checkAuth();
-    window.addEventListener('storage', checkAuth);
     
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -64,14 +60,12 @@ export function SiteHeader() {
     window.addEventListener('scroll', handleScroll);
     
     return () => {
-      window.removeEventListener('storage', checkAuth);
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('shaikh_auth_token');
-    setIsAuthenticated(false);
+  const handleLogout = async () => {
+    await logout();
     setMobileMenuOpen(false);
     toast({
       title: "Signed Out",
@@ -178,7 +172,7 @@ export function SiteHeader() {
                           <AvatarFallback>VN</AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-black text-xs uppercase tracking-tight">Julian Vane</p>
+                          <p className="font-black text-xs uppercase tracking-tight">{user?.name || "Collector"}</p>
                           <p className="text-[10px] text-primary font-bold uppercase tracking-widest">Collector Member</p>
                         </div>
                       </div>
@@ -244,7 +238,8 @@ export function SiteHeader() {
                 <DropdownMenuContent className="w-48 mt-2 bg-background/95 backdrop-blur-xl border-border/50" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal p-3">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-xs font-black leading-none uppercase tracking-tight">Julian Vane</p>
+                      <p className="text-xs font-black leading-none uppercase tracking-tight">{user?.name || "Collector"}</p>
+                      <p className="text-[10px] text-muted-foreground">{user?.email}</p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-border/50" />

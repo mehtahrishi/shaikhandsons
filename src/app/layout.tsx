@@ -6,6 +6,7 @@ import { SiteFooter } from '@/components/layout/SiteFooter';
 import { Toaster } from '@/components/ui/toaster';
 import { InitialLoader } from '@/components/common/InitialLoader';
 import { CookieConsent } from '@/components/common/CookieConsent';
+import { AuthProvider } from '@/context/AuthContext';
 
 export const metadata: Metadata = {
   title: 'Shaikh & Sons | High-Performance Electronic Mobility',
@@ -25,14 +26,16 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased selection:bg-primary/30 min-h-screen flex flex-col">
-        <InitialLoader />
-        <SiteHeader />
-        <main className="flex-1">
-          {children}
-        </main>
-        <SiteFooter />
-        <CookieConsent />
-        <Toaster />
+        <AuthProvider>
+          <InitialLoader />
+          <SiteHeader />
+          <main className="flex-1">
+            {children}
+          </main>
+          <SiteFooter />
+          <CookieConsent />
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );

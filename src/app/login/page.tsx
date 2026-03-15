@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -10,32 +9,65 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Mail, Lock } from 'lucide-react';
+import { validateCredentials } from '@/lib/appwrite/auth';
+import { getCurrentUser } from '@/lib/appwrite/auth';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
 
+  // Redirect if already logged in
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('shaikh_auth_token');
-    if (isAuthenticated) {
-      router.push('/profile');
-    }
+    getCurrentUser().then((user) => {
+      if (user) router.push('/profile');
+    });
   }, [router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Step 1 of Auth: Credential Check
-    setTimeout(() => {
-      setLoading(false);
-      toast({
-        title: "Credentials Validated",
-        description: "Please complete the security handshake.",
+
+    try {
+      // 1. Validates credentials with Appwrite (creates/deletes session to prove they are correct)
+      await validateCredentials(email, password);
+
+      // 2. Request OTP from our custom SMTP route
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
       });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to send OTP email.');
+      }
+
+      // 3. Stash the token and credentials temporarily for Verify page
+      sessionStorage.setItem('pending_email', email);
+      sessionStorage.setItem('pending_password', password); // Temporary! Will be cleared soon
+      sessionStorage.setItem('pending_otp_token', data.token);
+
+      toast({
+        title: "Security Verification",
+        description: `A code was sent to your email.`,
+      });
+
       router.push('/verify-otp');
-    }, 1200);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Login failed.';
+      toast({
+        title: "Login Failed",
+        description: message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -55,7 +87,15 @@ export default function LoginPage() {
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input id="email" placeholder="julian.vane@example.com" type="email" required className="pl-10" />
+                <Input
+                  id="email"
+                  placeholder="julian.vane@example.com"
+                  type="email"
+                  required
+                  className="pl-10"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
             </div>
             <div className="space-y-2">
@@ -65,7 +105,14 @@ export default function LoginPage() {
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input id="password" type="password" required className="pl-10" />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  className="pl-10"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </div>
             </div>
           </CardContent>

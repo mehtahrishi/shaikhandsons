@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState } from 'react';
@@ -10,25 +9,39 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, User, Mail, Lock } from 'lucide-react';
+import { signUp } from '@/lib/appwrite/auth';
 
 export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleSignUp = (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Step 1 of Auth: Registration
-    setTimeout(() => {
-      setLoading(false);
+
+    try {
+      await signUp({ name, email, password });
+
       toast({
-        title: "Credentials Created",
-        description: "Please complete the identity verification.",
+        title: "Account Created",
+        description: "Welcome to Shaikh & Sons! Please sign in to verify your access.",
       });
-      router.push('/verify-otp');
-    }, 1200);
+
+      router.push('/login');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Sign-up failed.';
+      toast({
+        title: "Sign Up Failed",
+        description: message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,21 +61,44 @@ export default function SignUpPage() {
               <Label htmlFor="name">Full Name</Label>
               <div className="relative">
                 <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input id="name" placeholder="Julian Vane" required className="pl-10" />
+                <Input
+                  id="name"
+                  placeholder="Julian Vane"
+                  required
+                  className="pl-10"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input id="email" placeholder="julian@example.com" type="email" required className="pl-10" />
+                <Input
+                  id="email"
+                  placeholder="julian@example.com"
+                  type="email"
+                  required
+                  className="pl-10"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input id="password" type="password" required className="pl-10" />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  className="pl-10"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  minLength={8}
+                />
               </div>
             </div>
           </CardContent>

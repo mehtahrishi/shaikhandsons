@@ -232,7 +232,7 @@ export function SiteHeader() {
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-9 w-9 p-0 overflow-visible focus-visible:ring-offset-0 focus-visible:ring-0">
-                    <span className="text-2xl font-headline font-black text-primary select-none">
+                    <span className="text-3xl font-headline font-black text-primary select-none">
                       {userInitial}
                     </span>
                   </Button>

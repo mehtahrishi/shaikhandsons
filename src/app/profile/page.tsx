@@ -130,7 +130,7 @@ export default function ProfilePage() {
                     <CheckCircle2 className="h-3 w-3" />
                     Verified User
                   </Badge>
-                  <span className="font-mono text-[10px] text-muted-foreground tracking-widest uppercase">{user.email.toLowerCase()}</span>
+                  <span className="font-mono text-[10px] text-muted-foreground tracking-widest">{user.email.toLowerCase()}</span>
                 </div>
               </div>
             </CardHeader>

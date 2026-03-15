@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -73,7 +72,7 @@ export function InitialLoader() {
   }, []);
 
   if (!mounted) {
-    return <div className="fixed inset-0 z-[100] bg-[#020202]" />;
+    return <div className="fixed inset-0 z-[100] bg-background" />;
   }
 
   const lightningBolts = [
@@ -89,7 +88,7 @@ export function InitialLoader() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.1 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="fixed inset-0 z-[100] bg-[#020202] flex items-center justify-center overflow-hidden"
+          className="fixed inset-0 z-[100] bg-background flex items-center justify-center overflow-hidden text-foreground"
         >
           {/* Lightning Strikes SVG */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -109,7 +108,7 @@ export function InitialLoader() {
                   <motion.path
                     d={paths[`${bolt.id}Core`]}
                     fill="none"
-                    stroke="white"
+                    stroke="currentColor"
                     strokeWidth="0.5"
                     filter="url(#lightning-glow)"
                     initial={{ pathLength: 0, opacity: 0 }}
@@ -165,7 +164,7 @@ export function InitialLoader() {
                       {sparkleValues.map((sparkle, i) => (
                         <motion.div
                           key={`${bolt.id}-sparkle-${i}`}
-                          className="absolute bg-white rounded-full shadow-[0_0_10px_white]"
+                          className="absolute bg-foreground rounded-full shadow-[0_0_10px_currentColor]"
                           style={{
                             width: sparkle.w,
                             height: sparkle.h,
@@ -198,12 +197,12 @@ export function InitialLoader() {
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                   />
                   
-                  <div className="z-10 text-white">
+                  <div className="z-10">
                     <svg 
                       width="120" 
                       height="120" 
                       viewBox="0 0 64 64" 
-                      className="drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]"
+                      className="drop-shadow-[0_0_10px_rgba(var(--foreground),0.3)]"
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <g transform="translate(-352,-326)">
@@ -211,14 +210,14 @@ export function InitialLoader() {
                           <g transform="translate(269.17,-192)">
                             <motion.path 
                               d="M103.754,214L102.523,210L98,210C96.896,210 96,209.104 96,208C96,206.896 96.896,206 98,206L104,206C104.878,206 105.653,206.573 105.912,207.412L107.939,214L112,214C113.104,214 114,214.896 114,216C114,217.104 113.104,218 112,218L109.169,218L111.634,226.008C111.755,226.003 111.877,226 112,226C116.415,226 120,229.585 120,234C120,238.415 116.415,242 112,242C107.585,242 104,238.415 104,234C104,231.12 105.525,228.594 107.811,227.185L106.609,223.278C102.69,225.254 100,229.315 100,234C100,234 100,234 100,234C100,235.105 99.105,236 98,236L87.748,236C86.858,239.449 83.725,242 80,242C75.585,242 72,238.415 72,234C72,230.275 74.551,227.142 78,226.252L78,224L76,224C75.47,224 74.961,223.789 74.586,223.414C74.211,223.039 74,222.53 74,222C74,221.47 74.211,220.961 74.586,220.586C74.961,220.211 75.47,220 76,220C79.685,220 87.172,220 87.172,220C87.172,220 91.076,216.095 92.586,214.586C92.961,214.211 93.47,214 94,214L103.754,214ZM112,230C114.208,230 116,231.792 116,234C116,236.208 114.208,238 112,238C109.792,238 108,236.208 108,234C108,231.792 109.792,230 112,230ZM80,230C82.208,230 84,231.792 84,234C84,236.208 82.208,238 80,238C77.792,238 76,236.208 76,234C76,231.792 77.792,230 80,230ZM104.984,218L94.828,218C94.828,218 90.924,221.905 89.414,223.414C89.039,223.789 88.53,224 88,224L82,224L82,226.252C84.81,226.977 87.023,229.191 87.748,232L96.124,232C96.826,226.381 100.447,221.663 105.419,219.414L104.984,218Z" 
-                              initial={{ fill: "rgb(255, 255, 255)" }}
+                              initial={{ fill: "hsl(var(--foreground))" }}
                               animate={{
                                 fill: [
-                                  "rgb(255, 255, 255)", 
-                                  "rgb(239, 68, 68)", 
-                                  "rgb(255, 255, 255)",
-                                  "rgb(239, 68, 68)",
-                                  "rgb(255, 255, 255)"
+                                  "hsl(var(--foreground))", 
+                                  "hsl(var(--primary))", 
+                                  "hsl(var(--foreground))",
+                                  "hsl(var(--primary))",
+                                  "hsl(var(--foreground))"
                                 ]
                               }}
                               transition={{
@@ -273,7 +272,7 @@ export function InitialLoader() {
                         transition={{ delay: 0.5, duration: 1 }}
                         className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mb-4"
                       />
-                      <h2 className="font-headline text-xl md:text-3xl font-black text-white tracking-widest text-center whitespace-nowrap flex items-center gap-2">
+                      <h2 className="font-headline text-xl md:text-3xl font-black text-foreground tracking-widest text-center whitespace-nowrap flex items-center gap-2">
                         <span>SHAIKH</span>
                         <span className="relative inline-flex items-center justify-center mx-1">
                           <span className="text-primary italic font-bold">&</span>

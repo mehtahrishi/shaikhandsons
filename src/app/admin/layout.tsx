@@ -5,7 +5,6 @@ import React, { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
-import { AdminFooter } from "@/components/admin/AdminFooter";
 import { AdminAuthProvider, useAdminAuth } from '@/context/AdminAuthContext';
 import { Toaster } from '@/components/ui/toaster';
 
@@ -40,7 +39,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       {/* 1. Sidebar (Desktop) */}
       <AdminSidebar />
       
-      {/* Right Column (Header + Content + Footer) */}
+      {/* Right Column (Header + Content) */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* 2. Header */}
         <AdminHeader />
@@ -49,9 +48,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         <main className="flex-1 p-6 md:p-10 flex flex-col gap-10">
           {children}
         </main>
-
-        {/* Footer sits at the bottom of the content column */}
-        <AdminFooter />
       </div>
       <Toaster />
     </div>

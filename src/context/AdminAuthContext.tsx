@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
@@ -10,12 +9,19 @@ interface AdminUser {
   role: string;
 }
 
+interface AdminSession {
+  user: AdminUser;
+  expiresAt: number;
+}
+
 interface AdminAuthContextValue {
   user: AdminUser | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
+
+const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 const AdminAuthContext = createContext<AdminAuthContextValue>({
   user: null,
@@ -30,9 +36,20 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('shaikh_admin_session');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    const savedSessionStr = localStorage.getItem('shaikh_admin_session');
+    if (savedSessionStr) {
+      try {
+        const session: AdminSession = JSON.parse(savedSessionStr);
+        // Check if session is still valid (within 7 days)
+        if (Date.now() < session.expiresAt) {
+          setUser(session.user);
+        } else {
+          // Session expired
+          localStorage.removeItem('shaikh_admin_session');
+        }
+      } catch (e) {
+        localStorage.removeItem('shaikh_admin_session');
+      }
     }
     setLoading(false);
   }, []);
@@ -52,8 +69,13 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(data.error || 'Authentication failed');
       }
 
+      const session: AdminSession = {
+        user: data.user,
+        expiresAt: Date.now() + SESSION_DURATION_MS
+      };
+
       setUser(data.user);
-      localStorage.setItem('shaikh_admin_session', JSON.stringify(data.user));
+      localStorage.setItem('shaikh_admin_session', JSON.stringify(session));
     } finally {
       setLoading(false);
     }

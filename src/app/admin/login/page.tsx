@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -68,7 +67,6 @@ export default function AdminLoginPage() {
             <span className="font-headline font-black text-3xl text-foreground uppercase tracking-tight" style={{ fontFamily: 'Playfair Display' }}>SHAIKH</span>
             <span className="font-headline font-light tracking-[0.3em] text-foreground text-3xl uppercase" style={{ fontFamily: 'Playfair Display' }}>& SONS</span>
           </div>
-          <p className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">Fleet Command Core</p>
         </div>
 
         <Card className="border-border/50 bg-card/40 backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
@@ -118,15 +116,6 @@ export default function AdminLoginPage() {
             </CardFooter>
           </form>
         </Card>
-        
-        <div className="mt-12 text-center space-y-1">
-          <p className="text-[9px] text-muted-foreground uppercase tracking-widest opacity-40">
-            Proprietary Fleet Management System
-          </p>
-          <p className="text-[8px] text-primary font-bold uppercase tracking-[0.3em]">
-            AES-256 Cloud Encrypted Persistence
-          </p>
-        </div>
       </div>
     </div>
   );

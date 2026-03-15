@@ -2,7 +2,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import Link from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import { Menu, Sun, Moon, LogOut, LayoutDashboard, ShoppingCart, Package, Users, Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -78,9 +78,9 @@ export function AdminHeader() {
         <SheetContent side="left" className="w-[300px] bg-background/95 backdrop-blur-md border-r-border/50 p-0 flex flex-col no-scrollbar [&>button]:hidden">
           <SheetHeader className="px-6 h-[76px] flex flex-row items-center justify-between shrink-0">
             <SheetTitle>
-              <div className="flex flex-col gap-0.5">
-                <span className="font-headline font-black text-lg tracking-tighter uppercase">SHAIKH</span>
-                <span className="font-headline font-light text-lg tracking-widest uppercase flex items-center">
+              <div className="flex items-center gap-2 group whitespace-nowrap">
+                <span className="font-headline font-black text-lg tracking-tighter text-foreground uppercase">SHAIKH</span>
+                <span className="font-headline font-light text-lg tracking-widest text-foreground uppercase flex items-center">
                   <span className="relative inline-flex items-center justify-center mr-1">
                     <span className="text-primary font-bold italic">&</span>
                     <span className="absolute -top-1.5 -left-0.5 w-2.5 h-2.5 -rotate-[15deg] text-primary">
@@ -97,7 +97,7 @@ export function AdminHeader() {
           </SheetHeader>
           <nav className="flex-1 px-8 py-8 space-y-6">
             {navItems.map((item) => (
-              <Link 
+              <a 
                 key={item.name} 
                 href={item.href} 
                 onClick={() => setMobileMenuOpen(false)}
@@ -110,7 +110,7 @@ export function AdminHeader() {
                   {item.name}
                 </span>
                 <item.icon className="h-5 w-5" />
-              </Link>
+              </a>
             ))}
           </nav>
           <div className="p-8 border-t">

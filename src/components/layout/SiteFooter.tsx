@@ -61,7 +61,7 @@ export function SiteFooter() {
         
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-muted gap-4">
           <p className="text-muted-foreground text-[10px] tracking-widest uppercase font-medium">
-            © 2025 Shaikh & Sons Automotive Group. All Rights Reserved.
+            © {new Date().getFullYear()} Shaikh & Sons Automotive Group. All Rights Reserved.
           </p>
           <div className="flex gap-8 text-[10px] uppercase tracking-widest font-bold">
             <Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link>

@@ -39,20 +39,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex flex-col min-h-screen w-full bg-background text-foreground">
-        {/* Full-width Top Navbar */}
+        {/* Full-width Top Navbar - Sticky but doesn't overlap */}
         <AdminNavbar />
         
         <div className="flex flex-1 w-full">
-          {/* Sidebar on the Left */}
+          {/* Sidebar on the Left - Scrolls with page */}
           <AdminSidebar />
           
-          {/* Main Content on the Right - Scrollable with page */}
-          <main className="flex-1 p-6 md:p-10 bg-background relative z-0 min-h-screen">
+          {/* Main Content on the Right - Scrolls with page */}
+          <main className="flex-1 p-6 md:p-10 bg-background relative z-0">
             {children}
           </main>
         </div>
 
-        {/* Full-width Bottom Footer */}
+        {/* Full-width Bottom Footer - At the end of the scroll */}
         <AdminFooter />
         <Toaster />
       </div>

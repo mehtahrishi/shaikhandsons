@@ -44,7 +44,7 @@ export function AdminSidebar() {
   return (
     <Sidebar 
       collapsible="icon" 
-      className="border-r border-border/50 bg-card/40 backdrop-blur-xl h-auto min-h-screen"
+      className="border-r border-border/50 bg-card/40 backdrop-blur-xl h-auto min-h-screen relative"
     >
       <SidebarContent className="px-4 py-8">
         <div className="mb-8">

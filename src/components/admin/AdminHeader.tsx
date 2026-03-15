@@ -2,7 +2,6 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import { Menu, Sun, Moon, LogOut, LayoutDashboard, ShoppingCart, Package, Users, Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -68,7 +67,6 @@ export function AdminHeader() {
 
   return (
     <header className="h-20 border-b bg-background/95 backdrop-blur-md sticky top-0 z-50 flex items-center px-6 md:px-10">
-      {/* Mobile Hamburger */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetTrigger asChild>
           <Button variant="ghost" size="icon" className="md:hidden mr-4">
@@ -121,10 +119,8 @@ export function AdminHeader() {
         </SheetContent>
       </Sheet>
 
-      {/* Spacer area for future search */}
       <div className="flex-1" />
 
-      {/* Utilities */}
       <div className="flex items-center gap-6">
         <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-muted-foreground hover:text-primary transition-colors">
           {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}

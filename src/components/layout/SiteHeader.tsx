@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Menu, Sun, Moon, User, LogIn, LogOut, ChevronRight, X, LayoutDashboard } from 'lucide-react';
+import { Menu, Sun, Moon, User, LogIn, LogOut, ChevronRight, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -52,7 +52,6 @@ export function SiteHeader() {
   
   const isAuthenticated = !!user;
 
-  // Don't show header on admin routes (they have a sidebar)
   const isAdminRoute = pathname?.startsWith('/admin');
 
   useEffect(() => {
@@ -243,7 +242,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="shrink-0 hidden md:flex">
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-muted-foreground hover:text-primary transition-colors shrink-0 hidden md:flex">
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
 

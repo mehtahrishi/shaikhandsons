@@ -5,14 +5,14 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  LogOut, 
   Loader2, 
   Phone,
   MapPin,
   Edit3,
   Check,
   X,
-  CheckCircle2
+  CheckCircle2,
+  Shield
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -27,7 +27,7 @@ import { updateUserProfile } from '@/lib/appwrite/auth';
 export default function ProfilePage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { user, loading, logout, refresh } = useAuth();
+  const { user, loading, refresh } = useAuth();
 
   // Local state for editability
   const [isEditing, setIsEditing] = useState(false);
@@ -60,15 +60,6 @@ export default function ProfilePage() {
       }
     }
   }, [user, loading, router, toast]);
-
-  const handleSignOut = async () => {
-    await logout();
-    toast({
-      title: "Secure Logout",
-      description: "Identity session terminated successfully.",
-    });
-    router.push('/');
-  };
 
   const handleSave = async () => {
     if (!user) return;
@@ -117,7 +108,6 @@ export default function ProfilePage() {
           <Card className="bg-white/5 backdrop-blur-2xl border-white/10 rounded-[2rem] overflow-hidden shadow-2xl">
             <CardHeader className="text-center pt-12 pb-8 space-y-6">
               <div className="mx-auto">
-                {/* Clean, static avatar icon - no bg hover or effects */}
                 <Avatar className="h-24 w-24 border-2 border-primary/20 bg-black/60 pointer-events-none ring-0">
                   <AvatarFallback className="text-4xl font-black bg-primary/10 text-white border-none shadow-none">
                     {userInitial}
@@ -126,7 +116,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <CardTitle className="font-headline text-4xl font-black uppercase tracking-tighter text-white">
+                <CardTitle className="font-headline text-4xl font-black tracking-tighter text-white">
                   {user.name || "Collector"}
                 </CardTitle>
                 <CardDescription className="flex flex-col items-center gap-3">
@@ -211,14 +201,13 @@ export default function ProfilePage() {
               </div>
 
               {!isEditing && (
-                <div className="pt-8 border-t border-white/5">
-                  <Button 
-                    variant="ghost" 
-                    onClick={handleSignOut}
-                    className="w-full h-14 bg-red-500/5 hover:bg-red-500/10 text-red-500 text-xs font-bold uppercase tracking-widest px-6 rounded-2xl border border-red-500/10"
-                  >
-                    <span className="flex items-center gap-4"><LogOut className="h-4 w-4" /> Terminate Session</span>
-                  </Button>
+                <div className="pt-8 border-t border-white/5 text-center">
+                  <div className="flex flex-col items-center gap-2">
+                    <Shield className="h-4 w-4 text-primary opacity-50 mb-1" />
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold max-w-[280px] mx-auto leading-relaxed">
+                      Shaikh & Sons ensures your bespoke credentials remain private. Data is handled via encrypted protocols to facilitate your future commissions.
+                    </p>
+                  </div>
                 </div>
               )}
             </CardContent>

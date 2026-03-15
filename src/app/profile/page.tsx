@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -115,11 +114,11 @@ export default function ProfilePage() {
           <Card className="bg-card/40 backdrop-blur-3xl border border-border/50 rounded-[2.5rem] overflow-hidden shadow-xl">
             <CardHeader className="text-center pt-12 pb-8 space-y-6">
               <div className="mx-auto">
-                <Avatar className="h-28 w-28 border-2 border-primary/20 bg-muted/50 pointer-events-none">
-                  <AvatarFallback className="text-5xl font-black bg-foreground text-background">
+                <div className="h-28 w-28 flex items-center justify-center pointer-events-none">
+                  <span className="text-8xl font-headline font-black text-primary select-none">
                     {userInitial}
-                  </AvatarFallback>
-                </Avatar>
+                  </span>
+                </div>
               </div>
 
               <div className="space-y-3">

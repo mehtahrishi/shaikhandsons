@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useEffect } from 'react';
@@ -37,13 +36,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider 
+      defaultOpen={true}
+      style={{ "--sidebar-top": "5rem" } as React.CSSProperties}
+    >
       <div className="flex flex-col min-h-screen bg-background overflow-hidden">
         <AdminNavbar />
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-hidden relative">
           <AdminSidebar />
-          <div className="flex flex-col flex-1 relative overflow-hidden">
-            <main className="flex-1 p-6 md:p-10 overflow-y-auto no-scrollbar">
+          <div className="flex flex-col flex-1 relative overflow-hidden bg-background">
+            <main className="flex-1 p-6 md:p-10 overflow-y-auto no-scrollbar relative z-0">
               {children}
             </main>
             <AdminFooter />

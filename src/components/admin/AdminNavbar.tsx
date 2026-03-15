@@ -1,4 +1,3 @@
-
 "use client"
 
 import React from 'react';
@@ -23,7 +22,7 @@ export function AdminNavbar() {
   const { user } = useAuth();
 
   return (
-    <header className="h-20 w-full bg-background border-b border-border/50 flex items-center px-10 justify-between sticky top-0 z-50">
+    <header className="h-20 w-full bg-background border-b border-border/50 flex items-center px-10 justify-between sticky top-0 z-[60]">
       <Link href="/" className="flex items-center gap-3 group">
         <span className="font-headline font-black text-2xl tracking-tighter text-foreground uppercase">SHAIKH</span>
         <span className="font-headline font-light text-2xl tracking-widest text-foreground uppercase flex items-center">
@@ -42,8 +41,8 @@ export function AdminNavbar() {
           <p className="text-[10px] font-black uppercase tracking-tight leading-none">{user?.name || "Fleet Master"}</p>
           <p className="text-[8px] text-primary font-bold uppercase tracking-widest mt-1">Operational Authority</p>
         </div>
-        <div className="h-12 w-12 flex items-center justify-center pointer-events-none">
-          <span className="text-4xl md:text-5xl font-headline font-black text-primary select-none">
+        <div className="flex items-center justify-center pointer-events-none ml-2">
+          <span className="text-5xl font-headline font-black text-primary select-none leading-none">
             A
           </span>
         </div>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, Sun, Moon, User, LogIn, LogOut, ChevronRight, X } from 'lucide-react';
+import { Menu, Sun, Moon, User, LogIn, LogOut, ChevronRight, X, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -22,7 +22,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
 
@@ -54,6 +53,21 @@ export function SiteHeader() {
   useEffect(() => {
     setMounted(true);
     
+    // Theme persistence logic
+    const savedTheme = localStorage.getItem('shaikh_theme');
+    if (savedTheme) {
+      const isCurrentlyDark = savedTheme === 'dark';
+      setIsDark(isCurrentlyDark);
+      if (isCurrentlyDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } else {
+      // Default to dark as requested
+      document.documentElement.classList.add('dark');
+    }
+
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
@@ -75,8 +89,15 @@ export function SiteHeader() {
   };
 
   const toggleTheme = () => {
-    setIsDark(!isDark);
-    document.documentElement.classList.toggle('dark');
+    const nextIsDark = !isDark;
+    setIsDark(nextIsDark);
+    if (nextIsDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('shaikh_theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('shaikh_theme', 'light');
+    }
   };
 
   const navLinks = [
@@ -163,6 +184,14 @@ export function SiteHeader() {
                       </Link>
                     </motion.div>
                   ))}
+                  {isAuthenticated && (
+                    <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}>
+                      <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="group flex items-center justify-between py-1">
+                        <span className="font-headline text-lg font-bold tracking-tight uppercase group-hover:text-primary transition-colors">Admin Dashboard</span>
+                        <ChevronRight className="h-5 w-5 text-primary opacity-0 group-hover:opacity-100 transition-all" />
+                      </Link>
+                    </motion.div>
+                  )}
                 </nav>
 
                 <div className="mt-auto space-y-6 pb-8">
@@ -170,7 +199,7 @@ export function SiteHeader() {
                     <div className="space-y-4">
                       <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-xl border border-white/5">
                         <div className="h-12 w-12 flex items-center justify-center">
-                          <span className="text-3xl font-headline font-black text-primary select-none">
+                          <span className="text-4xl font-headline font-black text-primary select-none">
                             {userInitial}
                           </span>
                         </div>
@@ -218,6 +247,11 @@ export function SiteHeader() {
               {link.name}
             </Link>
           ))}
+          {isAuthenticated && (
+            <Link href="/admin" className="text-[9px] font-bold tracking-[0.2em] hover:text-primary transition-colors uppercase flex items-center gap-1">
+              <LayoutDashboard className="h-2.5 w-2.5" /> Command
+            </Link>
+          )}
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
@@ -231,7 +265,7 @@ export function SiteHeader() {
             ) : isAuthenticated ? (
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-9 w-9 p-0 overflow-visible focus-visible:ring-offset-0 focus-visible:ring-0">
+                  <Button variant="ghost" className="relative h-9 w-9 p-0 overflow-visible focus-visible:ring-offset-0 focus-visible:ring-0 hover:bg-transparent">
                     <span className="text-3xl font-headline font-black text-primary select-none">
                       {userInitial}
                     </span>
@@ -249,6 +283,12 @@ export function SiteHeader() {
                     <Link href="/profile" className="flex w-full items-center">
                       <User className="mr-2 h-4 w-4 text-primary" />
                       <span className="text-[10px] font-bold uppercase tracking-widest">My Garage</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer focus:bg-primary/10 p-2">
+                    <Link href="/admin" className="flex w-full items-center">
+                      <LayoutDashboard className="mr-2 h-4 w-4 text-primary" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Fleet Command</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-border/50" />

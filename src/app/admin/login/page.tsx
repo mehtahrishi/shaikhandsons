@@ -62,13 +62,6 @@ export default function AdminLoginPage() {
       </div>
 
       <div className="w-full max-w-sm">
-        <div className="text-center mb-10 space-y-2">
-          <div className="inline-flex items-center gap-3 mb-2">
-            <span className="font-headline font-black text-3xl text-foreground uppercase tracking-tight" style={{ fontFamily: 'Playfair Display' }}>SHAIKH</span>
-            <span className="font-headline font-light tracking-[0.3em] text-foreground text-3xl uppercase" style={{ fontFamily: 'Playfair Display' }}>& SONS</span>
-          </div>
-        </div>
-
         <Card className="border-border/50 bg-card/40 backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold flex items-center gap-2">

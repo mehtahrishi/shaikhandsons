@@ -115,7 +115,7 @@ export function AdminHeader() {
           </nav>
           <div className="p-8 border-t">
             <Button variant="destructive" className="w-full font-black uppercase tracking-widest text-[10px] h-12" onClick={logout}>
-              Terminate Session
+              Logout
             </Button>
           </div>
         </SheetContent>
@@ -133,24 +133,23 @@ export function AdminHeader() {
         {user && (
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-12 w-12 p-0 overflow-visible hover:bg-transparent">
+              <Button variant="ghost" className="relative h-12 w-12 p-0 overflow-visible hover:bg-transparent focus-visible:ring-0">
                 <span className="text-5xl font-headline font-black text-primary select-none leading-none">
                   A
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 mt-2 bg-background/95 backdrop-blur-xl border-border/50" align="end">
-              <DropdownMenuLabel className="p-3">
+            <DropdownMenuContent className="w-48 mt-2 bg-background/95 backdrop-blur-xl border-border/50" align="end">
+              <DropdownMenuLabel className="p-4">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-tight leading-none">{user.name || "Fleet Master"}</p>
-                  <p className="text-[8px] text-primary font-bold uppercase tracking-widest mt-1">Operational Authority</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest leading-none">Admin</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-border/50" />
-              <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer p-3">
-                <div className="flex w-full items-center gap-2">
+              <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer p-4">
+                <div className="flex w-full items-center gap-3">
                   <LogOut className="h-4 w-4" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Terminate Session</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest">Logout</span>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>

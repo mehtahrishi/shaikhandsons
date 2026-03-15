@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -239,9 +240,6 @@ export function SiteHeader() {
               {link.name}
             </Link>
           ))}
-          <Link href="/admin" className="text-[9px] font-bold tracking-[0.2em] hover:text-primary transition-colors uppercase flex items-center gap-1">
-            <LayoutDashboard className="h-2.5 w-2.5" /> Command
-          </Link>
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
@@ -273,12 +271,6 @@ export function SiteHeader() {
                     <Link href="/profile" className="flex w-full items-center">
                       <User className="mr-2 h-4 w-4 text-primary" />
                       <span className="text-[10px] font-bold uppercase tracking-widest">My Garage</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="cursor-pointer focus:bg-primary/10 p-2">
-                    <Link href="/admin" className="flex w-full items-center">
-                      <LayoutDashboard className="mr-2 h-4 w-4 text-primary" />
-                      <span className="text-[10px] font-bold uppercase tracking-widest">Fleet Command</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-border/50" />

@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -160,7 +159,7 @@ export function SiteHeader() {
                   variant="ghost" 
                   size="icon" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:bg-white/5 -mt-1"
+                  className="hover:bg-muted -mt-1"
                 >
                   <X className="h-5 w-5" />
                 </Button>
@@ -246,7 +245,7 @@ export function SiteHeader() {
             variant="ghost" 
             size="icon" 
             onClick={toggleTheme} 
-            className="text-foreground hover:text-primary transition-colors shrink-0 hidden md:flex"
+            className="text-foreground transition-colors shrink-0 hidden md:flex hover:bg-muted"
           >
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>

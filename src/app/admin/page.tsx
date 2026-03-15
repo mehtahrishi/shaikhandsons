@@ -65,7 +65,7 @@ export default function AdminDashboardPage() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
         >
-          <h1 className="font-headline text-4xl md:text-6xl font-black mb-2">
+          <h1 className="font-headline text-4xl md:text-6xl font-black mb-2 text-primary">
             Dashboard
           </h1>
           <p className="text-muted-foreground text-sm max-w-xl uppercase tracking-widest font-bold">

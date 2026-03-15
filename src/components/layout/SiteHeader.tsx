@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Menu, Sun, Moon, User, LogIn, LogOut, ChevronRight, X, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -45,15 +45,18 @@ export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const router = useRouter();
+  const pathname = usePathname();
   const { toast } = useToast();
-  const { user, loading, logout } = useAuth();
+  const { user, logout } = useAuth();
   
   const isAuthenticated = !!user;
+
+  // Don't show header on admin routes (they have a sidebar)
+  const isAdminRoute = pathname?.startsWith('/admin');
 
   useEffect(() => {
     setMounted(true);
     
-    // Theme persistence logic
     const savedTheme = localStorage.getItem('shaikh_theme');
     if (savedTheme) {
       const isCurrentlyDark = savedTheme === 'dark';
@@ -64,7 +67,6 @@ export function SiteHeader() {
         document.documentElement.classList.remove('dark');
       }
     } else {
-      // Default to dark as requested
       document.documentElement.classList.add('dark');
     }
 
@@ -99,6 +101,8 @@ export function SiteHeader() {
       localStorage.setItem('shaikh_theme', 'light');
     }
   };
+
+  if (isAdminRoute && pathname !== '/admin/login') return null;
 
   const navLinks = [
     { name: 'Showroom', href: '/#showroom' },
@@ -141,7 +145,6 @@ export function SiteHeader() {
     >
       <div className="container mx-auto px-6 flex items-center justify-between h-10 md:h-12">
         <div className="flex items-center gap-4 w-full md:w-auto">
-          {/* Mobile Menu Trigger */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden shrink-0">
@@ -184,14 +187,6 @@ export function SiteHeader() {
                       </Link>
                     </motion.div>
                   ))}
-                  {isAuthenticated && (
-                    <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}>
-                      <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="group flex items-center justify-between py-1">
-                        <span className="font-headline text-lg font-bold tracking-tight uppercase group-hover:text-primary transition-colors">Admin Dashboard</span>
-                        <ChevronRight className="h-5 w-5 text-primary opacity-0 group-hover:opacity-100 transition-all" />
-                      </Link>
-                    </motion.div>
-                  )}
                 </nav>
 
                 <div className="mt-auto space-y-6 pb-8">
@@ -227,16 +222,13 @@ export function SiteHeader() {
             </SheetContent>
           </Sheet>
 
-          {/* Centered Brand on Mobile */}
           <Link href="/" className="flex items-center justify-center md:justify-start flex-1 md:flex-initial">
             <BrandIdentity size="md" />
           </Link>
 
-          {/* Spacer for balancing hamburger */}
           <div className="w-9 h-9 md:hidden" />
         </div>
 
-        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <Link 
@@ -247,11 +239,9 @@ export function SiteHeader() {
               {link.name}
             </Link>
           ))}
-          {isAuthenticated && (
-            <Link href="/admin" className="text-[9px] font-bold tracking-[0.2em] hover:text-primary transition-colors uppercase flex items-center gap-1">
-              <LayoutDashboard className="h-2.5 w-2.5" /> Command
-            </Link>
-          )}
+          <Link href="/admin" className="text-[9px] font-bold tracking-[0.2em] hover:text-primary transition-colors uppercase flex items-center gap-1">
+            <LayoutDashboard className="h-2.5 w-2.5" /> Command
+          </Link>
         </nav>
 
         <div className="hidden md:flex items-center gap-3">

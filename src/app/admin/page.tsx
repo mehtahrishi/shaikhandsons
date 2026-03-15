@@ -66,19 +66,12 @@ export default function AdminDashboardPage() {
           animate={{ opacity: 1, x: 0 }}
         >
           <h1 className="font-headline text-4xl md:text-6xl font-black mb-2">
-            Fleet <span className="text-primary italic">Command</span>
+            Dashboard
           </h1>
           <p className="text-muted-foreground text-sm max-w-xl uppercase tracking-widest font-bold">
-            Central intelligence hub for the Shaikh & Sons ecosystem.
+            Overview of your store's performance.
           </p>
         </motion.div>
-        
-        <div className="flex gap-4">
-          <div className="bg-primary/5 border border-primary/20 px-4 py-2 rounded-full flex items-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-primary">Core Synced</span>
-          </div>
-        </div>
       </div>
 
       {/* Stats Grid */}

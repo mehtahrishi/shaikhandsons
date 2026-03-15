@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useEffect, useState } from 'react';
@@ -100,9 +99,10 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background pt-32 pb-24 relative overflow-hidden flex items-center">
-      {/* Background Decor */}
+      {/* Background Decor - Subtle for Light/Dark Mode compatibility */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] opacity-30" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] opacity-20 dark:opacity-30" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,hsl(var(--background))_100%)] opacity-40" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10 flex justify-center">
@@ -112,7 +112,7 @@ export default function ProfilePage() {
           transition={{ duration: 0.6 }}
           className="w-full max-w-lg"
         >
-          <Card className="bg-card/50 backdrop-blur-3xl border-border rounded-[2.5rem] overflow-hidden shadow-2xl">
+          <Card className="bg-card/70 backdrop-blur-3xl border border-border/50 rounded-[2.5rem] overflow-hidden shadow-2xl">
             <CardHeader className="text-center pt-12 pb-8 space-y-6">
               <div className="mx-auto">
                 <Avatar className="h-28 w-28 border border-border bg-muted pointer-events-none">
@@ -138,14 +138,14 @@ export default function ProfilePage() {
 
             <CardContent className="px-6 md:px-12 pb-12 space-y-10">
               <div className="space-y-6">
-                <div className="flex items-center justify-between border-b border-border pb-4">
+                <div className="flex items-center justify-between border-b border-border/50 pb-4">
                   <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Identity Credentials</h3>
                   {!isEditing && (
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       onClick={() => setIsEditing(true)}
-                      className="text-[10px] font-bold uppercase tracking-widest h-8 px-4 hover:bg-accent"
+                      className="text-[10px] font-bold uppercase tracking-widest h-8 px-4 hover:bg-muted"
                     >
                       <Edit3 className="h-3 w-3 mr-2" /> Modify
                     </Button>
@@ -163,7 +163,7 @@ export default function ProfilePage() {
                         value={phone} 
                         onChange={(e) => setPhone(e.target.value)} 
                         placeholder="+1 (555) 000-0000"
-                        className="bg-muted border-border h-14 font-bold focus:border-primary transition-all text-sm"
+                        className="bg-muted/50 border-border h-14 font-bold focus:border-primary transition-all text-sm"
                       />
                     ) : (
                       <p className="text-base font-medium text-foreground/90">{phone || "No phone registered"}</p>
@@ -180,7 +180,7 @@ export default function ProfilePage() {
                         value={address} 
                         onChange={(e) => setAddress(e.target.value)} 
                         placeholder="123 Elite Avenue, Dubai"
-                        className="bg-muted border-border h-14 font-bold focus:border-primary transition-all text-sm"
+                        className="bg-muted/50 border-border h-14 font-bold focus:border-primary transition-all text-sm"
                       />
                     ) : (
                       <p className="text-base font-medium text-foreground/90 leading-relaxed">{address || "No address registered"}</p>
@@ -208,14 +208,14 @@ export default function ProfilePage() {
               </div>
 
               {!isEditing && (
-                <div className="pt-10 border-t border-border">
+                <div className="pt-10 border-t border-border/50">
                   <div className="flex flex-col gap-6">
                     <div className="flex items-center gap-3 text-primary">
                       <Shield className="h-4 w-4" />
                       <span className="text-[10px] font-black uppercase tracking-[0.4em]">Privacy Manifest</span>
                     </div>
                     <ul className="grid grid-cols-1 gap-4">
-                      <li className="flex items-start gap-4 bg-muted/30 p-4 rounded-2xl border border-border group transition-colors hover:border-primary/20">
+                      <li className="flex items-start gap-4 bg-muted/20 dark:bg-muted/30 p-4 rounded-2xl border border-border/50 group transition-colors hover:border-primary/20">
                         <Lock className="h-4 w-4 text-muted-foreground mt-0.5 group-hover:text-primary transition-colors" />
                         <div>
                           <p className="text-[10px] font-bold text-foreground uppercase tracking-widest mb-1">Encrypted Persistence</p>
@@ -224,7 +224,7 @@ export default function ProfilePage() {
                           </p>
                         </div>
                       </li>
-                      <li className="flex items-start gap-4 bg-muted/30 p-4 rounded-2xl border border-border group transition-colors hover:border-primary/20">
+                      <li className="flex items-start gap-4 bg-muted/20 dark:bg-muted/30 p-4 rounded-2xl border border-border/50 group transition-colors hover:border-primary/20">
                         <EyeOff className="h-4 w-4 text-muted-foreground mt-0.5 group-hover:text-primary transition-colors" />
                         <div>
                           <p className="text-[10px] font-bold text-foreground uppercase tracking-widest mb-1">Confidential Liaison</p>

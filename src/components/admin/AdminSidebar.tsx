@@ -38,10 +38,11 @@ export function AdminSidebar({ className }: { className?: string }) {
 
   return (
     <aside className={cn("hidden md:flex flex-col w-64 lg:w-72 bg-muted/40 border-r min-h-screen", className)}>
-      <div className="p-8">
-        <Link href="/" className="flex flex-col gap-1 group">
-          <span className="font-headline font-black text-xl tracking-tighter text-foreground uppercase">SHAIKH</span>
-          <span className="font-headline font-light text-xl tracking-widest text-foreground uppercase flex items-center">
+      {/* Brand Header: Aligned with AdminHeader (h-20) */}
+      <div className="h-20 flex items-center px-6 border-b">
+        <Link href="/" className="flex items-center gap-2 group whitespace-nowrap">
+          <span className="font-headline font-black text-lg tracking-tighter text-foreground uppercase">SHAIKH</span>
+          <span className="font-headline font-light text-lg tracking-widest text-foreground uppercase flex items-center">
             <span className="relative inline-flex items-center justify-center mr-1">
               <span className="text-primary font-bold italic">&</span>
               <span className="absolute -top-1.5 -left-0.5 w-2.5 h-2.5 -rotate-[15deg] text-primary">
@@ -53,7 +54,7 @@ export function AdminSidebar({ className }: { className?: string }) {
         </Link>
       </div>
 
-      <nav className="flex-1 px-4 py-4 space-y-1">
+      <nav className="flex-1 px-4 py-8 space-y-1">
         <p className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-4 px-4">
           Fleet Command
         </p>
@@ -74,7 +75,7 @@ export function AdminSidebar({ className }: { className?: string }) {
         ))}
       </nav>
 
-      <div className="p-6 mt-auto">
+      <div className="p-6 mt-auto border-t">
         <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
           <div className="flex items-center gap-2 mb-2">
             <Zap className="h-3 w-3 text-primary" />

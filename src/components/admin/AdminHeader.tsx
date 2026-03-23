@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { Menu, Sun, Moon, LogOut, LayoutDashboard, ShoppingCart, Package, Users, Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -95,7 +96,7 @@ export function AdminHeader() {
           </SheetHeader>
           <nav className="flex-1 px-8 py-8 space-y-6">
             {navItems.map((item) => (
-              <a 
+              <Link 
                 key={item.name} 
                 href={item.href} 
                 onClick={() => setMobileMenuOpen(false)}
@@ -108,7 +109,7 @@ export function AdminHeader() {
                   {item.name}
                 </span>
                 <item.icon className="h-5 w-5" />
-              </a>
+              </Link>
             ))}
           </nav>
           <div className="p-8 border-t">
@@ -135,7 +136,7 @@ export function AdminHeader() {
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-12 w-12 p-0 overflow-visible hover:bg-transparent focus-visible:ring-0 group">
-                <span className="text-5xl font-headline font-black text-foreground group-hover:text-primary transition-colors select-none leading-none">
+                <span className="text-5xl font-headline font-black text-foreground hover:text-primary transition-colors select-none leading-none">
                   A
                 </span>
               </Button>

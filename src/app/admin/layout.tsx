@@ -7,6 +7,7 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminAuthProvider, useAdminAuth } from '@/context/AdminAuthContext';
 import { Toaster } from '@/components/ui/toaster';
+import { Loader2 } from 'lucide-react';
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAdminAuth();
@@ -23,11 +24,12 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  if (loading || !user) {
+  // Only show the full-page loader on the very first mount/check
+  if (loading && !user) {
     return (
       <div className="h-screen flex items-center justify-center bg-background text-foreground">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <Loader2 className="h-10 w-10 text-primary animate-spin" />
           <p className="font-headline text-[10px] uppercase tracking-[0.4em] text-muted-foreground">Initializing Command...</p>
         </div>
       </div>
@@ -46,7 +48,13 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         
         {/* 3. Main Content Area */}
         <main className="flex-1 p-6 md:p-10 flex flex-col gap-10">
-          {children}
+          {!user && pathname !== '/admin/login' ? (
+            <div className="flex-1 flex items-center justify-center">
+              <Loader2 className="h-8 w-8 text-primary animate-spin" />
+            </div>
+          ) : (
+            children
+          )}
         </main>
       </div>
       <Toaster />

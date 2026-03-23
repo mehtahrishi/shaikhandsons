@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useEffect } from 'react';
@@ -24,31 +23,24 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  // Only show the full-page loader on the very first mount/check
-  if (loading && !user) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-background text-foreground">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-10 w-10 text-primary animate-spin" />
-          <p className="font-headline text-[10px] uppercase tracking-[0.4em] text-muted-foreground">Initializing Command...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* 1. Sidebar (Desktop) */}
+      {/* 1. Sidebar (Desktop) - PERSISTENT SHELL */}
       <AdminSidebar />
       
       {/* Right Column (Header + Content) */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* 2. Header */}
+        {/* 2. Header - PERSISTENT SHELL */}
         <AdminHeader />
         
         {/* 3. Main Content Area */}
         <main className="flex-1 p-6 md:p-10 flex flex-col gap-10">
-          {!user && pathname !== '/admin/login' ? (
+          {loading && !user ? (
+            <div className="flex-1 flex flex-col items-center justify-center gap-4">
+              <Loader2 className="h-10 w-10 text-primary animate-spin" />
+              <p className="font-headline text-[10px] uppercase tracking-[0.4em] text-muted-foreground">Initializing Command...</p>
+            </div>
+          ) : !user && pathname !== '/admin/login' ? (
             <div className="flex-1 flex items-center justify-center">
               <Loader2 className="h-8 w-8 text-primary animate-spin" />
             </div>

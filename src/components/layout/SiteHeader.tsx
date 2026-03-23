@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -114,7 +113,7 @@ export function SiteHeader() {
   const userInitial = user?.name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "C";
 
   const BrandIdentity = ({ className, size = "md" }: { className?: string, size?: "sm" | "md" | "lg" }) => (
-    <div className={cn("flex items-center gap-2 group", className)}>
+    <div className={cn("flex items-center gap-2 group whitespace-nowrap", className)}>
       <span className={cn(
         "font-headline font-black tracking-tighter text-foreground uppercase transition-colors",
         size === "sm" ? "text-xs" : size === "md" ? "text-sm md:text-lg" : "text-lg md:text-2xl"

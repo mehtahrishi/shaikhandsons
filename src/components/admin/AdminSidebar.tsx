@@ -16,7 +16,7 @@ const navItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Products", href: "/admin/inventory", icon: Package },
-  { name: "Customers", href: "/admin/users", icon: Users },
+  { name: "Users", href: "/admin/users", icon: Users },
   { name: "AI synthesis", href: "/admin/ai-tools", icon: Sparkles },
 ]
 

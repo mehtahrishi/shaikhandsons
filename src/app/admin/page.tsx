@@ -51,10 +51,27 @@ const recentEnquiries = [
 ];
 
 export default function AdminDashboardPage() {
+  const [totalUsers, setTotalUsers] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    async function fetchTotalUsers() {
+      try {
+        const response = await fetch('/api/admin/users?limit=1');
+        const data = await response.json();
+        if (response.ok) {
+          setTotalUsers(data.total || 0);
+        }
+      } catch (err) {
+        console.error('Failed to fetch total users:', err);
+      }
+    }
+    fetchTotalUsers();
+  }, []);
+
   const stats = [
+    { label: 'Total Users', value: totalUsers !== null ? String(totalUsers) : '...', icon: Users, trend: 'From Database' },
     { label: 'Active Reservations', value: '1,284', icon: Car, trend: '+12%' },
     { label: 'Network Hashrate', value: '42.8 PH/s', icon: Cpu, trend: 'Stable' },
-    { label: 'Verified Collectors', value: '842', icon: Users, trend: '+5%' },
     { label: 'Energy Efficiency', value: '98.2%', icon: Zap, trend: '+1.4%' },
   ];
 

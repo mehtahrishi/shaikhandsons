@@ -37,35 +37,38 @@ export function SiteFooter() {
               </span>
             </Link>
             <p className="text-muted-foreground max-w-xs text-sm leading-relaxed">
-              Defining the pinnacle of electronic luxury through transcendental engineering and uncompromising design.
+              Defining the pinnacle of electric luxury through transcendental engineering and uncompromising sustainable design.
             </p>
           </div>
           <div className="space-y-4">
             <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary">The Fleet</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="#" className="hover:text-primary transition-colors">Aether Sedan</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">Lumina SUV</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">Spectre GT</Link></li>
+              <li><Link href="/#showroom" className="hover:text-primary transition-colors">Aether Sedan</Link></li>
+              <li><Link href="/#showroom" className="hover:text-primary transition-colors">Lumina SUV</Link></li>
+              <li><Link href="/#showroom" className="hover:text-primary transition-colors">Spectre GT</Link></li>
             </ul>
           </div>
           <div className="space-y-4">
             <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary">Company</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="#" className="hover:text-primary transition-colors">Our Vision</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">Technology</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">Careers</Link></li>
+              <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
             </ul>
           </div>
         </div>
         
-        <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-muted gap-4">
-          <p className="text-muted-foreground text-[10px] tracking-widest uppercase font-medium">
-            © {new Date().getFullYear()} Shaikh & Sons Automotive Group. All Rights Reserved.
+        <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-muted gap-4 text-center md:text-left">
+          <p className="text-muted-foreground text-[10px] uppercase tracking-widest font-bold">
+            © {new Date().getFullYear()} Shaikh & Sons Electric Automotive Group. All Rights Reserved.
           </p>
+          
+          <div className="text-muted-foreground text-xs font-medium">
+            Developed By <a href="https://hrishi-portfolio-two.vercel.app/" target="_blank" rel="noopener noreferrer" className="font-headline font-black text-red-600 tracking-normal text-sm bg-gradient-to-r from-foreground to-foreground bg-no-repeat [background-position:0_100%] [background-size:0_2px] hover:[background-size:100%_2px] transition-all duration-300">Hrishi Mehta</a>
+          </div>
+
           <div className="flex gap-8 text-[10px] uppercase tracking-widest font-bold">
-            <Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link>
-            <Link href="#" className="hover:text-primary transition-colors">Terms of Service</Link>
-            <Link href="#" className="hover:text-primary transition-colors">Cookies</Link>
+            <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

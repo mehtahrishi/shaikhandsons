@@ -225,7 +225,14 @@ export function SiteHeader() {
             <BrandIdentity size="md" />
           </Link>
 
-          <div className="w-9 h-9 md:hidden" />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleTheme} 
+            className="text-foreground shrink-0 flex md:hidden hover:bg-transparent hover:text-foreground focus-visible:ring-0"
+          >
+            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
         </div>
 
         <nav className="hidden md:flex items-center gap-6">

@@ -24,14 +24,6 @@ export function InitialLoader() {
   const [sparkleValues, setSparkleValues] = useState<{ x: number, y: number, w: number, h: number }[]>([]);
 
   useEffect(() => {
-    // Prevent the loader from running on every internal navigation
-    const hasSeenLoader = sessionStorage.getItem('shaikh_loader_seen');
-    if (hasSeenLoader) {
-      setIsLoading(false);
-      setMounted(true);
-      return;
-    }
-
     setMounted(true);
 
     const generatePath = (startX: number, startY: number, endX: number, endY: number, segments: number = 8, jitter: number = 30) => {
@@ -64,7 +56,6 @@ export function InitialLoader() {
 
     const timer = setTimeout(() => {
       setIsLoading(false);
-      sessionStorage.setItem('shaikh_loader_seen', 'true');
     }, 5500);
 
     const textTimer = setTimeout(() => {

@@ -26,6 +26,7 @@ import {
   ChartTooltipContent 
 } from "@/components/ui/chart";
 import { Area, AreaChart, CartesianGrid, XAxis, ResponsiveContainer } from "recharts";
+import { vehicles } from '@/lib/mock-data';
 
 const chartData = [
   { month: "Jan", reservations: 186 },
@@ -70,7 +71,7 @@ export default function AdminDashboardPage() {
 
   const stats = [
     { label: 'Total Users', value: totalUsers !== null ? String(totalUsers) : '...', icon: Users, trend: 'From Database' },
-    { label: 'Active Reservations', value: '1,284', icon: Car, trend: '+12%' },
+    { label: 'Total Vehicles', value: String(vehicles.length), icon: Car, trend: 'In Fleet' },
     { label: 'Network Hashrate', value: '42.8 PH/s', icon: Cpu, trend: 'Stable' },
     { label: 'Energy Efficiency', value: '98.2%', icon: Zap, trend: '+1.4%' },
   ];

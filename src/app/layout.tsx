@@ -3,7 +3,7 @@ import './globals.css';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { Toaster } from '@/components/ui/toaster';
-import { InitialLoader } from '@/components/common/InitialLoader';
+import { InitialLoaderV2 as InitialLoader } from '@/components/common/InitialLoaderV2';
 import { CookieConsent } from '@/components/common/CookieConsent';
 import { AuthProvider } from '@/context/AuthContext';
 
@@ -28,7 +28,7 @@ export default function RootLayout({
         <AuthProvider>
           <InitialLoader />
           <SiteHeader />
-          <main className="flex-1">
+          <main className="flex-1 pt-16 md:pt-20">
             {children}
           </main>
           <SiteFooter />

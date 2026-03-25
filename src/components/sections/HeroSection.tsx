@@ -46,7 +46,7 @@ export function HeroSection() {
   const prevSlide = () => setSlide(getSlideIndex(-1));
 
   return (
-    <section className="relative w-full bg-black overflow-hidden pt-20 md:pt-24 pb-0">
+    <section className="relative w-full bg-black overflow-hidden pb-0">
       <div className="w-full">
         {/* Desktop & Tablet View: Interactive Window Slide (50% center) */}
         <div className="hidden md:flex w-full items-stretch justify-center bg-black group/hero">

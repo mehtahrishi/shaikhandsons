@@ -5,7 +5,6 @@ import { useRouter, usePathname } from 'next/navigation';
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminAuthProvider, useAdminAuth } from '@/context/AdminAuthContext';
-import { Toaster } from '@/components/ui/toaster';
 import { Loader2 } from 'lucide-react';
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
@@ -20,11 +19,11 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   }, [user, loading, router, pathname]);
 
   if (pathname === '/admin/login') {
-    return <>{children}</>;
+    return <div className="-mt-16 md:-mt-20">{children}</div>;
   }
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="flex min-h-screen bg-background text-foreground overflow-x-hidden -mt-16 md:-mt-20">
       {/* 1. Sidebar (Desktop) - PERSISTENT SHELL */}
       <AdminSidebar />
       
@@ -49,7 +48,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           )}
         </main>
       </div>
-      <Toaster />
     </div>
   );
 }

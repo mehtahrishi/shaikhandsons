@@ -9,7 +9,7 @@ import {
   Zap,
   Cpu,
   Mail,
-  ArrowUpRight
+  ChartSpline,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
@@ -136,7 +136,7 @@ export default function AdminDashboardPage() {
                   <CardDescription className="text-[10px] uppercase tracking-widest">Global fleet acquisition data.</CardDescription>
                 </div>
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <ArrowUpRight className="h-4 w-4" />
+                  <ChartSpline className="h-4 w-4" />
                 </div>
               </div>
             </CardHeader>

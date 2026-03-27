@@ -24,11 +24,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 const orders = [
-  { id: "ORD-7721", user: "Julian Vane", model: "Veridian Aether", date: "2024-05-20", status: "Delivered", price: "$125,000" },
-  { id: "ORD-7722", user: "Elena Rodriguez", model: "Noir Spectre", date: "2024-05-21", status: "In Transit", price: "$210,000" },
-  { id: "ORD-7723", user: "Michael Chen", model: "Veridian Lumina", date: "2024-05-22", status: "Processing", price: "$98,000" },
-  { id: "ORD-7724", user: "Sarah Jenkins", model: "Veridian Aether", date: "2024-05-22", status: "Pending", price: "$125,000" },
-  { id: "ORD-7725", user: "Alexander Vance", model: "Noir Spectre", date: "2024-05-23", status: "Production", price: "$210,000" },
+  { id: "ORD-7721", user: "Julian Vane", model: "Veridian Aether", date: "2024-05-20", status: "Delivered", price: "₹1,25,000" },
+  { id: "ORD-7722", user: "Elena Rodriguez", model: "Noir Spectre", date: "2024-05-21", status: "In Transit", price: "₹2,10,000" },
+  { id: "ORD-7723", user: "Michael Chen", model: "Veridian Lumina", date: "2024-05-22", status: "Processing", price: "₹98,000" },
+  { id: "ORD-7724", user: "Sarah Jenkins", model: "Veridian Aether", date: "2024-05-22", status: "Pending", price: "₹1,25,000" },
+  { id: "ORD-7725", user: "Alexander Vance", model: "Noir Spectre", date: "2024-05-23", status: "Production", price: "₹2,10,000" },
 ];
 
 export default function AdminOrdersPage() {
@@ -50,7 +50,7 @@ export default function AdminOrdersPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: 'Total Revenue', value: '$1.2M', icon: ShoppingCart, trend: '+18%' },
+          { label: 'Total Revenue', value: '₹1.2Cr', icon: ShoppingCart, trend: '+18%' },
           { label: 'Active Builds', value: '42', icon: Clock, trend: 'Stable' },
           { label: 'Delivered', value: '128', icon: CheckCircle2, trend: '+5%' },
         ].map((stat, idx) => (

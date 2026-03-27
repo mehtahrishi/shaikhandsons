@@ -233,9 +233,9 @@ export default function AdminInventoryPage() {
 
   const totalAssets = vehicles.length;
   const totalValue = vehicles.reduce((sum, v) => sum + v.price, 0);
-  const formattedTotalValue = new Intl.NumberFormat('en-US', {
+  const formattedTotalValue = new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'INR',
     notation: 'compact',
     maximumFractionDigits: 1
   }).format(totalValue);
@@ -513,10 +513,13 @@ export default function AdminInventoryPage() {
           </p>
         </motion.div>
         
-        <div className="flex flex-wrap gap-2">
+        <div className="flex w-full sm:w-auto items-center gap-2 rounded-2xl border border-border/50 bg-card/40 backdrop-blur-xl p-2 shadow-[0_12px_32px_-20px_rgba(0,0,0,0.7)]">
           <Dialog open={isBulkModalOpen} onOpenChange={setIsBulkModalOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="h-12 px-6 font-black uppercase tracking-widest text-[10px] rounded-xl border-primary/20 hover:bg-primary/5">
+              <Button
+                variant="outline"
+                className="h-12 flex-1 sm:flex-none px-4 sm:px-6 font-black uppercase tracking-[0.16em] text-[10px] rounded-xl border-border/60 bg-background/60 hover:bg-primary/10 hover:border-primary/50 transition-all"
+              >
                 <Upload className="h-4 w-4 mr-2" /> Bulk Add
               </Button>
             </DialogTrigger>
@@ -712,7 +715,7 @@ export default function AdminInventoryPage() {
 
           <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
             <DialogTrigger asChild>
-              <Button className="h-12 px-8 font-black uppercase tracking-widest text-[10px] rounded-xl">
+              <Button className="h-12 flex-1 sm:flex-none px-4 sm:px-8 font-black uppercase tracking-[0.16em] text-[10px] rounded-xl shadow-[0_10px_24px_-12px_hsl(var(--primary))] hover:shadow-[0_14px_30px_-14px_hsl(var(--primary))] transition-all">
                 <Plus className="h-4 w-4 mr-2" /> Add New Asset
               </Button>
             </DialogTrigger>
@@ -766,12 +769,12 @@ export default function AdminInventoryPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest">Price ($)</Label>
-                  <Input 
-                    type="number" 
+                  <Label className="text-[10px] font-black uppercase tracking-widest">Price (₹)</Label>
+                  <Input
+                    type="number"
                     value={formData.price}
                     onChange={(e) => setFormData(prev => ({...prev, price: parseInt(e.target.value)}))}
-                    placeholder="125000" className="bg-muted/20 h-10 text-xs" 
+                    placeholder="125000" className="bg-muted/20 h-10 text-xs"
                   />
                 </div>
                 <div className="space-y-2">
@@ -989,7 +992,7 @@ export default function AdminInventoryPage() {
                           </span>
                         </TableCell>
                         <TableCell className="py-4 font-headline font-bold text-sm">
-                          {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(item.price)}
+                          {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(item.price)}
                         </TableCell>
                         <TableCell className="py-4 text-right">
                           <DropdownMenu modal={false}>
@@ -1152,12 +1155,12 @@ export default function AdminInventoryPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase tracking-widest">Price ($)</Label>
-              <Input 
-                type="number" 
+              <Label className="text-[10px] font-black uppercase tracking-widest">Price (₹)</Label>
+              <Input
+                type="number"
                 value={formData.price}
                 onChange={(e) => setFormData(prev => ({...prev, price: parseInt(e.target.value)}))}
-                className="bg-muted/20 h-10 text-xs" 
+                className="bg-muted/20 h-10 text-xs"
               />
             </div>
             <div className="space-y-2">

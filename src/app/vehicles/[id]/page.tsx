@@ -64,7 +64,7 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Starting at</p>
-                  <p className="text-4xl font-headline font-bold text-primary">${vehicle.price.toLocaleString()}</p>
+                  <p className="text-4xl font-headline font-bold text-primary">₹{vehicle.price.toLocaleString('en-IN')}</p>
                 </div>
               </div>
               <p className="text-lg leading-relaxed text-muted-foreground border-l-2 border-primary pl-6">
@@ -158,7 +158,7 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                 <div className="p-4 bg-muted/50 rounded-lg space-y-2">
                   <div className="flex justify-between text-xs">
                     <span className="text-muted-foreground">Reservation Fee</span>
-                    <span>$1,000</span>
+                    <span>₹1,000</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-muted-foreground">Estimated Delivery</span>

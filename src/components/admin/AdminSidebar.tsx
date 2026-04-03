@@ -17,7 +17,6 @@ const navItems = [
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Products", href: "/admin/inventory", icon: Package },
   { name: "Users", href: "/admin/users", icon: Users },
-  { name: "AI synthesis", href: "/admin/ai-tools", icon: Sparkles },
 ]
 
 const CrownIcon = () => (

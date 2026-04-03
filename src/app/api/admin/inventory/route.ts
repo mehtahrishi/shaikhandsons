@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Client, Databases, ID } from 'node-appwrite';
+import { getAllVehicles, createVehicle, updateVehicle, deleteVehicle } from '@/lib/db/inventory';
+import { isAdminAuthenticated } from '@/lib/db/admin-auth';
 
 export const runtime = 'nodejs';
 
 type NewVehicleData = {
+  brandId: number;
   make: string;
   model: string;
   year: number;
@@ -12,149 +14,86 @@ type NewVehicleData = {
   batteryRangeKm: number;
   horsepower: number;
   zeroToSixtySeconds: number;
-  images: string[];
+  imageUrls: string[];
   designPhilosophy: string;
 };
 
-function normalizeImageUrl(url: unknown): string {
-  if (typeof url !== 'string' || !url.trim()) {
-    return '';
-  }
-
-  if (url.startsWith('/api/admin/storage/view/')) {
-    return url;
-  }
-
-  const match = url.match(/\/files\/([^/?#]+)\/(view|preview)/i);
-  if (match && match[1]) {
-    return `/api/admin/storage/view/${match[1]}`;
-  }
-
-  return url;
-}
-
 export async function POST(req: NextRequest) {
-  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
-  const apiKey = process.env.APPWRITE_API_KEY;
-  const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
-  const collectionId =
-    process.env.NEXT_PUBLIC_APPWRITE_DATABASE_COLLECTION_NAME ||
-    process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ID;
-
-  if (!endpoint || !projectId || !apiKey || !databaseId || !collectionId) {
-    return NextResponse.json(
-      { error: 'Appwrite database environment is not configured.' },
-      { status: 500 }
-    );
-  }
-
   try {
-    const body = (await req.json()) as Partial<NewVehicleData>;
-
-    const requiredTextFields: Array<keyof NewVehicleData> = [
-      'make',
-      'model',
-      'trim',
-      'designPhilosophy',
-    ];
-
-    for (const field of requiredTextFields) {
-      const value = body[field];
-      if (typeof value !== 'string' || value.trim().length === 0) {
-        return NextResponse.json({ error: `Invalid field: ${field}` }, { status: 400 });
-      }
+    // Check admin authentication
+    const authenticated = await isAdminAuthenticated(req);
+    if (!authenticated) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const requiredNumberFields: Array<keyof NewVehicleData> = [
+    const body = (await req.json()) as Partial<NewVehicleData>;
+
+    const requiredFields = [
+      'brandId',
+      'make',
+      'model',
       'year',
+      'trim',
       'price',
       'batteryRangeKm',
       'horsepower',
       'zeroToSixtySeconds',
+      'imageUrls',
+      'designPhilosophy',
     ];
 
-    for (const field of requiredNumberFields) {
-      const value = body[field];
-      if (typeof value !== 'number' || Number.isNaN(value)) {
+    for (const field of requiredFields) {
+      if (field === 'brandId' && (typeof body[field as keyof NewVehicleData] !== 'number' || !body[field as keyof NewVehicleData])) {
         return NextResponse.json({ error: `Invalid field: ${field}` }, { status: 400 });
+      }
+      if (
+        field !== 'brandId' &&
+        field !== 'imageUrls' &&
+        field !== 'year' &&
+        field !== 'price' &&
+        field !== 'batteryRangeKm' &&
+        field !== 'horsepower' &&
+        field !== 'zeroToSixtySeconds'
+      ) {
+        const value = body[field as keyof NewVehicleData];
+        if (typeof value !== 'string' || (value as string).trim().length === 0) {
+          return NextResponse.json({ error: `Invalid field: ${field}` }, { status: 400 });
+        }
       }
     }
 
-    if (!Array.isArray(body.images) || body.images.length === 0) {
-      return NextResponse.json({ error: 'Invalid field: images' }, { status: 400 });
-    }
-
-    const data: NewVehicleData = {
-      make: body.make as string,
-      model: body.model as string,
+    const vehicle = await createVehicle({
+      brandId: body.brandId as number,
+      make: (body.make as string).trim(),
+      model: (body.model as string).trim(),
       year: body.year as number,
-      trim: body.trim as string,
-      price: body.price as number,
+      trim: (body.trim as string).trim(),
+      price: String(body.price),
       batteryRangeKm: body.batteryRangeKm as number,
       horsepower: body.horsepower as number,
-      zeroToSixtySeconds: body.zeroToSixtySeconds as number,
-      images: body.images,
-      designPhilosophy: body.designPhilosophy as string,
-    };
-
-    const client = new Client().setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
-    const databases = new Databases(client);
-
-    const created = await databases.createDocument({
-      databaseId,
-      collectionId,
-      documentId: ID.unique(),
-      data,
+      zeroToSixtySeconds: String(body.zeroToSixtySeconds),
+      imageUrls: Array.isArray(body.imageUrls) ? (body.imageUrls as string[]).filter(Boolean) : [],
+      designPhilosophy: (body.designPhilosophy as string).trim(),
     });
 
-    return NextResponse.json({ success: true, document: created });
+    return NextResponse.json({ success: true, vehicle });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to create vehicle document.';
+    const message = err instanceof Error ? err.message : 'Failed to create vehicle.';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
 export async function GET(req: NextRequest) {
-  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
-  const apiKey = process.env.APPWRITE_API_KEY;
-  const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
-  const collectionId =
-    process.env.NEXT_PUBLIC_APPWRITE_DATABASE_COLLECTION_NAME ||
-    process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ID;
-
-  if (!endpoint || !projectId || !apiKey || !databaseId || !collectionId) {
-    return NextResponse.json(
-      { error: 'Appwrite database environment is not configured.' },
-      { status: 500 }
-    );
-  }
-
-  const client = new Client().setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
-  const databases = new Databases(client);
-
   try {
-    const result = await databases.listDocuments(databaseId, collectionId);
+    // Check admin authentication
+    const authenticated = await isAdminAuthenticated(req);
+    if (!authenticated) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    const vehicles = result.documents.map((doc) => ({
-      id: doc.$id,
-      make: doc.make,
-      model: doc.model,
-      year: doc.year,
-      trim: doc.trim,
-      price: doc.price,
-      batteryRangeKm: doc.batteryRangeKm,
-      horsepower: doc.horsepower,
-      zeroToSixtySeconds: doc.zeroToSixtySeconds,
-      images: Array.isArray(doc.images)
-        ? doc.images.map((url: unknown) => normalizeImageUrl(url)).filter(Boolean)
-        : [],
-      designPhilosophy: doc.designPhilosophy,
-      createdAt: doc.$createdAt,
-    }));
+    const vehicles = await getAllVehicles();
 
-    return NextResponse.json({ total: result.total, vehicles });
+    return NextResponse.json({ total: vehicles.length, vehicles });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to fetch vehicles.';
     return NextResponse.json({ error: message }, { status: 500 });
@@ -162,75 +101,56 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
-  const apiKey = process.env.APPWRITE_API_KEY;
-  const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
-  const collectionId =
-    process.env.NEXT_PUBLIC_APPWRITE_DATABASE_COLLECTION_NAME ||
-    process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ID;
-
-  if (!endpoint || !projectId || !apiKey || !databaseId || !collectionId) {
-    return NextResponse.json(
-      { error: 'Appwrite database environment is not configured.' },
-      { status: 500 }
-    );
-  }
-
-  const id = req.nextUrl.searchParams.get('id');
-  if (!id) {
-    return NextResponse.json({ error: 'Missing document ID' }, { status: 400 });
-  }
-
   try {
+    // Check admin authentication
+    const authenticated = await isAdminAuthenticated(req);
+    if (!authenticated) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
-    const client = new Client().setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
-    const databases = new Databases(client);
+    
+    const id = body.id;
+    if (!id || isNaN(Number(id))) {
+      return NextResponse.json({ error: 'Missing or invalid vehicle ID' }, { status: 400 });
+    }
 
-    const updated = await databases.updateDocument(
-      databaseId,
-      collectionId,
-      id,
-      body
-    );
+    // Remove id from body to avoid passing it to the database
+    const { id: _, ...updateData } = body;
 
-    return NextResponse.json({ success: true, document: updated });
+    const vehicle = await updateVehicle(Number(id), updateData);
+
+    if (!vehicle) {
+      return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, vehicle });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update vehicle document.';
+    const message = err instanceof Error ? err.message : 'Failed to update vehicle.';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
 export async function DELETE(req: NextRequest) {
-  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
-  const apiKey = process.env.APPWRITE_API_KEY;
-  const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
-  const collectionId =
-    process.env.NEXT_PUBLIC_APPWRITE_DATABASE_COLLECTION_NAME ||
-    process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ID;
-
-  if (!endpoint || !projectId || !apiKey || !databaseId || !collectionId) {
-    return NextResponse.json(
-      { error: 'Appwrite database environment is not configured.' },
-      { status: 500 }
-    );
-  }
-
-  const id = req.nextUrl.searchParams.get('id');
-  if (!id) {
-    return NextResponse.json({ error: 'Missing document ID' }, { status: 400 });
-  }
-
   try {
-    const client = new Client().setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
-    const databases = new Databases(client);
+    // Check admin authentication
+    const authenticated = await isAdminAuthenticated(req);
+    if (!authenticated) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    await databases.deleteDocument(databaseId, collectionId, id);
+    const body = await req.json();
+    const id = body.id;
+    
+    if (!id || isNaN(Number(id))) {
+      return NextResponse.json({ error: 'Missing or invalid vehicle ID' }, { status: 400 });
+    }
+
+    await deleteVehicle(Number(id));
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to delete vehicle document.';
+    const message = err instanceof Error ? err.message : 'Failed to delete vehicle.';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

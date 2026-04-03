@@ -1,41 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Client, Storage } from 'node-appwrite';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
+import { existsSync } from 'fs';
 
 export const runtime = 'nodejs';
+
+const UPLOADS_DIR = join(process.cwd(), 'public', 'uploads');
 
 export async function GET(
   _req: NextRequest,
   context: { params: Promise<{ fileId: string }> }
 ) {
-  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
-  const apiKey = process.env.APPWRITE_API_KEY;
-  const bucketId = process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID;
-
-  if (!endpoint || !projectId || !apiKey || !bucketId) {
-    return NextResponse.json(
-      { error: 'Appwrite image environment is not configured.' },
-      { status: 500 }
-    );
-  }
-
-  const { fileId } = await context.params;
-  if (!fileId) {
-    return NextResponse.json({ error: 'Missing file ID' }, { status: 400 });
-  }
-
   try {
-    const client = new Client().setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
-    const storage = new Storage(client);
+    const { fileId } = await context.params;
+    if (!fileId) {
+      return NextResponse.json({ error: 'Missing file ID' }, { status: 400 });
+    }
 
-    const [metadata, binary] = await Promise.all([
-      storage.getFile({ bucketId, fileId }),
-      storage.getFileView({ bucketId, fileId }),
-    ]);
+    // Prevent directory traversal attacks
+    if (fileId.includes('..') || fileId.includes('/')) {
+      return NextResponse.json({ error: 'Invalid file ID' }, { status: 400 });
+    }
 
-    return new NextResponse(binary, {
+    const filePath = join(UPLOADS_DIR, fileId);
+
+    // Check if file exists
+    if (!existsSync(filePath)) {
+      return NextResponse.json({ error: 'File not found' }, { status: 404 });
+    }
+
+    // Read file
+    const fileBuffer = await readFile(filePath);
+
+    // Determine MIME type based on file extension
+    const ext = fileId.split('.').pop()?.toLowerCase();
+    const mimeTypes: Record<string, string> = {
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      png: 'image/png',
+      gif: 'image/gif',
+      webp: 'image/webp',
+      svg: 'image/svg+xml',
+    };
+
+    const mimeType = mimeTypes[ext || ''] || 'application/octet-stream';
+
+    return new NextResponse(fileBuffer, {
       headers: {
-        'Content-Type': metadata.mimeType || 'application/octet-stream',
+        'Content-Type': mimeType,
         'Cache-Control': 'public, max-age=31536000, immutable',
       },
     });

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { getCurrentUser, signOut, type AuthUser } from '@/lib/appwrite/auth';
+import { getCurrentUser, signOut, type AuthUser } from '@/lib/postgres/auth';
 
 // ─── Context Shape ────────────────────────────────────────────────────────────
 
@@ -28,15 +28,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    setLoading(true);
-    const currentUser = await getCurrentUser();
-    setUser(currentUser);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+    } catch (err) {
+      console.error('Auth refresh error:', err);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const logout = useCallback(async () => {
-    await signOut();
-    setUser(null);
+    try {
+      await signOut();
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      setUser(null);
+    }
   }, []);
 
   useEffect(() => {

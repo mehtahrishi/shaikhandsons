@@ -110,7 +110,7 @@ export function SiteHeader() {
     { name: 'Inquiry', href: '/#inquiry' },
   ];
 
-  const userInitial = user?.name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "C";
+  const userInitial = user?.fullName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "C";
 
   const BrandIdentity = ({ className, size = "md" }: { className?: string, size?: "sm" | "md" | "lg" }) => (
     <div className={cn("flex items-center gap-2 group whitespace-nowrap", className)}>
@@ -198,7 +198,7 @@ export function SiteHeader() {
                           </span>
                         </div>
                         <div>
-                          <p className="font-black text-xs uppercase tracking-tight">{user?.name || "Collector"}</p>
+                          <p className="font-black text-xs tracking-tight capitalize">{user?.fullName || user?.email?.split('@')[0] || "Collector"}</p>
                           <p className="text-[10px] text-primary font-bold uppercase tracking-widest">Collector Member</p>
                         </div>
                       </div>
@@ -272,7 +272,7 @@ export function SiteHeader() {
                 <DropdownMenuContent className="w-48 mt-2 bg-background/95 backdrop-blur-xl border-border/50" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal p-3">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-xs font-black leading-none uppercase tracking-tight">{user?.name || "Collector"}</p>
+                      <p className="text-xs font-black leading-none tracking-tight capitalize">{user?.fullName || user?.email?.split('@')[0] || "Collector"}</p>
                       <p className="text-[10px] text-muted-foreground">{user?.email}</p>
                     </div>
                   </DropdownMenuLabel>

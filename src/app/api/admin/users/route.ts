@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Client, Query, Users } from 'node-appwrite';
+import { db } from '@/lib/db/index';
+import { users } from '@/lib/db/schema';
+import { isAdminAuthenticated } from '@/lib/db/admin-auth';
+import { desc } from 'drizzle-orm';
 
 export const runtime = 'nodejs';
 
@@ -7,44 +10,43 @@ const DEFAULT_LIMIT = 100;
 const MAX_LIMIT = 1000;
 
 export async function GET(req: NextRequest) {
-  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
-  const apiKey = process.env.APPWRITE_API_KEY;
-
-  if (!endpoint || !projectId || !apiKey) {
-    return NextResponse.json(
-      { error: 'Appwrite admin environment is not configured.' },
-      { status: 500 }
-    );
-  }
-
-  const rawLimit = Number(req.nextUrl.searchParams.get('limit') ?? DEFAULT_LIMIT);
-  const limit = Number.isFinite(rawLimit)
-    ? Math.min(Math.max(Math.floor(rawLimit), 1), MAX_LIMIT)
-    : DEFAULT_LIMIT;
-
-  const client = new Client().setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
-  const usersApi = new Users(client);
-
   try {
-    const result = await usersApi.list([Query.limit(limit), Query.orderDesc('$createdAt')]);
+    // Check admin authentication
+    const authenticated = await isAdminAuthenticated(req);
+    if (!authenticated) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    const users = result.users.map((user) => ({
-      id: user.$id,
-      name: user.name,
+    const rawLimit = Number(req.nextUrl.searchParams.get('limit') ?? DEFAULT_LIMIT);
+    const limit = Number.isFinite(rawLimit)
+      ? Math.min(Math.max(Math.floor(rawLimit), 1), MAX_LIMIT)
+      : DEFAULT_LIMIT;
+
+    // Fetch users from PostgreSQL
+    const userList = await db.query.users.findMany({
+      limit,
+      orderBy: [desc(users.createdAt)],
+    });
+
+    const formattedUsers = userList.map((user) => ({
+      id: String(user.id),
+      name: user.fullName || 'Unknown User',
       email: user.email,
       phone: user.phone || '',
-      prefs: user.prefs || {},
-      emailVerification: user.emailVerification,
-      status: user.status,
-      labels: user.labels ?? [],
-      createdAt: user.$createdAt,
-      registration: user.registration,
+      address: user.address || '',
+      prefs: {
+        phone: user.phone || '',
+        address: user.address || '',
+      },
+      emailVerification: user.isVerified,
+      status: user.isVerified,
+      labels: user.isVerified ? ['verified'] : [],
+      createdAt: user.createdAt?.toISOString() || new Date().toISOString(),
     }));
 
-    return NextResponse.json({ total: result.total, users });
+    return NextResponse.json({ total: userList.length, users: formattedUsers });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch Appwrite users.';
+    const message = err instanceof Error ? err.message : 'Failed to fetch users.';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

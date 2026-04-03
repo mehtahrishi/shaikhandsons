@@ -1,40 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Client, Databases, ID } from 'node-appwrite';
+import { getAllBrands, createBrand, updateBrand, deleteBrand } from '@/lib/db/inventory';
+import { isAdminAuthenticated } from '@/lib/db/admin-auth';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
-  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
-  const apiKey = process.env.APPWRITE_API_KEY;
-  const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
-  const collectionId = process.env.NEXT_PUBLIC_APPWRITE_BRANDS_COLLECTION_ID;
-
-  if (!endpoint || !projectId || !apiKey || !databaseId || !collectionId) {
-    return NextResponse.json(
-      { error: 'Appwrite brands database environment is not configured.' },
-      { status: 500 }
-    );
-  }
-
   try {
+    // Check admin authentication
+    const authenticated = await isAdminAuthenticated(req);
+    if (!authenticated) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { name } = await req.json();
 
     if (typeof name !== 'string' || name.trim().length === 0) {
       return NextResponse.json({ error: 'Invalid brand name' }, { status: 400 });
     }
 
-    const client = new Client().setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
-    const databases = new Databases(client);
+    const brand = await createBrand(name.trim());
 
-    const created = await databases.createDocument({
-      databaseId,
-      collectionId,
-      documentId: ID.unique(),
-      data: { name: name.trim() },
-    });
-
-    return NextResponse.json({ success: true, document: created });
+    return NextResponse.json({ success: true, brand });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to create brand.';
     return NextResponse.json({ error: message }, { status: 500 });
@@ -42,32 +28,16 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
-  const apiKey = process.env.APPWRITE_API_KEY;
-  const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
-  const collectionId = process.env.NEXT_PUBLIC_APPWRITE_BRANDS_COLLECTION_ID;
-
-  if (!endpoint || !projectId || !apiKey || !databaseId || !collectionId) {
-    return NextResponse.json(
-      { error: 'Appwrite brands database environment is not configured.' },
-      { status: 500 }
-    );
-  }
-
-  const client = new Client().setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
-  const databases = new Databases(client);
-
   try {
-    const result = await databases.listDocuments(databaseId, collectionId);
+    // Check admin authentication
+    const authenticated = await isAdminAuthenticated(req);
+    if (!authenticated) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    const brands = result.documents.map((doc) => ({
-      id: doc.$id,
-      name: doc.name,
-      createdAt: doc.$createdAt,
-    }));
+    const brands = await getAllBrands();
 
-    return NextResponse.json({ total: result.total, brands });
+    return NextResponse.json({ total: brands.length, brands });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to fetch brands.';
     return NextResponse.json({ error: message }, { status: 500 });
@@ -75,41 +45,30 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
-  const apiKey = process.env.APPWRITE_API_KEY;
-  const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
-  const collectionId = process.env.NEXT_PUBLIC_APPWRITE_BRANDS_COLLECTION_ID;
-
-  if (!endpoint || !projectId || !apiKey || !databaseId || !collectionId) {
-    return NextResponse.json(
-      { error: 'Appwrite brands database environment is not configured.' },
-      { status: 500 }
-    );
-  }
-
-  const id = req.nextUrl.searchParams.get('id');
-  if (!id) {
-    return NextResponse.json({ error: 'Missing document ID' }, { status: 400 });
-  }
-
   try {
+    // Check admin authentication
+    const authenticated = await isAdminAuthenticated(req);
+    if (!authenticated) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const id = req.nextUrl.searchParams.get('id');
+    if (!id || isNaN(Number(id))) {
+      return NextResponse.json({ error: 'Missing or invalid brand ID' }, { status: 400 });
+    }
+
     const { name } = await req.json();
     if (typeof name !== 'string' || name.trim().length === 0) {
       return NextResponse.json({ error: 'Invalid brand name' }, { status: 400 });
     }
 
-    const client = new Client().setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
-    const databases = new Databases(client);
+    const brand = await updateBrand(Number(id), name.trim());
 
-    const updated = await databases.updateDocument(
-      databaseId,
-      collectionId,
-      id,
-      { name: name.trim() }
-    );
+    if (!brand) {
+      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
+    }
 
-    return NextResponse.json({ success: true, document: updated });
+    return NextResponse.json({ success: true, brand });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to update brand.';
     return NextResponse.json({ error: message }, { status: 500 });
@@ -117,29 +76,19 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
-  const apiKey = process.env.APPWRITE_API_KEY;
-  const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
-  const collectionId = process.env.NEXT_PUBLIC_APPWRITE_BRANDS_COLLECTION_ID;
-
-  if (!endpoint || !projectId || !apiKey || !databaseId || !collectionId) {
-    return NextResponse.json(
-      { error: 'Appwrite brands database environment is not configured.' },
-      { status: 500 }
-    );
-  }
-
-  const id = req.nextUrl.searchParams.get('id');
-  if (!id) {
-    return NextResponse.json({ error: 'Missing document ID' }, { status: 400 });
-  }
-
   try {
-    const client = new Client().setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
-    const databases = new Databases(client);
+    // Check admin authentication
+    const authenticated = await isAdminAuthenticated(req);
+    if (!authenticated) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    await databases.deleteDocument(databaseId, collectionId, id);
+    const id = req.nextUrl.searchParams.get('id');
+    if (!id || isNaN(Number(id))) {
+      return NextResponse.json({ error: 'Missing or invalid brand ID' }, { status: 400 });
+    }
+
+    await deleteBrand(Number(id));
 
     return NextResponse.json({ success: true });
   } catch (err) {

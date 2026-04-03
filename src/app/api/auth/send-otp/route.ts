@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { generateOtp, signOtpToken } from '@/lib/otp';
+import { createOTPToken } from '@/lib/db/auth';
 
 export const runtime = 'nodejs'; // Ensure Node.js runtime for crypto + nodemailer
 
@@ -16,7 +17,15 @@ export async function POST(req: NextRequest) {
     const otp = generateOtp();
     const token = signOtpToken(email.toLowerCase().trim(), otp);
 
-    // 2. Send OTP email via Gmail SMTP
+    // 2. Store OTP in PostgreSQL
+    try {
+      await createOTPToken(email.toLowerCase().trim());
+    } catch (dbError) {
+      console.error('[send-otp] DB error:', dbError);
+      // Don't fail if DB storage fails, we still have the stateless token
+    }
+
+    // 3. Send OTP email via Gmail SMTP
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT ?? 587),
@@ -34,7 +43,7 @@ export async function POST(req: NextRequest) {
       html: buildEmailHtml(otp),
     });
 
-    // 3. Return signed token to client (otp is NEVER returned — only in token)
+    // 4. Return signed token to client (otp is NEVER returned — only in token)
     return NextResponse.json({ token });
   } catch (err) {
     console.error('[send-otp]', err);

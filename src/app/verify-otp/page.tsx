@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, ShieldCheck, RefreshCw, Mail } from 'lucide-react';
-import { createSessionFromCredentials } from '@/lib/appwrite/auth';
+
 import { useAuth } from '@/context/AuthContext';
 
 const OTP_LENGTH = 6;
@@ -21,7 +21,7 @@ export default function VerifyOTPPage() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const router = useRouter();
   const { toast } = useToast();
-  const { refresh } = useAuth(); // to ensure Appwrite context updates instantly
+  const { refresh } = useAuth(); // Update auth context after login
 
   // Load pending auth info from sessionStorage
   useEffect(() => {
@@ -119,8 +119,16 @@ export default function VerifyOTPPage() {
         throw new Error(data.error || 'Verification failed.');
       }
 
-      // 2. If verification is successful, officially log them into Appwrite!
-      await createSessionFromCredentials(email, password);
+      // 2. If verification is successful, log them into PostgreSQL backend
+      const loginRes = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!loginRes.ok) {
+        throw new Error('Failed to create session');
+      }
       
       // Cleanup sensitive data immediately
       sessionStorage.removeItem('pending_email');

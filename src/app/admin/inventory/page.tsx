@@ -52,6 +52,16 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from "@/hooks/use-toast";
 import { 
+  fetchBrands, 
+  createBrand, 
+  updateBrand, 
+  deleteBrand, 
+  createVehicle, 
+  uploadVehicleImages, 
+  updateVehicleAPI, 
+  deleteVehicleAPI 
+} from '@/lib/admin-inventory-service';
+import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -72,12 +82,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { uploadVehicleImages } from '@/lib/appwrite/storage';
-import { createVehicle, updateVehicle, deleteVehicle } from '@/lib/appwrite/inventory';
-import { fetchBrands, createBrand, updateBrand, deleteBrand, BrandData } from '@/lib/appwrite/brands';
 
 type Vehicle = {
   id: string;
+  brandId: number;
   make: string;
   model: string;
   year: number;
@@ -91,7 +99,15 @@ type Vehicle = {
   createdAt: string;
 };
 
+type BrandData = {
+  id: number;
+  name: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 type BulkVehicleForm = {
+  brandId: number;
   make: string;
   model: string;
   year: number;
@@ -106,6 +122,7 @@ type BulkVehicleForm = {
 };
 
 const createEmptyBulkVehicle = (): BulkVehicleForm => ({
+  brandId: 0,
   make: '',
   model: '',
   year: 2026,
@@ -173,7 +190,7 @@ export default function AdminInventoryPage() {
     if (!editingBrand || !editingBrand.name.trim()) return;
     try {
       setIsBrandActionLoading(true);
-      await updateBrand(editingBrand.id, editingBrand.name);
+      await updateBrand(String(editingBrand.id), editingBrand.name);
       setEditingBrand(null);
       fetchAllBrands();
       toast({ title: "Success", description: "Brand updated successfully." });
@@ -184,10 +201,10 @@ export default function AdminInventoryPage() {
     }
   };
 
-  const handleDeleteBrand = async (id: string) => {
+  const handleDeleteBrand = async (id: number) => {
     try {
       setIsBrandActionLoading(true);
-      await deleteBrand(id);
+      await deleteBrand(String(id));
       fetchAllBrands();
       toast({ title: "Success", description: "Brand deleted successfully." });
     } catch (err: any) {
@@ -242,6 +259,7 @@ export default function AdminInventoryPage() {
 
   // Form State
   const [formData, setFormData] = React.useState({
+    brandId: 0,
     make: '',
     model: '',
     year: 2026,
@@ -263,6 +281,15 @@ export default function AdminInventoryPage() {
       return;
     }
 
+    if (!formData.brandId || !formData.make) {
+      toast({
+        title: "Missing Brand",
+        description: "Please select a brand.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsUploading(true);
       
@@ -271,7 +298,16 @@ export default function AdminInventoryPage() {
       
       // 2. Save Data to Database
       await createVehicle({
-        ...formData,
+        brandId: formData.brandId,
+        make: formData.make,
+        model: formData.model,
+        year: formData.year,
+        trim: formData.trim,
+        price: formData.price,
+        batteryRangeKm: formData.batteryRangeKm,
+        horsepower: formData.horsepower,
+        zeroToSixtySeconds: formData.zeroToSixtySeconds,
+        designPhilosophy: formData.designPhilosophy,
         images: imageUrls,
       });
 
@@ -282,6 +318,7 @@ export default function AdminInventoryPage() {
       setIsAddModalOpen(false);
       setSelectedFiles([]);
       setFormData({
+        brandId: 0,
         make: '',
         model: '',
         year: 2026,
@@ -310,6 +347,7 @@ export default function AdminInventoryPage() {
   const handleEditClick = (vehicle: Vehicle) => {
     setEditingVehicle(vehicle);
     setFormData({
+      brandId: vehicle.brandId,
       make: vehicle.make,
       model: vehicle.model,
       year: vehicle.year,
@@ -326,6 +364,15 @@ export default function AdminInventoryPage() {
   const handleUpdateUnit = async () => {
     if (!editingVehicle) return;
 
+    if (!formData.brandId || !formData.make) {
+      toast({
+        title: "Missing Brand",
+        description: "Please select a brand.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsUploading(true);
       
@@ -335,9 +382,18 @@ export default function AdminInventoryPage() {
         imageUrls = await uploadVehicleImages(selectedFiles);
       }
       
-      await updateVehicle(editingVehicle.id, {
-        ...formData,
-        images: imageUrls,
+      await updateVehicleAPI(editingVehicle.id, {
+        brandId: formData.brandId,
+        make: formData.make,
+        model: formData.model,
+        year: formData.year,
+        trim: formData.trim,
+        price: formData.price,
+        batteryRangeKm: formData.batteryRangeKm,
+        horsepower: formData.horsepower,
+        zeroToSixtySeconds: formData.zeroToSixtySeconds,
+        designPhilosophy: formData.designPhilosophy,
+        imageUrls: imageUrls,
       });
 
       toast({
@@ -370,7 +426,7 @@ export default function AdminInventoryPage() {
 
     try {
       setIsUploading(true);
-      await deleteVehicle(vehicleToDelete);
+      await deleteVehicleAPI(vehicleToDelete);
       toast({
         title: "Success",
         description: "Asset removed from fleet.",
@@ -443,6 +499,7 @@ export default function AdminInventoryPage() {
 
     const firstInvalidIndex = bulkVehicles.findIndex(
       (entry) =>
+        !entry.brandId ||
         !entry.make.trim() ||
         !entry.model.trim() ||
         !entry.trim.trim() ||
@@ -465,6 +522,7 @@ export default function AdminInventoryPage() {
         const imageUrls = await uploadVehicleImages(entry.selectedFiles);
 
         await createVehicle({
+          brandId: entry.brandId,
           make: entry.make,
           model: entry.model,
           year: entry.year,
@@ -573,7 +631,13 @@ export default function AdminInventoryPage() {
                         >
                           <Select
                             value={entry.make}
-                            onValueChange={(val) => updateBulkVehicle(idx, 'make', val)}
+                            onValueChange={(brandName) => {
+                              const selectedBrand = brands.find(b => b.name === brandName);
+                              if (selectedBrand) {
+                                updateBulkVehicle(idx, 'make', selectedBrand.name);
+                                updateBulkVehicle(idx, 'brandId', selectedBrand.id);
+                              }
+                            }}
                           >
                             <SelectTrigger className="h-9 text-xs bg-muted/20">
                               <SelectValue placeholder="Select Brand" />
@@ -731,7 +795,16 @@ export default function AdminInventoryPage() {
                   <Label className="text-[10px] font-black uppercase tracking-widest">Make (Brand)</Label>
                   <Select
                     value={formData.make}
-                    onValueChange={(val) => setFormData(prev => ({...prev, make: val}))}
+                    onValueChange={(brandName) => {
+                      const selectedBrand = brands.find(b => b.name === brandName);
+                      if (selectedBrand) {
+                        setFormData(prev => ({
+                          ...prev, 
+                          make: selectedBrand.name,
+                          brandId: selectedBrand.id
+                        }));
+                      }
+                    }}
                   >
                     <SelectTrigger className="bg-muted/20 h-10 text-xs">
                       <SelectValue placeholder="Select Brand" />

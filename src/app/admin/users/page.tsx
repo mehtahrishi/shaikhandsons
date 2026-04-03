@@ -120,7 +120,7 @@ export default function AdminUsersPage() {
       {error ? (
         <Alert variant="destructive" className="border-border/50 bg-card/40">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Unable to load Appwrite users</AlertTitle>
+          <AlertTitle>Unable to load users</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : null}
@@ -159,7 +159,7 @@ export default function AdminUsersPage() {
                 <TableRow className="border-border/50 hover:bg-transparent">
                   <TableCell colSpan={7} className="py-8">
                     <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                      <Loader2 className="h-4 w-4 animate-spin" /> Loading users from Appwrite...
+                      <Loader2 className="h-4 w-4 animate-spin" /> Loading users...
                     </div>
                   </TableCell>
                 </TableRow>

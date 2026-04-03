@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, User, Mail, Lock } from 'lucide-react';
-import { signUp } from '@/lib/appwrite/auth';
 
 export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
@@ -24,7 +23,17 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      await signUp({ name, email, password });
+      const res = await fetch('/api/auth/create-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, fullName: name }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Sign-up failed');
+      }
 
       toast({
         title: "Account Created",

@@ -9,8 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Mail, Lock } from 'lucide-react';
-import { validateCredentials } from '@/lib/appwrite/auth';
-import { getCurrentUser } from '@/lib/appwrite/auth';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -21,9 +19,18 @@ export default function LoginPage() {
 
   // Redirect if already logged in
   useEffect(() => {
-    getCurrentUser().then((user) => {
-      if (user) router.push('/profile');
-    });
+    const checkUser = async () => {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) router.push('/profile');
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err);
+      }
+    };
+    checkUser();
   }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -31,8 +38,16 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // 1. Validates credentials with Appwrite (creates/deletes session to prove they are correct)
-      await validateCredentials(email, password);
+      // 1. Validate credentials with our API
+      const validateRes = await fetch('/api/auth/validate-credentials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!validateRes.ok) {
+        throw new Error('Invalid email or password');
+      }
 
       // 2. Request OTP from our custom SMTP route
       const res = await fetch('/api/auth/send-otp', {

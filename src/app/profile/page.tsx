@@ -22,7 +22,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
-import { updateUserProfile } from '@/lib/appwrite/auth';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -43,31 +42,52 @@ export default function ProfilePage() {
     }
 
     if (user) {
-      // Sync local state with Appwrite Prefs
-      const savedPhone = user.prefs?.phone || "";
-      const savedAddress = user.prefs?.address || "";
-      
-      setPhone(savedPhone);
-      setAddress(savedAddress);
+      // Initialize from user data
+      setPhone(user.phone || "");
+      setAddress(user.address || "");
 
       // Notify if profile is incomplete
-      if (!savedPhone || !savedAddress) {
-        toast({
-          title: "Profile Incomplete",
-          description: "Please complete your bespoke details to ensure a seamless commission process.",
-          variant: "default",
-        });
-      }
+      toast({
+        title: "Welcome",
+        description: "You're logged in as " + user.email,
+        variant: "default",
+      });
     }
   }, [user, loading, router, toast]);
+
+  // Timeout to prevent stuck loading state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (loading && !user) {
+        router.push('/login');
+      }
+    }, 5000); // 5 second timeout
+
+    return () => clearTimeout(timer);
+  }, [loading, user, router]);
 
   const handleSave = async () => {
     if (!user) return;
     setSaving(true);
     try {
-      await updateUserProfile(phone, address);
-      await refresh(); // Force refresh context to get latest prefs
+      const res = await fetch('/api/auth/update-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: phone || null,
+          address: address || null,
+        }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Failed to update profile');
+      }
+
+      const data = await res.json();
       setIsEditing(false);
+      await refresh(); // Refresh user data from context
+
       toast({
         title: "Identity Updated",
         description: "Your bespoke details have been securely saved.",
@@ -94,10 +114,10 @@ export default function ProfilePage() {
     );
   }
 
-  const userInitial = user.name?.charAt(0).toUpperCase() || user.email.charAt(0).toUpperCase();
+  const userInitial = user.fullName?.charAt(0).toUpperCase() || user.email.charAt(0).toUpperCase();
 
   return (
-    <div className="min-h-screen bg-background pt-32 pb-24 relative overflow-hidden flex items-center">
+    <div className="min-h-screen bg-background pt-20 pb-24 relative overflow-hidden">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--primary),0.05)_0%,transparent_100%)] opacity-30" />
@@ -111,6 +131,7 @@ export default function ProfilePage() {
           transition={{ duration: 0.6 }}
           className="w-full max-w-lg"
         >
+          {/* Profile Card */}
           <Card className="bg-card/40 backdrop-blur-3xl border border-border/50 rounded-[2.5rem] overflow-hidden shadow-xl">
             <CardHeader className="text-center pt-12 pb-8 space-y-6">
               <div className="mx-auto">
@@ -123,7 +144,7 @@ export default function ProfilePage() {
 
               <div className="space-y-3">
                 <CardTitle className="font-headline text-3xl font-bold tracking-tight text-foreground">
-                  {user.name || "Collector"}
+                  {user.fullName || user.email.split('@')[0]}
                 </CardTitle>
                 <div className="flex flex-col items-center gap-2">
                   <Badge variant="outline" className="text-primary border-primary bg-primary/5 px-4 py-1 uppercase tracking-[0.2em] text-[10px] font-black flex items-center gap-2">
@@ -135,7 +156,7 @@ export default function ProfilePage() {
               </div>
             </CardHeader>
 
-            <CardContent className="px-6 md:px-12 pb-12 space-y-10">
+            <CardContent className="px-6 md:px-12 pb-12">
               <div className="space-y-6">
                 <div className="flex items-center justify-between border-b border-border/50 pb-4">
                   <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Identity Details</h3>
@@ -151,87 +172,109 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                <div className="grid gap-8">
-                  {/* Phone Field */}
-                  <div className="space-y-3">
-                    <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                      <Phone className="h-3 w-3" /> Phone Number
-                    </Label>
-                    {isEditing ? (
-                      <Input 
-                        value={phone} 
-                        onChange={(e) => setPhone(e.target.value)} 
-                        placeholder="+1 (555) 000-0000"
-                        className="bg-muted/30 border-border h-14 font-bold focus:border-primary transition-all text-sm"
-                      />
-                    ) : (
-                      <p className="text-base font-medium text-foreground/90">{phone || "No phone registered"}</p>
-                    )}
-                  </div>
-
-                  {/* Address Field */}
-                  <div className="space-y-3">
-                    <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                      <MapPin className="h-3 w-3" /> Bespoke Address
-                    </Label>
-                    {isEditing ? (
-                      <Input 
-                        value={address} 
-                        onChange={(e) => setAddress(e.target.value)} 
-                        placeholder="123 Elite Avenue, Dubai"
-                        className="bg-muted/30 border-border h-14 font-bold focus:border-primary transition-all text-sm"
-                      />
-                    ) : (
-                      <p className="text-base font-medium text-foreground/90 leading-relaxed">{address || "No address registered"}</p>
-                    )}
-                  </div>
-                </div>
-
-                <AnimatePresence>
-                  {isEditing && (
-                    <motion.div 
+                <AnimatePresence mode="wait">
+                  {isEditing ? (
+                    <motion.div
+                      key="edit-form"
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="flex gap-4 pt-4"
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
                     >
-                      <Button onClick={handleSave} disabled={saving} className="flex-1 font-bold uppercase tracking-widest h-14 text-xs">
-                        {saving ? <Loader2 className="animate-spin h-4 w-4" /> : <><Check className="h-4 w-4 mr-2" /> Save Changes</>}
-                      </Button>
-                      <Button variant="ghost" onClick={() => setIsEditing(false)} className="px-6 hover:bg-destructive/10 hover:text-destructive border border-border h-14">
-                        <X className="h-4 w-4" />
-                      </Button>
+                      <div className="grid gap-8 pt-4">
+                        {/* Phone Field */}
+                        <div className="space-y-3">
+                          <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                            <Phone className="h-3 w-3" /> Phone Number
+                          </Label>
+                          <Input 
+                            value={phone} 
+                            onChange={(e) => setPhone(e.target.value)} 
+                            placeholder="+1 (555) 000-0000"
+                            className="bg-muted/30 border-border h-14 font-bold focus:border-primary transition-all text-sm"
+                          />
+                        </div>
+
+                        {/* Address Field */}
+                        <div className="space-y-3">
+                          <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                            <MapPin className="h-3 w-3" /> Bespoke Address
+                          </Label>
+                          <Input 
+                            value={address} 
+                            onChange={(e) => setAddress(e.target.value)} 
+                            placeholder="123 Elite Avenue, Dubai"
+                            className="bg-muted/30 border-border h-14 font-bold focus:border-primary transition-all text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex gap-4 pt-6">
+                        <Button onClick={handleSave} disabled={saving} className="flex-1 font-bold uppercase tracking-widest h-14 text-xs">
+                          {saving ? <Loader2 className="animate-spin h-4 w-4" /> : <><Check className="h-4 w-4 mr-2" /> Save Changes</>}
+                        </Button>
+                        <Button variant="ghost" onClick={() => setIsEditing(false)} className="px-6 hover:bg-destructive/10 hover:text-destructive border border-border h-14">
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="view-mode"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="grid gap-8 pt-4"
+                    >
+                      {/* Phone Field */}
+                      <div className="space-y-3">
+                        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                          <Phone className="h-3 w-3" /> Phone Number
+                        </Label>
+                        <p className="text-base font-medium text-foreground/90">{phone || "No phone registered"}</p>
+                      </div>
+
+                      {/* Address Field */}
+                      <div className="space-y-3">
+                        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                          <MapPin className="h-3 w-3" /> Bespoke Address
+                        </Label>
+                        <p className="text-base font-medium text-foreground/90 leading-relaxed">{address || "No address registered"}</p>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
+            </CardContent>
+          </Card>
 
-              {!isEditing && (
-                <div className="pt-10 border-t border-border/50">
-                  <div className="flex flex-col gap-6">
-                    <div className="flex items-center gap-3 text-primary">
-                      <Shield className="h-4 w-4" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.4em]">Privacy Manifest</span>
-                    </div>
-                    <ul className="space-y-4">
-                      <li className="flex items-start gap-4 p-4 rounded-2xl bg-muted/20 border border-border/50">
-                        <Lock className="h-4 w-4 text-primary mt-1 shrink-0" />
-                        <p className="text-[11px] text-muted-foreground leading-relaxed">
-                          <strong className="text-foreground uppercase tracking-widest block mb-1">Encrypted Persistence</strong>
-                          Your bespoke credentials are protected via AES-256 cloud encryption layers within our production servers.
-                        </p>
-                      </li>
-                      <li className="flex items-start gap-4 p-4 rounded-2xl bg-muted/20 border border-border/50">
-                        <EyeOff className="h-4 w-4 text-primary mt-1 shrink-0" />
-                        <p className="text-[11px] text-muted-foreground leading-relaxed">
-                          <strong className="text-foreground uppercase tracking-widest block mb-1">Confidential Liaison</strong>
-                          Residence data is accessible only to authorized fleet production managers during the commission process.
-                        </p>
-                      </li>
-                    </ul>
-                  </div>
+          {/* Privacy Manifest Card */}
+          <Card className="mt-6 bg-card/40 backdrop-blur-3xl border border-border/50 rounded-[2.5rem] overflow-hidden shadow-xl">
+            <CardContent className="px-6 md:px-12 py-10">
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center gap-3 text-primary">
+                  <Shield className="h-4 w-4" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em]">Privacy Manifest</span>
                 </div>
-              )}
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-4 p-4 rounded-2xl bg-muted/20 border border-border/50">
+                    <Lock className="h-4 w-4 text-primary mt-1 shrink-0" />
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      <strong className="text-foreground uppercase tracking-widest block mb-1">Encrypted Persistence</strong>
+                      Your bespoke credentials are protected via AES-256 cloud encryption layers within our production servers.
+                    </p>
+                  </li>
+                  <li className="flex items-start gap-4 p-4 rounded-2xl bg-muted/20 border border-border/50">
+                    <EyeOff className="h-4 w-4 text-primary mt-1 shrink-0" />
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      <strong className="text-foreground uppercase tracking-widest block mb-1">Confidential Liaison</strong>
+                      Residence data is accessible only to authorized fleet production managers during the commission process.
+                    </p>
+                  </li>
+                </ul>
+              </div>
             </CardContent>
           </Card>
         </motion.div>

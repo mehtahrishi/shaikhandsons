@@ -10,6 +10,9 @@ import {
   Cpu,
   Mail,
   ChartSpline,
+  ShieldCheck,
+  CircleDollarSign,
+  Loader2
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
@@ -26,7 +29,6 @@ import {
   ChartTooltipContent 
 } from "@/components/ui/chart";
 import { Area, AreaChart, CartesianGrid, XAxis, ResponsiveContainer } from "recharts";
-import { vehicles } from '@/lib/mock-data';
 
 const chartData = [
   { month: "Jan", reservations: 186 },
@@ -51,29 +53,70 @@ const recentEnquiries = [
   { id: "ENQ-104", user: "Elena Rodriguez", model: "Veridian Aether", region: "New York", status: "Contacted" },
 ];
 
+type DashboardStats = {
+  totalUsers: number;
+  totalVehicles: number;
+  totalBrands: number;
+  totalAssetValue: number;
+};
+
 export default function AdminDashboardPage() {
-  const [totalUsers, setTotalUsers] = React.useState<number | null>(null);
+  const [statsData, setStatsData] = React.useState<DashboardStats | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
-    async function fetchTotalUsers() {
+    async function fetchDashboardStats() {
       try {
-        const response = await fetch('/api/admin/users?limit=1');
+        setIsLoading(true);
+        const response = await fetch('/api/admin/dashboard/stats');
         const data = await response.json();
         if (response.ok) {
-          setTotalUsers(data.total || 0);
+          setStatsData(data.stats);
         }
       } catch (err) {
-        console.error('Failed to fetch total users:', err);
+        console.error('Failed to fetch dashboard stats:', err);
+      } finally {
+        setIsLoading(false);
       }
     }
-    fetchTotalUsers();
+    fetchDashboardStats();
   }, []);
 
+  const formattedTotalValue = React.useMemo(() => {
+    if (!statsData) return '₹0';
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      notation: 'compact',
+      maximumFractionDigits: 1
+    }).format(statsData.totalAssetValue);
+  }, [statsData]);
+
   const stats = [
-    { label: 'Total Users', value: totalUsers !== null ? String(totalUsers) : '...', icon: Users, trend: 'From Database' },
-    { label: 'Total Vehicles', value: String(vehicles.length), icon: Car, trend: 'In Fleet' },
-    { label: 'Network Hashrate', value: '42.8 PH/s', icon: Cpu, trend: 'Stable' },
-    { label: 'Energy Efficiency', value: '98.2%', icon: Zap, trend: '+1.4%' },
+    { 
+      label: 'Total Users', 
+      value: statsData ? String(statsData.totalUsers) : '...', 
+      icon: Users, 
+      trend: 'Registered' 
+    },
+    { 
+      label: 'Total Vehicles', 
+      value: statsData ? String(statsData.totalVehicles) : '...', 
+      icon: Car, 
+      trend: 'In Fleet' 
+    },
+    { 
+      label: 'Brand Network', 
+      value: statsData ? String(statsData.totalBrands) : '...', 
+      icon: ShieldCheck, 
+      trend: 'Active' 
+    },
+    { 
+      label: 'Fleet Valuation', 
+      value: statsData ? formattedTotalValue : '...', 
+      icon: CircleDollarSign, 
+      trend: 'Estimated' 
+    },
   ];
 
   return (
@@ -109,7 +152,13 @@ export default function AdminDashboardPage() {
                 <stat.icon className="h-3.5 w-3.5 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-headline font-black mb-1">{stat.value}</div>
+                <div className="text-2xl font-headline font-black mb-1 flex items-center gap-2">
+                  {isLoading ? (
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  ) : (
+                    stat.value
+                  )}
+                </div>
                 <div className="flex items-center gap-1 text-[9px] font-bold text-primary">
                   <TrendingUp className="h-2.5 w-2.5" /> {stat.trend}
                 </div>

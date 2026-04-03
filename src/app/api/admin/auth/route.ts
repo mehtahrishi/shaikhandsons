@@ -1,42 +1,58 @@
-
 import { NextRequest, NextResponse } from 'next/server';
+import { getAdminByEmail, compareAdminPassword, createAdminToken } from '@/lib/db/admin-auth';
 
-/**
- * @fileOverview Secure API route for administrative authentication.
- * Validates credentials against environment variables.
- */
+export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
     const { email, password } = await req.json();
 
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const adminPassword = process.env.ADMIN_PASSWORD;
-
-    if (!adminEmail || !adminPassword) {
-      return NextResponse.json(
-        { error: 'Admin credentials not configured in environment.' },
-        { status: 500 }
-      );
+    if (!email || typeof email !== 'string') {
+      return NextResponse.json({ error: 'Email is required.' }, { status: 400 });
     }
 
-    if (email === adminEmail && password === adminPassword) {
-      // In a production app, you would set a secure HTTP-only cookie here.
-      // For this prototype, we return a success signal.
-      return NextResponse.json({ 
-        success: true, 
-        user: { name: 'Fleet Master', email: adminEmail, role: 'ADMIN' } 
-      });
+    if (!password || typeof password !== 'string') {
+      return NextResponse.json({ error: 'Password is required.' }, { status: 400 });
     }
 
-    return NextResponse.json(
-      { error: 'Authorization Denied. Invalid credentials.' },
-      { status: 401 }
-    );
+    // Get admin from PostgreSQL
+    const admin = await getAdminByEmail(email);
+
+    if (!admin) {
+      return NextResponse.json({ error: 'Invalid credentials.' }, { status: 401 });
+    }
+
+    // Compare password
+    const passwordMatch = await compareAdminPassword(password, admin.passwordHash);
+
+    if (!passwordMatch) {
+      return NextResponse.json({ error: 'Invalid credentials.' }, { status: 401 });
+    }
+
+    // Create JWT token
+    const token = createAdminToken(admin.email);
+
+    // Set secure HTTP-only cookie
+    const response = NextResponse.json({
+      success: true,
+      user: {
+        email: admin.email,
+        role: 'ADMIN',
+      },
+      token,
+    });
+
+    response.cookies.set('admin-token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+      path: '/',
+    });
+
+    return response;
   } catch (err) {
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
+    console.error('[admin-auth]', err);
+    return NextResponse.json({ error: 'Authentication failed.' }, { status: 500 });
   }
 }

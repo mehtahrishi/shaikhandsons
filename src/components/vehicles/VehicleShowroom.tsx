@@ -7,18 +7,52 @@ import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
 
 type Vehicle = {
-  id: string;
+  id: number;
+  brandId: number;
   make: string;
   model: string;
   year: number;
-  trim: string;
-  price: number;
-  batteryRangeKm: number;
-  horsepower: number;
-  zeroToSixtySeconds: number;
-  images: string[];
-  designPhilosophy: string;
-  createdAt: string;
+  trim?: string;
+  price: number | string;
+  
+  modelCode?: string;
+  category?: string;
+  shortDescription?: string;
+  topSpeed?: string;
+  certifiedRange?: string;
+  realWorldRange?: string;
+  ridingModes?: string[];
+  climbingDegree?: string;
+  loadCapacity?: string;
+  
+  batteryType?: string;
+  batteryCapacity?: string;
+  chargingTime?: string;
+  fastCharging?: boolean;
+  chargerIncluded?: string;
+  batteryWarranty?: string;
+  
+  motorPower?: string;
+  brakingSystem?: string;
+  tyreType?: string;
+  wheelType?: string;
+  wheelSize?: string;
+  groundClearance?: string;
+  
+  displayType?: string;
+  colors?: string[];
+  keyFeatures?: string[];
+  bootSpace?: string;
+  
+  designPhilosophy?: string;
+  imageUrls?: string[];
+  
+  batteryRangeKm?: number;
+  horsepower?: number;
+  zeroToSixtySeconds?: number;
+  
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export function VehicleShowroom() {
@@ -30,7 +64,7 @@ export function VehicleShowroom() {
     const fetchVehicles = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('/api/admin/inventory');
+        const response = await fetch('/api/vehicles');
         if (!response.ok) {
           throw new Error('Failed to fetch the vehicle collection.');
         }

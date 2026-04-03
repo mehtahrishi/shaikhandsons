@@ -62,7 +62,9 @@ import {
   createVehicle, 
   uploadVehicleImages, 
   updateVehicleAPI, 
-  deleteVehicleAPI 
+  deleteVehicleAPI,
+  bulkUpdateVehicles,
+  generatePlaceholderImages 
 } from '@/lib/admin-inventory-service';
 import { 
   DropdownMenu,
@@ -85,6 +87,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { Mail, FileText } from 'lucide-react';
 
 type Vehicle = {
   id: string;
@@ -712,29 +715,15 @@ export default function AdminInventoryPage() {
       return;
     }
 
-    const firstWithoutImages = bulkVehicles.findIndex((entry) => entry.selectedFiles.length === 0);
-    if (firstWithoutImages !== -1) {
-      toast({
-        title: 'Missing Images',
-        description: `Please select at least one image in row ${firstWithoutImages + 1}.`,
-        variant: 'destructive',
-      });
-      return;
-    }
-
+    // Validate only required fields: brandId, make, model, price
     const firstInvalidIndex = bulkVehicles.findIndex(
-      (entry) =>
-        !entry.brandId ||
-        !entry.make.trim() ||
-        !entry.model.trim() ||
-        !entry.trim.trim() ||
-        !entry.designPhilosophy.trim()
+      (entry) => !entry.brandId || !entry.make.trim() || !entry.model.trim() || entry.price === 0
     );
 
     if (firstInvalidIndex !== -1) {
       toast({
         title: 'Incomplete Entry',
-        description: `Please complete required fields in row ${firstInvalidIndex + 1}.`,
+        description: `Please complete required fields (Brand, Model, Price) in row ${firstInvalidIndex + 1}.`,
         variant: 'destructive',
       });
       return;
@@ -742,51 +731,66 @@ export default function AdminInventoryPage() {
 
     try {
       setIsUploading(true);
+      let successCount = 0;
 
       for (const entry of bulkVehicles) {
-        const imageUrls = await uploadVehicleImages(entry.selectedFiles);
-
-        await createVehicle({
-          brandId: entry.brandId,
-          make: entry.make,
-          model: entry.model,
-          year: entry.year,
-          trim: entry.trim,
-          price: entry.price,
-          designPhilosophy: entry.designPhilosophy,
-          images: imageUrls,
+        try {
+          let imageUrls: string[] = [];
           
-          modelCode: entry.modelCode,
-          category: entry.category,
-          shortDescription: entry.shortDescription,
-          topSpeed: entry.topSpeed,
-          certifiedRange: entry.certifiedRange,
-          realWorldRange: entry.realWorldRange,
-          ridingModes: entry.ridingModes,
-          climbingDegree: entry.climbingDegree,
-          loadCapacity: entry.loadCapacity,
-          batteryType: entry.batteryType,
-          batteryCapacity: entry.batteryCapacity,
-          chargingTime: entry.chargingTime,
-          fastCharging: entry.fastCharging,
-          chargerIncluded: entry.chargerIncluded,
-          batteryWarranty: entry.batteryWarranty,
-          motorPower: entry.motorPower,
-          brakingSystem: entry.brakingSystem,
-          tyreType: entry.tyreType,
-          wheelType: entry.wheelType,
-          wheelSize: entry.wheelSize,
-          groundClearance: entry.groundClearance,
-          displayType: entry.displayType,
-          colors: entry.colors,
-          keyFeatures: entry.keyFeatures,
-          bootSpace: entry.bootSpace,
-        });
+          // Use uploaded images if provided, otherwise generate placeholders
+          if (entry.selectedFiles.length > 0) {
+            imageUrls = await uploadVehicleImages(entry.selectedFiles);
+          } else {
+            imageUrls = generatePlaceholderImages(entry.make, entry.model);
+          }
+
+          await createVehicle({
+            brandId: entry.brandId,
+            make: entry.make,
+            model: entry.model,
+            year: entry.year || 2026,
+            trim: entry.trim || '',
+            price: entry.price,
+            designPhilosophy: entry.designPhilosophy || '',
+            images: imageUrls,
+            
+            modelCode: entry.modelCode,
+            category: entry.category,
+            shortDescription: entry.shortDescription,
+            topSpeed: entry.topSpeed,
+            certifiedRange: entry.certifiedRange,
+            realWorldRange: entry.realWorldRange,
+            ridingModes: entry.ridingModes,
+            climbingDegree: entry.climbingDegree,
+            loadCapacity: entry.loadCapacity,
+            batteryType: entry.batteryType,
+            batteryCapacity: entry.batteryCapacity,
+            chargingTime: entry.chargingTime,
+            fastCharging: entry.fastCharging,
+            chargerIncluded: entry.chargerIncluded,
+            batteryWarranty: entry.batteryWarranty,
+            motorPower: entry.motorPower,
+            brakingSystem: entry.brakingSystem,
+            tyreType: entry.tyreType,
+            wheelType: entry.wheelType,
+            wheelSize: entry.wheelSize,
+            groundClearance: entry.groundClearance,
+            displayType: entry.displayType,
+            colors: entry.colors,
+            keyFeatures: entry.keyFeatures,
+            bootSpace: entry.bootSpace,
+          });
+          
+          successCount++;
+        } catch (error: any) {
+          console.error(`Failed to add ${entry.make} ${entry.model}:`, error);
+          // Continue with next entry instead of stopping
+        }
       }
 
       toast({
         title: 'Bulk Import Complete',
-        description: `${bulkVehicles.length} vehicle${bulkVehicles.length > 1 ? 's' : ''} added successfully.`,
+        description: `Successfully added ${successCount} of ${bulkVehicles.length} vehicle${bulkVehicles.length > 1 ? 's' : ''}.`,
       });
 
       setIsBulkModalOpen(false);
@@ -794,7 +798,7 @@ export default function AdminInventoryPage() {
       fetchVehicles();
     } catch (error: any) {
       toast({
-        title: 'Bulk Import Failed',
+        title: 'Bulk Import Error',
         description: error.message || 'Failed to import vehicles.',
         variant: 'destructive',
       });
@@ -875,165 +879,370 @@ export default function AdminInventoryPage() {
                         <motion.div 
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
-                          className="grid grid-cols-1 md:grid-cols-4 gap-3 px-0.5"
+                          className="space-y-3 px-0.5"
                         >
-                          {/* Row 1 */}
-                          <div className="space-y-1">
-                            <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Manufacturer</Label>
-                            <Select
-                              value={entry.make}
-                              onValueChange={(brandName) => {
-                                const selectedBrand = brands.find(b => b.name === brandName);
-                                if (selectedBrand) {
-                                  updateBulkVehicle(idx, 'make', selectedBrand.name);
-                                  updateBulkVehicle(idx, 'brandId', selectedBrand.id);
-                                }
-                              }}
-                            >
-                              <SelectTrigger className="h-8 text-[10px] bg-muted/20">
-                                <SelectValue placeholder="Brand" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {brands.map((b) => (
-                                  <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>
+                          {/* Section 1: Basic Information */}
+                          <div className="space-y-3">
+                            <h4 className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                              <div className="h-1 w-4 bg-primary rounded-full" /> 1. Basic Information
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Manufacturer</Label>
+                                <Select
+                                  value={entry.make}
+                                  onValueChange={(brandName) => {
+                                    const selectedBrand = brands.find(b => b.name === brandName);
+                                    if (selectedBrand) {
+                                      updateBulkVehicle(idx, 'make', selectedBrand.name);
+                                      updateBulkVehicle(idx, 'brandId', selectedBrand.id);
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Brand" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {brands.map((b) => (
+                                      <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Model Name</Label>
+                                <Input placeholder="Model" className="h-8 text-[9px] bg-muted/20" value={entry.model} onChange={(e) => updateBulkVehicle(idx, 'model', e.target.value)} />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Model Code</Label>
+                                <Input placeholder="Code" className="h-8 text-[9px] bg-muted/20" value={entry.modelCode} onChange={(e) => updateBulkVehicle(idx, 'modelCode', e.target.value)} />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Category</Label>
+                                <Select value={entry.category} onValueChange={(val) => updateBulkVehicle(idx, 'category', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Category" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Scooter">Scooter</SelectItem>
+                                    <SelectItem value="Bike">Bike</SelectItem>
+                                    <SelectItem value="Loader">Loader</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Price (₹)</Label>
+                                <Input type="number" placeholder="Price" className="h-8 text-[9px] bg-muted/20" value={entry.price} onChange={(e) => updateBulkVehicle(idx, 'price', Number(e.target.value) || 0)} />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Year</Label>
+                                <Input type="number" placeholder="Year" className="h-8 text-[9px] bg-muted/20" value={entry.year} onChange={(e) => updateBulkVehicle(idx, 'year', Number(e.target.value) || 0)} />
+                              </div>
+                              <div className="md:col-span-2 space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Short Description</Label>
+                                <Input placeholder="Brief description..." className="h-8 text-[9px] bg-muted/20" value={entry.shortDescription} onChange={(e) => updateBulkVehicle(idx, 'shortDescription', e.target.value)} />
+                              </div>
+                            </div>
+                          </div>
+
+                          <Separator className="bg-border/30" />
+
+                          {/* Section 2: Technical Specifications */}
+                          <div className="space-y-3">
+                            <h4 className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                              <div className="h-1 w-4 bg-primary rounded-full" /> 2. Technical Specifications
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Top Speed</Label>
+                                <Select value={entry.topSpeed} onValueChange={(val) => updateBulkVehicle(idx, 'topSpeed', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Speed" />
+                                  </SelectTrigger>
+                                  <SelectContent>{TOP_SPEEDS.map((speed) => (<SelectItem key={speed} value={speed}>{speed}</SelectItem>))}</SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Certified Range</Label>
+                                <Select value={entry.certifiedRange} onValueChange={(val) => updateBulkVehicle(idx, 'certifiedRange', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Range" />
+                                  </SelectTrigger>
+                                  <SelectContent>{RANGES.map((range) => (<SelectItem key={range} value={range}>{range}</SelectItem>))}</SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Real-World Range</Label>
+                                <Select value={entry.realWorldRange} onValueChange={(val) => updateBulkVehicle(idx, 'realWorldRange', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Range" />
+                                  </SelectTrigger>
+                                  <SelectContent>{RANGES.map((range) => (<SelectItem key={range} value={range}>{range}</SelectItem>))}</SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Climbing Degree</Label>
+                                <Select value={entry.climbingDegree} onValueChange={(val) => updateBulkVehicle(idx, 'climbingDegree', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Degree" />
+                                  </SelectTrigger>
+                                  <SelectContent>{CLIMBING_DEGREES.map((degree) => (<SelectItem key={degree} value={degree}>{degree}</SelectItem>))}</SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Load Capacity</Label>
+                                <Select value={entry.loadCapacity} onValueChange={(val) => updateBulkVehicle(idx, 'loadCapacity', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Capacity" />
+                                  </SelectTrigger>
+                                  <SelectContent>{LOAD_CAPACITIES.map((capacity) => (<SelectItem key={capacity} value={capacity}>{capacity}</SelectItem>))}</SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                            <div className="md:col-span-3 space-y-2">
+                              <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Riding Modes</Label>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                {['Eco', 'City', 'Sport', 'Reverse'].map((mode) => (
+                                  <div key={mode} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`bulk-mode-${idx}-${mode}`}
+                                      checked={entry.ridingModes.includes(mode)}
+                                      onCheckedChange={(checked) => {
+                                        const updatedModes = checked
+                                          ? [...entry.ridingModes, mode]
+                                          : entry.ridingModes.filter(m => m !== mode);
+                                        updateBulkVehicle(idx, 'ridingModes', updatedModes);
+                                      }}
+                                    />
+                                    <Label htmlFor={`bulk-mode-${idx}-${mode}`} className="text-[8px] font-black uppercase cursor-pointer">{mode}</Label>
+                                  </div>
                                 ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Model Name</Label>
-                            <Input
-                              placeholder="Model"
-                              className="h-8 text-[10px] bg-muted/20"
-                              value={entry.model}
-                              onChange={(e) => updateBulkVehicle(idx, 'model', e.target.value)}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Model Code</Label>
-                            <Input
-                              placeholder="Code"
-                              className="h-8 text-[10px] bg-muted/20"
-                              value={entry.modelCode}
-                              onChange={(e) => updateBulkVehicle(idx, 'modelCode', e.target.value)}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Category</Label>
-                            <Select
-                              value={entry.category}
-                              onValueChange={(val) => updateBulkVehicle(idx, 'category', val)}
-                            >
-                              <SelectTrigger className="h-8 text-[10px] bg-muted/20">
-                                <SelectValue placeholder="Category" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Scooter">Scooter</SelectItem>
-                                <SelectItem value="Bike">Bike</SelectItem>
-                                <SelectItem value="Loader">Loader</SelectItem>
-                              </SelectContent>
-                            </Select>
+                              </div>
+                            </div>
                           </div>
 
-                          {/* Row 2 */}
-                          <div className="space-y-1">
-                            <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Price (₹)</Label>
-                            <Input
-                              type="number"
-                              placeholder="Price"
-                              className="h-8 text-[10px] bg-muted/20"
-                              value={entry.price}
-                              onChange={(e) => updateBulkVehicle(idx, 'price', Number(e.target.value) || 0)}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Year</Label>
-                            <Input
-                              type="number"
-                              placeholder="Year"
-                              className="h-8 text-[10px] bg-muted/20"
-                              value={entry.year}
-                              onChange={(e) => updateBulkVehicle(idx, 'year', Number(e.target.value) || 0)}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Top Speed</Label>
-                            <Input
-                              placeholder="Top Speed"
-                              className="h-8 text-[10px] bg-muted/20"
-                              value={entry.topSpeed}
-                              onChange={(e) => updateBulkVehicle(idx, 'topSpeed', e.target.value)}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">ARAI Range</Label>
-                            <Input
-                              placeholder="Range"
-                              className="h-8 text-[10px] bg-muted/20"
-                              value={entry.certifiedRange}
-                              onChange={(e) => updateBulkVehicle(idx, 'certifiedRange', e.target.value)}
-                            />
+                          <Separator className="bg-border/30" />
+
+                          {/* Section 3: Battery & Charging */}
+                          <div className="space-y-3">
+                            <h4 className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                              <div className="h-1 w-4 bg-primary rounded-full" /> 3. Battery & Charging
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Battery Type</Label>
+                                <Select value={entry.batteryType} onValueChange={(val) => updateBulkVehicle(idx, 'batteryType', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Lithium-ion (NMC)">Lithium-ion (NMC)</SelectItem>
+                                    <SelectItem value="LFP">LFP</SelectItem>
+                                    <SelectItem value="Lead Graphene">Lead Graphene</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Battery Capacity</Label>
+                                <Select value={entry.batteryCapacity} onValueChange={(val) => updateBulkVehicle(idx, 'batteryCapacity', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Capacity" />
+                                  </SelectTrigger>
+                                  <SelectContent>{BATTERY_CAPACITIES.map((capacity) => (<SelectItem key={capacity} value={capacity}>{capacity}</SelectItem>))}</SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Charging Time</Label>
+                                <Select value={entry.chargingTime} onValueChange={(val) => updateBulkVehicle(idx, 'chargingTime', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Time" />
+                                  </SelectTrigger>
+                                  <SelectContent>{CHARGING_TIMES.map((time) => (<SelectItem key={time} value={time}>{time}</SelectItem>))}</SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Battery Warranty</Label>
+                                <Select value={entry.batteryWarranty} onValueChange={(val) => updateBulkVehicle(idx, 'batteryWarranty', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Warranty" />
+                                  </SelectTrigger>
+                                  <SelectContent>{BATTERY_WARRANTIES.map((warranty) => (<SelectItem key={warranty} value={warranty}>{warranty}</SelectItem>))}</SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Charger Details</Label>
+                                <Select value={entry.chargerIncluded} onValueChange={(val) => updateBulkVehicle(idx, 'chargerIncluded', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Charger" />
+                                  </SelectTrigger>
+                                  <SelectContent>{CHARGER_OPTIONS.map((charger) => (<SelectItem key={charger} value={charger}>{charger}</SelectItem>))}</SelectContent>
+                                </Select>
+                              </div>
+                              <div className="flex items-center space-x-2 pt-2">
+                                <Checkbox id={`bulk-fast-${idx}`} checked={entry.fastCharging} onCheckedChange={(checked) => updateBulkVehicle(idx, 'fastCharging', !!checked)} />
+                                <Label htmlFor={`bulk-fast-${idx}`} className="text-[8px] font-black uppercase cursor-pointer">Fast Charging</Label>
+                              </div>
+                            </div>
                           </div>
 
-                          {/* Row 3: Battery & Charging */}
-                          <div className="space-y-1">
-                            <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Battery Type</Label>
-                            <Input
-                              placeholder="Battery Type"
-                              className="h-8 text-[10px] bg-muted/20"
-                              value={entry.batteryType}
-                              onChange={(e) => updateBulkVehicle(idx, 'batteryType', e.target.value)}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Charging Time</Label>
-                            <Input
-                              placeholder="Time"
-                              className="h-8 text-[10px] bg-muted/20"
-                              value={entry.chargingTime}
-                              onChange={(e) => updateBulkVehicle(idx, 'chargingTime', e.target.value)}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Motor Power</Label>
-                            <Input
-                              placeholder="Motor"
-                              className="h-8 text-[10px] bg-muted/20"
-                              value={entry.motorPower}
-                              onChange={(e) => updateBulkVehicle(idx, 'motorPower', e.target.value)}
-                            />
-                          </div>
-                          <div className="flex items-center space-x-2 pt-4">
-                            <Checkbox 
-                              id={`bulk-fast-${idx}`} 
-                              checked={entry.fastCharging}
-                              onCheckedChange={(checked) => updateBulkVehicle(idx, 'fastCharging', !!checked)}
-                            />
-                            <Label htmlFor={`bulk-fast-${idx}`} className="text-[8px] font-black uppercase cursor-pointer">Fast Charge</Label>
+                          <Separator className="bg-border/30" />
+
+                          {/* Section 4: Hardware & Mechanicals */}
+                          <div className="space-y-3">
+                            <h4 className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                              <div className="h-1 w-4 bg-primary rounded-full" /> 4. Hardware & Mechanicals
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Motor Power</Label>
+                                <Select value={entry.motorPower} onValueChange={(val) => updateBulkVehicle(idx, 'motorPower', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Power" />
+                                  </SelectTrigger>
+                                  <SelectContent>{MOTOR_POWERS.map((power) => (<SelectItem key={power} value={power}>{power}</SelectItem>))}</SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Braking System</Label>
+                                <Select value={entry.brakingSystem} onValueChange={(val) => updateBulkVehicle(idx, 'brakingSystem', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Braking" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Dual Disc">Dual Disc</SelectItem>
+                                    <SelectItem value="Front Disc/Rear Drum">Front Disc/Rear Drum</SelectItem>
+                                    <SelectItem value="Regenerative Braking">Regenerative Braking</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Tyre Type</Label>
+                                <Select value={entry.tyreType} onValueChange={(val) => updateBulkVehicle(idx, 'tyreType', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Tyre" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Tubeless">Tubeless</SelectItem>
+                                    <SelectItem value="Tube">Tube</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Wheel Type</Label>
+                                <Select value={entry.wheelType} onValueChange={(val) => updateBulkVehicle(idx, 'wheelType', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Wheel" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Alloy">Alloy</SelectItem>
+                                    <SelectItem value="Spoke">Spoke</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Wheel Size</Label>
+                                <Select value={entry.wheelSize} onValueChange={(val) => updateBulkVehicle(idx, 'wheelSize', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Size" />
+                                  </SelectTrigger>
+                                  <SelectContent>{WHEEL_SIZES.map((size) => (<SelectItem key={size} value={size}>{size}</SelectItem>))}</SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Ground Clearance</Label>
+                                <Select value={entry.groundClearance} onValueChange={(val) => updateBulkVehicle(idx, 'groundClearance', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Clearance" />
+                                  </SelectTrigger>
+                                  <SelectContent>{GROUND_CLEARANCES.map((clearance) => (<SelectItem key={clearance} value={clearance}>{clearance}</SelectItem>))}</SelectContent>
+                                </Select>
+                              </div>
+                            </div>
                           </div>
 
-                          <div className="md:col-span-4 space-y-2 pt-2">
-                            <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Short Description</Label>
-                            <Input
-                              placeholder="Brief hook..."
-                              className="h-8 text-[10px] bg-muted/20"
-                              value={entry.shortDescription}
-                              onChange={(e) => updateBulkVehicle(idx, 'shortDescription', e.target.value)}
-                            />
+                          <Separator className="bg-border/30" />
+
+                          {/* Section 5: Smart Features & Aesthetics */}
+                          <div className="space-y-3">
+                            <h4 className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                              <div className="h-1 w-4 bg-primary rounded-full" /> 5. Smart Features & Aesthetics
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Display Type</Label>
+                                <Select value={entry.displayType} onValueChange={(val) => updateBulkVehicle(idx, 'displayType', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Display" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="LED Digital">LED Digital</SelectItem>
+                                    <SelectItem value="TFT">TFT</SelectItem>
+                                    <SelectItem value="Touchscreen">Touchscreen</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Boot Space</Label>
+                                <Select value={entry.bootSpace} onValueChange={(val) => updateBulkVehicle(idx, 'bootSpace', val)}>
+                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
+                                    <SelectValue placeholder="Boot" />
+                                  </SelectTrigger>
+                                  <SelectContent>{BOOT_SPACES.map((space) => (<SelectItem key={space} value={space}>{space}</SelectItem>))}</SelectContent>
+                                </Select>
+                              </div>
+                              <div className="md:col-span-2 space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Available Colors</Label>
+                                <Input placeholder="Red, Blue, Grey" className="h-8 text-[9px] bg-muted/20" value={entry.colors.join(', ')} onChange={(e) => updateBulkVehicle(idx, 'colors', e.target.value.split(',').map(c => c.trim()).filter(Boolean))} />
+                              </div>
+                            </div>
+                            <div className="md:col-span-2 space-y-2 pt-2">
+                              <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Key Features</Label>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {['Anti-theft Alarm', 'USB Charging Port', 'Keyless Entry', 'Find My Scooter', 'Projector Headlight', 'DRL'].map((feature) => (
+                                  <div key={feature} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`bulk-feature-${idx}-${feature}`}
+                                      checked={entry.keyFeatures.includes(feature)}
+                                      onCheckedChange={(checked) => {
+                                        const updatedFeatures = checked
+                                          ? [...entry.keyFeatures, feature]
+                                          : entry.keyFeatures.filter(f => f !== feature);
+                                        updateBulkVehicle(idx, 'keyFeatures', updatedFeatures);
+                                      }}
+                                    />
+                                    <Label htmlFor={`bulk-feature-${idx}-${feature}`} className="text-[8px] font-black uppercase cursor-pointer">{feature}</Label>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
                           </div>
 
-                          <div className="md:col-span-4 space-y-2">
-                            <Label className="text-[9px] font-black uppercase tracking-widest">Images For This Row</Label>
-                            <Input
-                              type="file"
-                              accept="image/*"
-                              multiple
-                              onChange={(e) => {
-                                const files = e.target.files ? Array.from(e.target.files) : [];
-                                updateBulkVehicle(idx, 'selectedFiles', files);
-                              }}
-                              className="h-9 text-xs bg-muted/20 border-dashed border-primary/20"
-                            />
+                          <Separator className="bg-border/30" />
+
+                          {/* Section 6: Media & Assets */}
+                          <div className="space-y-3">
+                            <h4 className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                              <div className="h-1 w-4 bg-primary rounded-full" /> 6. Media & Assets
+                            </h4>
+                            <div className="grid grid-cols-1 gap-2">
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Design Philosophy</Label>
+                                <Input placeholder="Design philosophy..." className="h-8 text-[9px] bg-muted/20" value={entry.designPhilosophy} onChange={(e) => updateBulkVehicle(idx, 'designPhilosophy', e.target.value)} />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[9px] font-black uppercase tracking-widest">Images (Optional)</Label>
+                                <Input
+                                  type="file"
+                                  accept="image/*"
+                                  multiple
+                                  onChange={(e) => {
+                                    const files = e.target.files ? Array.from(e.target.files) : [];
+                                    updateBulkVehicle(idx, 'selectedFiles', files);
+                                  }}
+                                  className="h-9 text-xs bg-muted/20 border-dashed border-primary/20"
+                                />
+                              </div>
+                            </div>
                           </div>
                         </motion.div>
                       )}
@@ -1091,7 +1300,7 @@ export default function AdminInventoryPage() {
             </DialogContent>
           </Dialog>
 
-          <Dialog open={isAddModalOpen} onOpenChange={(open) => {
+            <Dialog open={isAddModalOpen} onOpenChange={(open) => {
             setIsAddModalOpen(open);
             if (!open) setColorsInput('');
           }}>
@@ -1107,8 +1316,8 @@ export default function AdminInventoryPage() {
                   Configure technical specifications for the new unit.
                 </DialogDescription>
               </DialogHeader>
-              <ScrollArea className="max-h-[75vh] px-6">
-                <div className="space-y-8 py-6">
+              <ScrollArea className="max-h-[75vh]">
+                <div className="space-y-8 py-6 px-6">
                   {/* Form Hints */}
                   <div className="p-3 bg-blue-500/10 border border-blue-200/50 rounded-lg space-y-2">
                     <p className="text-[10px] font-black uppercase tracking-widest text-blue-600">✏️ Form Tips</p>
@@ -1780,7 +1989,7 @@ export default function AdminInventoryPage() {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="h-32 text-center">
+                      <TableCell colSpan={7} className="h-32 text-center">
                         <div className="flex items-center justify-center gap-2 text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
                           <Loader2 className="h-4 w-4 animate-spin" /> Synchronizing Fleet...
                         </div>
@@ -1788,7 +1997,7 @@ export default function AdminInventoryPage() {
                     </TableRow>
                   ) : filteredVehicles.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="h-32 text-center text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
+                      <TableCell colSpan={7} className="h-32 text-center text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
                         No units found in database.
                       </TableCell>
                     </TableRow>
@@ -1956,8 +2165,8 @@ export default function AdminInventoryPage() {
               Modify technical specifications for unit: {editingVehicle?.id}
             </DialogDescription>
           </DialogHeader>
-          <ScrollArea className="max-h-[75vh] px-6">
-            <div className="space-y-8 py-6">
+          <ScrollArea className="max-h-[75vh]">
+            <div className="space-y-8 py-6 px-6">
               {/* Section 1: Basic Information */}
               <div className="space-y-4">
                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
@@ -2056,43 +2265,83 @@ export default function AdminInventoryPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Top Speed</Label>
-                    <Input 
+                    <Select
                       value={formData.topSpeed}
-                      onChange={(e) => setFormData(prev => ({...prev, topSpeed: e.target.value}))}
-                      placeholder="e.g., 45 km/h" className="bg-muted/20 h-10 text-xs border-border/50" 
-                    />
+                      onValueChange={(val) => setFormData(prev => ({...prev, topSpeed: val}))}
+                    >
+                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
+                        <SelectValue placeholder="Select Speed" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TOP_SPEEDS.map((speed) => (
+                          <SelectItem key={speed} value={speed}>{speed}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Certified Range (ARAI)</Label>
-                    <Input 
+                    <Select
                       value={formData.certifiedRange}
-                      onChange={(e) => setFormData(prev => ({...prev, certifiedRange: e.target.value}))}
-                      placeholder="e.g., 180 km/charge" className="bg-muted/20 h-10 text-xs border-border/50" 
-                    />
+                      onValueChange={(val) => setFormData(prev => ({...prev, certifiedRange: val}))}
+                    >
+                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
+                        <SelectValue placeholder="Select Range" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {RANGES.map((range) => (
+                          <SelectItem key={range} value={range}>{range}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Real-World Range</Label>
-                    <Input 
+                    <Select
                       value={formData.realWorldRange}
-                      onChange={(e) => setFormData(prev => ({...prev, realWorldRange: e.target.value}))}
-                      placeholder="e.g., 120-150 km" className="bg-muted/20 h-10 text-xs border-border/50" 
-                    />
+                      onValueChange={(val) => setFormData(prev => ({...prev, realWorldRange: val}))}
+                    >
+                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
+                        <SelectValue placeholder="Select Range" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {RANGES.map((range) => (
+                          <SelectItem key={range} value={range}>{range}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Climbing Degree</Label>
-                    <Input 
+                    <Select
                       value={formData.climbingDegree}
-                      onChange={(e) => setFormData(prev => ({...prev, climbingDegree: e.target.value}))}
-                      placeholder="e.g., 15 Degrees" className="bg-muted/20 h-10 text-xs border-border/50" 
-                    />
+                      onValueChange={(val) => setFormData(prev => ({...prev, climbingDegree: val}))}
+                    >
+                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
+                        <SelectValue placeholder="Select Degree" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CLIMBING_DEGREES.map((degree) => (
+                          <SelectItem key={degree} value={degree}>{degree}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Load Capacity</Label>
-                    <Input 
+                    <Select
                       value={formData.loadCapacity}
-                      onChange={(e) => setFormData(prev => ({...prev, loadCapacity: e.target.value}))}
-                      placeholder="e.g., 180 kg" className="bg-muted/20 h-10 text-xs border-border/50" 
-                    />
+                      onValueChange={(val) => setFormData(prev => ({...prev, loadCapacity: val}))}
+                    >
+                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
+                        <SelectValue placeholder="Select Capacity" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {LOAD_CAPACITIES.map((capacity) => (
+                          <SelectItem key={capacity} value={capacity}>{capacity}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2 md:col-span-3">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3 block">Riding Modes</Label>
@@ -2144,19 +2393,35 @@ export default function AdminInventoryPage() {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Battery Capacity</Label>
-                    <Input 
+                    <Select
                       value={formData.batteryCapacity}
-                      onChange={(e) => setFormData(prev => ({...prev, batteryCapacity: e.target.value}))}
-                      placeholder="e.g., 60 Ah / 2.5 kWh" className="bg-muted/20 h-10 text-xs border-border/50" 
-                    />
+                      onValueChange={(val) => setFormData(prev => ({...prev, batteryCapacity: val}))}
+                    >
+                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
+                        <SelectValue placeholder="Select Capacity" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {BATTERY_CAPACITIES.map((capacity) => (
+                          <SelectItem key={capacity} value={capacity}>{capacity}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Charging Time (0-100%)</Label>
-                    <Input 
+                    <Select
                       value={formData.chargingTime}
-                      onChange={(e) => setFormData(prev => ({...prev, chargingTime: e.target.value}))}
-                      placeholder="e.g., 4-5 Hours" className="bg-muted/20 h-10 text-xs border-border/50" 
-                    />
+                      onValueChange={(val) => setFormData(prev => ({...prev, chargingTime: val}))}
+                    >
+                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
+                        <SelectValue placeholder="Select Time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CHARGING_TIMES.map((time) => (
+                          <SelectItem key={time} value={time}>{time}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Battery Warranty</Label>

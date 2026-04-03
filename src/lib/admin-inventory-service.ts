@@ -194,3 +194,33 @@ export async function deleteVehicleAPI(id: string) {
 
   return await res.json();
 }
+
+// Bulk Update Vehicles
+export async function bulkUpdateVehicles(
+  vehicleIds: string[],
+  updates: {
+    [key: string]: any;
+  }
+) {
+  const res = await fetch('/api/admin/inventory/bulk-update', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ vehicleIds, updates }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || 'Failed to bulk update vehicles');
+  }
+
+  return await res.json();
+}
+
+// Get vehicle placeholder images
+export function generatePlaceholderImages(make: string, model: string): string[] {
+  return [
+    `https://picsum.photos/seed/${make}-${model}-1/800/600`,
+    `https://picsum.photos/seed/${make}-${model}-2/800/600`,
+    `https://picsum.photos/seed/${make}-${model}-3/800/600`,
+  ];
+}

@@ -9,18 +9,19 @@ import { ArrowRight, IndianRupee, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Vehicle {
-  id: string;
+  id: number | string;
   make: string;
   model: string;
-  year: number;
-  trim: string;
-  price: number;
-  batteryRangeKm: number;
-  horsepower: number;
-  zeroToSixtySeconds: number;
-  images: string[];
-  designPhilosophy: string;
-  createdAt: string;
+  year?: number;
+  trim?: string;
+  price: number | string;
+  batteryRangeKm?: number;
+  horsepower?: number;
+  zeroToSixtySeconds?: number;
+  imageUrls?: string[];
+  images?: string[];
+  designPhilosophy?: string;
+  createdAt?: string;
 }
 
 interface VehicleCardProps {
@@ -29,11 +30,12 @@ interface VehicleCardProps {
 
 export function VehicleCard({ vehicle }: VehicleCardProps) {
   const [isFlipped, setIsFlipped] = React.useState(false);
-  const primaryImage = vehicle.images && vehicle.images.length > 0 ? vehicle.images[0] : 'https://picsum.photos/seed/placeholder/1200/800';
-  const inrPrice = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.max(0, vehicle.price));
+  const images = vehicle.imageUrls || vehicle.images || [];
+  const primaryImage = images.length > 0 ? images[0] : 'https://picsum.photos/seed/placeholder/1200/800';
+  const inrPrice = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.max(0, typeof vehicle.price === 'string' ? parseFloat(vehicle.price) : vehicle.price));
 
-  const formatCompact = (value: number) => {
-    if (!Number.isFinite(value)) return '0';
+  const formatCompact = (value: number | undefined) => {
+    if (!value || !Number.isFinite(value)) return '0';
     return new Intl.NumberFormat('en-US', {
       notation: 'compact',
       maximumFractionDigits: 1,

@@ -1,34 +1,23 @@
-import { db } from './index';
-import { adminUsers } from './schema';
-import { eq } from 'drizzle-orm';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { NextRequest } from 'next/server';
 
-const SALT_ROUNDS = 10;
-
 /**
- * Get admin user by email
+ * Validate admin credentials against environment variables
  */
-export async function getAdminByEmail(email: string) {
-  const result = await db.query.adminUsers.findFirst({
-    where: eq(adminUsers.email, email.toLowerCase()),
-  });
-  return result || null;
-}
+export async function validateAdminCredentials(email: string, password: string): Promise<boolean> {
+  const envEmail = process.env.ADMIN_EMAIL;
+  const envPassword = process.env.ADMIN_PASSWORD;
 
-/**
- * Hash password using bcrypt
- */
-export async function hashAdminPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, SALT_ROUNDS);
-}
+  if (!envEmail || !envPassword) {
+    console.error('❌ ADMIN_EMAIL and ADMIN_PASSWORD must be set in .env.local');
+    return false;
+  }
 
-/**
- * Compare password with hash
- */
-export async function compareAdminPassword(password: string, hash: string): Promise<boolean> {
-  return bcrypt.compare(password, hash);
+  // Case-insensitive email comparison
+  const emailMatch = email.toLowerCase() === envEmail.toLowerCase();
+  const passwordMatch = password === envPassword;
+
+  return emailMatch && passwordMatch;
 }
 
 /**

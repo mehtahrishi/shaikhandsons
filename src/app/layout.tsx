@@ -10,6 +10,10 @@ import { AuthProvider } from '@/context/AuthContext';
 export const metadata: Metadata = {
   title: 'Shaikh & Sons | High-Performance Electronic Mobility',
   description: 'Uncompromising luxury and engineering excellence by Shaikh & Sons.',
+  icons: {
+    icon: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({

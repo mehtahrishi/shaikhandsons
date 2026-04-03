@@ -11,8 +11,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "db:migrate": "tsx src/lib/db/migrate.ts",
-    "db:push": "drizzle-kit push",
-    "db:seed-admin": "tsx src/lib/db/seed-admin.ts"
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.28.0",

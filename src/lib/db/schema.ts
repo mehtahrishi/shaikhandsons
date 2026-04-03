@@ -130,17 +130,6 @@ export const sessions = pgTable(
   })
 );
 
-// Admin users table
-export const adminUsers = pgTable(
-  'admin_users',
-  {
-    id: serial('id').primaryKey(),
-    email: varchar('email', { length: 255 }).notNull().unique(),
-    passwordHash: varchar('password_hash', { length: 255 }).notNull(),
-    createdAt: timestamp('created_at').defaultNow(),
-  }
-);
-
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Brand = typeof brands.$inferSelect;

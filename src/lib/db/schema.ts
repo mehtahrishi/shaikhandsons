@@ -56,12 +56,50 @@ export const vehicles = pgTable(
     model: varchar('model', { length: 255 }).notNull(),
     year: integer('year').notNull(),
     trim: varchar('trim', { length: 255 }),
-    price: decimal('price', { precision: 12, scale: 2 }),
-    batteryRangeKm: integer('battery_range_km'),
-    horsepower: integer('horsepower'),
-    zeroToSixtySeconds: decimal('zero_to_sixty_seconds', { precision: 5, scale: 2 }),
+    price: decimal('price', { precision: 12, scale: 2 }).notNull(),
+    
+    // Basic Info
+    modelCode: varchar('model_code', { length: 100 }),
+    category: varchar('category', { length: 50 }), // Scooter, Bike, Loader
+    shortDescription: text('short_description'),
+    
+    // Performance
+    topSpeed: varchar('top_speed', { length: 50 }),
+    certifiedRange: varchar('certified_range', { length: 50 }),
+    realWorldRange: varchar('real_world_range', { length: 100 }),
+    ridingModes: text('riding_modes').array().default([]),
+    climbingDegree: varchar('climbing_degree', { length: 50 }),
+    loadCapacity: varchar('load_capacity', { length: 50 }),
+    
+    // Battery & Charging
+    batteryType: varchar('battery_type', { length: 100 }),
+    batteryCapacity: varchar('battery_capacity', { length: 100 }),
+    chargingTime: varchar('charging_time', { length: 100 }),
+    fastCharging: boolean('fast_charging').default(false),
+    chargerIncluded: varchar('charger_included', { length: 255 }),
+    batteryWarranty: varchar('battery_warranty', { length: 100 }),
+    
+    // Hardware
+    motorPower: varchar('motor_power', { length: 100 }),
+    brakingSystem: varchar('braking_system', { length: 100 }),
+    tyreType: varchar('tyre_type', { length: 50 }),
+    wheelType: varchar('wheel_type', { length: 50 }),
+    wheelSize: varchar('wheel_size', { length: 50 }),
+    groundClearance: varchar('ground_clearance', { length: 50 }),
+    
+    // Smart Features & Aesthetics
+    displayType: varchar('display_type', { length: 100 }),
+    colors: text('colors').array().default([]),
+    keyFeatures: text('key_features').array().default([]),
+    bootSpace: varchar('boot_space', { length: 50 }),
+
+    // Original fields kept for compatibility
+    batteryRangeKm: integer('battery_range_km'), // Legacy
+    horsepower: integer('horsepower'), // Legacy
+    zeroToSixtySeconds: decimal('zero_to_sixty_seconds', { precision: 5, scale: 2 }), // Legacy
     designPhilosophy: text('design_philosophy'),
     imageUrls: text('image_urls').array().default([]),
+    
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
   },
@@ -72,6 +110,7 @@ export const vehicles = pgTable(
     }).onDelete('cascade'),
     brandIdx: index('idx_vehicles_brand').on(table.brandId),
     yearIdx: index('idx_vehicles_year').on(table.year),
+    categoryIdx: index('idx_vehicles_category').on(table.category),
   })
 );
 

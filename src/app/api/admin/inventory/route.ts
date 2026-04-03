@@ -26,54 +26,53 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = (await req.json()) as Partial<NewVehicleData>;
+    const body = (await req.json());
 
-    const requiredFields = [
-      'brandId',
-      'make',
-      'model',
-      'year',
-      'trim',
-      'price',
-      'batteryRangeKm',
-      'horsepower',
-      'zeroToSixtySeconds',
-      'imageUrls',
-      'designPhilosophy',
-    ];
-
-    for (const field of requiredFields) {
-      if (field === 'brandId' && (typeof body[field as keyof NewVehicleData] !== 'number' || !body[field as keyof NewVehicleData])) {
-        return NextResponse.json({ error: `Invalid field: ${field}` }, { status: 400 });
-      }
-      if (
-        field !== 'brandId' &&
-        field !== 'imageUrls' &&
-        field !== 'year' &&
-        field !== 'price' &&
-        field !== 'batteryRangeKm' &&
-        field !== 'horsepower' &&
-        field !== 'zeroToSixtySeconds'
-      ) {
-        const value = body[field as keyof NewVehicleData];
-        if (typeof value !== 'string' || (value as string).trim().length === 0) {
-          return NextResponse.json({ error: `Invalid field: ${field}` }, { status: 400 });
-        }
-      }
+    // Basic required fields validation
+    if (!body.brandId || !body.make || !body.model || !body.price) {
+       return NextResponse.json({ error: 'Missing required fields (brandId, make, model, price)' }, { status: 400 });
     }
 
     const vehicle = await createVehicle({
-      brandId: body.brandId as number,
-      make: (body.make as string).trim(),
-      model: (body.model as string).trim(),
-      year: body.year as number,
-      trim: (body.trim as string).trim(),
+      brandId: Number(body.brandId),
+      make: String(body.make).trim(),
+      model: String(body.model).trim(),
+      year: Number(body.year) || new Date().getFullYear(),
+      trim: body.trim ? String(body.trim).trim() : null,
       price: String(body.price),
-      batteryRangeKm: body.batteryRangeKm as number,
-      horsepower: body.horsepower as number,
-      zeroToSixtySeconds: String(body.zeroToSixtySeconds),
-      imageUrls: Array.isArray(body.imageUrls) ? (body.imageUrls as string[]).filter(Boolean) : [],
-      designPhilosophy: (body.designPhilosophy as string).trim(),
+      
+      modelCode: body.modelCode ? String(body.modelCode).trim() : null,
+      category: body.category ? String(body.category).trim() : null,
+      shortDescription: body.shortDescription ? String(body.shortDescription).trim() : null,
+      
+      topSpeed: body.topSpeed ? String(body.topSpeed).trim() : null,
+      certifiedRange: body.certifiedRange ? String(body.certifiedRange).trim() : null,
+      realWorldRange: body.realWorldRange ? String(body.realWorldRange).trim() : null,
+      ridingModes: Array.isArray(body.ridingModes) ? body.ridingModes : [],
+      climbingDegree: body.climbingDegree ? String(body.climbingDegree).trim() : null,
+      loadCapacity: body.loadCapacity ? String(body.loadCapacity).trim() : null,
+      
+      batteryType: body.batteryType ? String(body.batteryType).trim() : null,
+      batteryCapacity: body.batteryCapacity ? String(body.batteryCapacity).trim() : null,
+      chargingTime: body.chargingTime ? String(body.chargingTime).trim() : null,
+      fastCharging: !!body.fastCharging,
+      chargerIncluded: body.chargerIncluded ? String(body.chargerIncluded).trim() : null,
+      batteryWarranty: body.batteryWarranty ? String(body.batteryWarranty).trim() : null,
+      
+      motorPower: body.motorPower ? String(body.motorPower).trim() : null,
+      brakingSystem: body.brakingSystem ? String(body.brakingSystem).trim() : null,
+      tyreType: body.tyreType ? String(body.tyreType).trim() : null,
+      wheelType: body.wheelType ? String(body.wheelType).trim() : null,
+      wheelSize: body.wheelSize ? String(body.wheelSize).trim() : null,
+      groundClearance: body.groundClearance ? String(body.groundClearance).trim() : null,
+      
+      displayType: body.displayType ? String(body.displayType).trim() : null,
+      colors: Array.isArray(body.colors) ? body.colors : [],
+      keyFeatures: Array.isArray(body.keyFeatures) ? body.keyFeatures : [],
+      bootSpace: body.bootSpace ? String(body.bootSpace).trim() : null,
+
+      designPhilosophy: body.designPhilosophy ? String(body.designPhilosophy).trim() : null,
+      imageUrls: Array.isArray(body.imageUrls) ? body.imageUrls.filter(Boolean) : [],
     });
 
     return NextResponse.json({ success: true, vehicle });

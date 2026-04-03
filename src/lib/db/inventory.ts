@@ -110,7 +110,38 @@ export async function createVehicle(data: {
   model: string;
   year: number;
   trim?: string | null;
-  price?: string | null;
+  price: string;
+  
+  modelCode?: string | null;
+  category?: string | null;
+  shortDescription?: string | null;
+  
+  topSpeed?: string | null;
+  certifiedRange?: string | null;
+  realWorldRange?: string | null;
+  ridingModes?: string[] | null;
+  climbingDegree?: string | null;
+  loadCapacity?: string | null;
+  
+  batteryType?: string | null;
+  batteryCapacity?: string | null;
+  chargingTime?: string | null;
+  fastCharging?: boolean | null;
+  chargerIncluded?: string | null;
+  batteryWarranty?: string | null;
+  
+  motorPower?: string | null;
+  brakingSystem?: string | null;
+  tyreType?: string | null;
+  wheelType?: string | null;
+  wheelSize?: string | null;
+  groundClearance?: string | null;
+  
+  displayType?: string | null;
+  colors?: string[] | null;
+  keyFeatures?: string[] | null;
+  bootSpace?: string | null;
+
   batteryRangeKm?: number | null;
   horsepower?: number | null;
   zeroToSixtySeconds?: string | null;
@@ -125,7 +156,38 @@ export async function createVehicle(data: {
       model: data.model,
       year: data.year,
       trim: data.trim || null,
-      price: data.price || null,
+      price: data.price,
+      
+      modelCode: data.modelCode || null,
+      category: data.category || null,
+      shortDescription: data.shortDescription || null,
+      
+      topSpeed: data.topSpeed || null,
+      certifiedRange: data.certifiedRange || null,
+      realWorldRange: data.realWorldRange || null,
+      ridingModes: data.ridingModes || [],
+      climbingDegree: data.climbingDegree || null,
+      loadCapacity: data.loadCapacity || null,
+      
+      batteryType: data.batteryType || null,
+      batteryCapacity: data.batteryCapacity || null,
+      chargingTime: data.chargingTime || null,
+      fastCharging: !!data.fastCharging,
+      chargerIncluded: data.chargerIncluded || null,
+      batteryWarranty: data.batteryWarranty || null,
+      
+      motorPower: data.motorPower || null,
+      brakingSystem: data.brakingSystem || null,
+      tyreType: data.tyreType || null,
+      wheelType: data.wheelType || null,
+      wheelSize: data.wheelSize || null,
+      groundClearance: data.groundClearance || null,
+      
+      displayType: data.displayType || null,
+      colors: data.colors || [],
+      keyFeatures: data.keyFeatures || [],
+      bootSpace: data.bootSpace || null,
+
       batteryRangeKm: data.batteryRangeKm || null,
       horsepower: data.horsepower || null,
       zeroToSixtySeconds: data.zeroToSixtySeconds || null,

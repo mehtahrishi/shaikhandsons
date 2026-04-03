@@ -55,32 +55,43 @@ export async function createVehicle(data: {
   make: string;
   model: string;
   year: number;
-  trim: string;
+  trim?: string;
   price: number;
-  batteryRangeKm: number;
-  horsepower: number;
-  zeroToSixtySeconds: number;
   designPhilosophy: string;
   images: string[];
-  brandId?: number;
+  brandId: number;
+  
+  modelCode?: string;
+  category?: string;
+  shortDescription?: string;
+  topSpeed?: string;
+  certifiedRange?: string;
+  realWorldRange?: string;
+  ridingModes?: string[];
+  climbingDegree?: string;
+  loadCapacity?: string;
+  batteryType?: string;
+  batteryCapacity?: string;
+  chargingTime?: string;
+  fastCharging?: boolean;
+  chargerIncluded?: string;
+  batteryWarranty?: string;
+  motorPower?: string;
+  brakingSystem?: string;
+  tyreType?: string;
+  wheelType?: string;
+  wheelSize?: string;
+  groundClearance?: string;
+  displayType?: string;
+  colors?: string[];
+  keyFeatures?: string[];
+  bootSpace?: string;
 }) {
-  // If brandId not provided, use default Tesla
-  const brandId = data.brandId || 1;
-
   const res = await fetch('/api/admin/inventory', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      brandId,
-      make: data.make,
-      model: data.model,
-      year: data.year,
-      trim: data.trim,
-      price: data.price,
-      batteryRangeKm: data.batteryRangeKm,
-      horsepower: data.horsepower,
-      zeroToSixtySeconds: data.zeroToSixtySeconds,
-      designPhilosophy: data.designPhilosophy,
+      ...data,
       imageUrls: data.images || [],
     }),
   });
@@ -124,11 +135,34 @@ export async function updateVehicleAPI(
     year?: number;
     trim?: string;
     price?: number;
-    batteryRangeKm?: number;
-    horsepower?: number;
-    zeroToSixtySeconds?: number;
     designPhilosophy?: string;
     imageUrls?: string[];
+    
+    modelCode?: string;
+    category?: string;
+    shortDescription?: string;
+    topSpeed?: string;
+    certifiedRange?: string;
+    realWorldRange?: string;
+    ridingModes?: string[];
+    climbingDegree?: string;
+    loadCapacity?: string;
+    batteryType?: string;
+    batteryCapacity?: string;
+    chargingTime?: string;
+    fastCharging?: boolean;
+    chargerIncluded?: string;
+    batteryWarranty?: string;
+    motorPower?: string;
+    brakingSystem?: string;
+    tyreType?: string;
+    wheelType?: string;
+    wheelSize?: string;
+    groundClearance?: string;
+    displayType?: string;
+    colors?: string[];
+    keyFeatures?: string[];
+    bootSpace?: string;
   }
 ) {
   const res = await fetch('/api/admin/inventory', {

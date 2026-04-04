@@ -11,6 +11,7 @@
     --popover: 0 0% 96%;
     --popover-foreground: 0 0% 10%;
     --primary: 0 84% 44%;
+    --primary-rgb: 206, 18, 18;
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 90%;
     --secondary-foreground: 0 0% 9%;
@@ -42,6 +43,7 @@
     --popover: 0 0% 7%;
     --popover-foreground: 0 0% 98%;
     --primary: 0 84% 44%;
+    --primary-rgb: 206, 18, 18;
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 98%;

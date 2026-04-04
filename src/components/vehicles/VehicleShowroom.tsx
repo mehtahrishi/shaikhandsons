@@ -86,20 +86,26 @@ export function VehicleShowroom() {
       <div className="container mx-auto px-6">
         {error && <div className="text-center text-red-500 py-8">{error}</div>}
 
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-8">
           {isLoading ? (
-            Array.from({ length: 3 }).map((_, index) => (
+            Array.from({ length: 4 }).map((_, index) => (
               <motion.div
                 key={`skeleton-${index}`}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <div className="space-y-4">
-                  <Skeleton className="h-[250px] w-full rounded-2xl" />
-                  <div className="space-y-2 px-2">
-                    <Skeleton className="h-6 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
+                <div className="h-[420px] sm:h-[520px] w-full rounded-[1.5rem] sm:rounded-[2.5rem] bg-zinc-950/50 border border-white/5 flex flex-col p-8 space-y-8">
+                  <div className="flex-1 flex items-center justify-center">
+                    <Skeleton className="h-40 w-full rounded-3xl opacity-20" />
+                  </div>
+                  <div className="space-y-4">
+                    <Skeleton className="h-8 w-3/4 opacity-20" />
+                    <Skeleton className="h-12 w-full opacity-10" />
+                    <div className="flex justify-between items-end">
+                      <Skeleton className="h-10 w-24 opacity-20" />
+                      <Skeleton className="h-12 w-12 rounded-full opacity-20" />
+                    </div>
                   </div>
                 </div>
               </motion.div>

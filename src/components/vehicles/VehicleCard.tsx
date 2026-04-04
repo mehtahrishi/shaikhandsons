@@ -1,11 +1,10 @@
-
 "use client"
 
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, IndianRupee, RefreshCw } from 'lucide-react';
+import { IndianRupee, Zap, Gauge, Battery, ChevronRight, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Vehicle {
@@ -32,15 +31,12 @@ interface VehicleCardProps {
 }
 
 export function VehicleCard({ vehicle }: VehicleCardProps) {
-  const [isFlipped, setIsFlipped] = React.useState(false);
   const [liveData, setLiveData] = React.useState<Vehicle>(vehicle);
-  const [isLoading, setIsLoading] = React.useState(false);
 
   // Fetch real-time vehicle data
   React.useEffect(() => {
     const fetchVehicleData = async () => {
       try {
-        setIsLoading(true);
         const response = await fetch(`/api/vehicles?id=${vehicle.id}`);
         if (response.ok) {
           const data = await response.json();
@@ -50,21 +46,20 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
       } catch (error) {
         console.error('Failed to fetch vehicle data:', error);
         setLiveData(vehicle);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchVehicleData();
-    
-    // Auto-refresh every 30 seconds
     const interval = setInterval(fetchVehicleData, 30000);
     return () => clearInterval(interval);
   }, [vehicle.id, vehicle]);
 
   const images = liveData.imageUrls || liveData.images || [];
   const primaryImage = images.length > 0 ? images[0] : 'https://picsum.photos/seed/placeholder/1200/800';
-  const inrPrice = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.max(0, typeof liveData.price === 'string' ? parseFloat(liveData.price) : liveData.price));
+  const inrPrice = new Intl.NumberFormat('en-IN', { 
+    maximumFractionDigits: 0,
+    style: 'decimal'
+  }).format(Math.max(0, typeof liveData.price === 'string' ? parseFloat(liveData.price) : liveData.price));
 
   const formatCompact = (value: number | undefined) => {
     if (value === null || value === undefined || !Number.isFinite(value)) return null;
@@ -74,207 +69,99 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
     }).format(value);
   };
 
-  const rangeLabel = liveData.certifiedRange || liveData.batteryRangeKm ? formatCompact(liveData.batteryRangeKm) : null;
-  const powerLabel = liveData.motorPower || (liveData.horsepower ? formatCompact(liveData.horsepower) : null);
-  const speedLabel = liveData.topSpeed || (liveData.zeroToSixtySeconds ? formatCompact(typeof liveData.zeroToSixtySeconds === 'string' ? parseFloat(liveData.zeroToSixtySeconds) : liveData.zeroToSixtySeconds) : null);
+  const rangeLabel = liveData.certifiedRange || (liveData.batteryRangeKm ? `${formatCompact(liveData.batteryRangeKm)} km` : null);
+  const powerLabel = liveData.motorPower || (liveData.horsepower ? `${formatCompact(liveData.horsepower)} HP` : null);
+  const speedLabel = liveData.topSpeed || (liveData.zeroToSixtySeconds ? `${formatCompact(typeof liveData.zeroToSixtySeconds === 'string' ? parseFloat(liveData.zeroToSixtySeconds) : liveData.zeroToSixtySeconds)}s` : null);
 
   return (
-    <motion.div
-      className="group relative w-full"
-      layout
-    >
-      <div className="md:hidden relative h-[384px] rounded-2xl" style={{ perspective: '1400px' }}>
-        <button
-          type="button"
-          aria-label="Flip vehicle card"
-          onClick={() => setIsFlipped((prev) => !prev)}
-          className="absolute right-3 top-3 z-20 h-9 w-9 rounded-full border border-border/60 bg-background/80 backdrop-blur flex items-center justify-center shadow-sm"
-        >
-          <RefreshCw className="h-3.5 w-3.5" />
-        </button>
+    <Link href={`/vehicles/${liveData.id}`} className="block w-full h-full">
+      <motion.div 
+        className="group relative w-full h-[420px] sm:h-[520px] bg-card rounded-[1.5rem] sm:rounded-[2.5rem] border border-border/40 overflow-hidden shadow-2xl transition-all duration-500 hover:border-primary/30"
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        whileHover={{ y: -5 }}
+      >
+        {/* Stage Lighting / Ambient Glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(var(--primary-rgb),0.05),transparent_60%)] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-card via-card/80 to-transparent pointer-events-none z-10" />
 
-        <div
-          className="relative h-full w-full transition-transform duration-500"
-          style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
-        >
-          <div
-            className="absolute inset-0 bg-card border border-border/50 overflow-hidden flex flex-col"
-            style={{ backfaceVisibility: 'hidden' }}
+        {/* HUD Elements */}
+        <div className="absolute top-4 left-4 sm:top-8 sm:left-8 z-20 flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <span className="w-1 h-1 rounded-full bg-primary animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/80">Active Showroom</span>
+          </div>
+          <div className="h-[1px] w-8 bg-primary/20" />
+        </div>
+
+        {/* Main Stage Image */}
+        <div className="relative h-[60%] sm:h-[65%] w-full overflow-hidden">
+          <motion.div 
+            className="relative w-full h-full"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <div className="relative h-64 w-full overflow-hidden flex items-center justify-center bg-zinc-100 dark:bg-zinc-900">
-              <Image
-                src={primaryImage}
-                alt={liveData.model}
-                fill
-                sizes="100vw"
-                className="object-contain grayscale transition-all duration-500 group-hover:scale-105 group-hover:grayscale-0"
-                data-ai-hint="luxury electric car"
-              />
-            </div>
+            <Image
+              src={primaryImage}
+              alt={`${liveData.make} ${liveData.model}`}
+              fill
+              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover"
+              priority
+            />
+          </motion.div>
+          {/* Reflective Surface overlay for depth */}
+          <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent z-10" />
+        </div>
 
-            <div className="flex-1 flex flex-col justify-end bg-gradient-to-b from-card to-card/80">
-              <div className="px-4 pt-4 pb-3">
-                <div className="mb-3">
-                  <div className="flex items-center gap-2">
-                    <p className="text-[10px] uppercase tracking-[0.24em] font-semibold text-muted-foreground">{liveData.make}</p>
-                    <p className="text-[10px] uppercase tracking-[0.24em] font-semibold text-muted-foreground truncate">{liveData.model}</p>
-                  </div>
-                </div>
-                <div className="mb-1 flex items-center gap-1">
-                  <IndianRupee className="h-3.5 w-3.5 text-muted-foreground" />
-                  <p className="font-headline text-[34px] font-black text-primary leading-none tabular-nums truncate">{inrPrice}</p>
-                </div>
-              </div>
-              <Link href={`/vehicles/${liveData.id}`} className="block w-full">
-                <Button className="w-full h-12 rounded-none font-bold uppercase tracking-[0.14em] text-[10px] group/button shadow-none">
-                  <span>Discover</span>
-                </Button>
-              </Link>
+        {/* Info HUD Panel */}
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 z-20 flex flex-col gap-4 sm:gap-6">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-primary">{liveData.make}</span>
+              <Activity className="h-3 w-3 text-primary/60" />
             </div>
+            <h3 className="text-2xl sm:text-4xl font-black text-foreground uppercase tracking-tighter leading-none">
+              {liveData.model}
+            </h3>
           </div>
 
-          <div
-            className="absolute inset-0 bg-card border border-border/50 overflow-hidden flex flex-col"
-            style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-          >
-            <div className="h-64 w-full px-4 py-5 bg-muted/20">
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.24em] mb-4">Performance</p>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Brand</p>
-                  <p className="text-base font-black text-foreground tabular-nums truncate">{liveData.make}</p>
+          {/* Precision Stats Strip */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 py-3 border-y border-border/40">
+            {[
+              { icon: Battery, label: 'Range', value: rangeLabel || '450 km' },
+              { icon: Zap, label: 'Power', value: powerLabel || '150 kW' },
+              { icon: Gauge, label: 'Top', value: speedLabel || '180 km/h' }
+            ].map((stat, i) => (
+              <div key={i} className="flex flex-col gap-1">
+                <div className="flex items-center gap-1.5">
+                  <stat.icon className="h-3 w-3 text-primary" />
+                  <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-tighter text-muted-foreground">{stat.label}</span>
                 </div>
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Model</p>
-                  <p className="text-base font-black text-foreground tabular-nums truncate">{liveData.model}</p>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Range</p>
-                  <p className="text-base font-black text-foreground tabular-nums truncate">{liveData.certifiedRange || rangeLabel || 'N/A'}</p>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Power</p>
-                  <p className="text-base font-black text-foreground tabular-nums truncate">{liveData.motorPower || powerLabel || 'N/A'}</p>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Speed</p>
-                  <p className="text-base font-black text-foreground tabular-nums truncate">{liveData.topSpeed || speedLabel || 'N/A'}</p>
-                </div>
+                <span className="text-[11px] sm:text-[14px] font-black text-foreground tabular-nums">{stat.value}</span>
               </div>
+            ))}
+          </div>
 
+          <div className="flex items-center justify-between mt-2">
+            <div className="flex flex-col">
+              <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 mb-0.5">Asset Valuation</span>
+              <div className="flex items-baseline gap-1">
+                <IndianRupee className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+                <span className="text-xl sm:text-3xl font-black text-foreground tracking-tighter tabular-nums">{inrPrice}</span>
+              </div>
             </div>
-
-            <div className="bg-gradient-to-b from-card to-card/80">
-              <div className="px-4 py-3 flex items-center gap-1">
-                <IndianRupee className="h-3.5 w-3.5 text-muted-foreground" />
-                <p className="font-headline text-[34px] font-black text-primary leading-none tabular-nums truncate">{inrPrice}</p>
-              </div>
-              <Link href={`/vehicles/${liveData.id}`} className="block w-full">
-                <Button className="w-full h-12 rounded-none font-bold uppercase tracking-[0.14em] text-[10px] group/button shadow-none">
-                  <span>Discover</span>
-                </Button>
-              </Link>
+            
+            <div className="h-10 w-10 sm:h-14 sm:w-14 rounded-full bg-secondary border border-border flex items-center justify-center transition-all duration-300 group-hover:bg-primary group-hover:border-primary group-hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)]">
+              <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-foreground group-hover:text-primary-foreground transition-transform group-hover:translate-x-1" />
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="hidden md:block relative h-[384px] rounded-2xl" style={{ perspective: '1400px' }}>
-        <button
-          type="button"
-          aria-label="Flip vehicle card"
-          onClick={() => setIsFlipped((prev) => !prev)}
-          className="absolute right-3 top-3 z-20 h-9 w-9 rounded-full border border-border/60 bg-background/80 backdrop-blur flex items-center justify-center shadow-sm"
-        >
-          <RefreshCw className="h-3.5 w-3.5" />
-        </button>
-
-        <div
-          className="relative h-full w-full transition-transform duration-500"
-          style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
-        >
-          <div
-            className="absolute inset-0 bg-card border border-border/50 overflow-hidden flex flex-col"
-            style={{ backfaceVisibility: 'hidden' }}
-          >
-            <div className="relative h-64 w-full overflow-hidden flex items-center justify-center bg-zinc-100 dark:bg-zinc-900">
-              <Image
-                src={primaryImage}
-                alt={liveData.model}
-                fill
-                sizes="(max-width: 1024px) 50vw, 25vw"
-                className="object-contain grayscale transition-all duration-500 group-hover:scale-105 group-hover:grayscale-0"
-                data-ai-hint="luxury electric car"
-              />
-            </div>
-
-            <div className="flex-1 flex flex-col justify-end bg-gradient-to-b from-card to-card/80">
-              <div className="px-4 pt-4 pb-3">
-                <div className="mb-3">
-                  <div className="flex items-center gap-2">
-                    <p className="text-[10px] uppercase tracking-[0.24em] font-semibold text-muted-foreground">{liveData.make}</p>
-                    <p className="text-[10px] uppercase tracking-[0.24em] font-semibold text-muted-foreground truncate">{liveData.model}</p>
-                  </div>
-                </div>
-                <div className="mb-1 flex items-center gap-1">
-                  <IndianRupee className="h-3.5 w-3.5 text-muted-foreground" />
-                  <p className="font-headline text-[34px] font-black text-primary leading-none tabular-nums truncate">{inrPrice}</p>
-                </div>
-              </div>
-              <Link href={`/vehicles/${liveData.id}`} className="block w-full">
-                <Button className="w-full h-12 rounded-none font-bold uppercase tracking-[0.14em] text-[10px] group/button shadow-none">
-                  <span>Discover</span>
-                </Button>
-              </Link>
-            </div>
-          </div>
-
-          <div
-            className="absolute inset-0 bg-card border border-border/50 overflow-hidden flex flex-col"
-            style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-          >
-            <div className="h-64 w-full px-4 py-5 bg-muted/20">
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.24em] mb-4">Performance</p>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Brand</p>
-                  <p className="text-base font-black text-foreground tabular-nums truncate">{liveData.make}</p>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Model</p>
-                  <p className="text-base font-black text-foreground tabular-nums truncate">{liveData.model}</p>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Range</p>
-                  <p className="text-base font-black text-foreground tabular-nums truncate">{liveData.certifiedRange || rangeLabel || 'N/A'}</p>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Power</p>
-                  <p className="text-base font-black text-foreground tabular-nums truncate">{liveData.motorPower || powerLabel || 'N/A'}</p>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Speed</p>
-                  <p className="text-base font-black text-foreground tabular-nums truncate">{liveData.topSpeed || speedLabel || 'N/A'}</p>
-                </div>
-              </div>
-
-            </div>
-
-            <div className="bg-gradient-to-b from-card to-card/80">
-              <div className="px-4 py-3 flex items-center gap-1">
-                <IndianRupee className="h-3.5 w-3.5 text-muted-foreground" />
-                <p className="font-headline text-[34px] font-black text-primary leading-none tabular-nums truncate">{inrPrice}</p>
-              </div>
-              <Link href={`/vehicles/${liveData.id}`} className="block w-full">
-                <Button className="w-full h-12 rounded-none font-bold uppercase tracking-[0.14em] text-[10px] group/button shadow-none">
-                  <span>Discover</span>
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
+        {/* Scanline Effect Overlay */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%]" />
+      </motion.div>
+    </Link>
   );
 }
-

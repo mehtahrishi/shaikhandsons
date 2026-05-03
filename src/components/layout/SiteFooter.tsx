@@ -59,7 +59,7 @@ export function SiteFooter() {
         
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-muted gap-4 text-center md:text-left">
           <p className="text-muted-foreground text-[10px] uppercase tracking-widest font-bold">
-            © {new Date().getFullYear()} Shaikh & Sons Electric Automotive Group. All Rights Reserved.
+            © {new Date().getFullYear()} Shaikh and Sons Private Limited. All Rights Reserved.
           </p>
           
           <div className="text-muted-foreground text-xs font-medium">

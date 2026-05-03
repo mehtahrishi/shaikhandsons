@@ -4,9 +4,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldCheck, RefreshCw, Mail } from 'lucide-react';
+import { Loader2, ShieldCheck, RefreshCw, Mail, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 import { useAuth } from '@/context/AuthContext';
 
@@ -21,35 +21,29 @@ export default function VerifyOTPPage() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const router = useRouter();
   const { toast } = useToast();
-  const { refresh } = useAuth(); // Update auth context after login
+  const { refresh } = useAuth();
 
-  // Load pending auth info from sessionStorage
   useEffect(() => {
     const email = sessionStorage.getItem('pending_email') ?? '';
     setPendingEmail(email);
 
     if (!sessionStorage.getItem('pending_otp_token') || !sessionStorage.getItem('pending_password')) {
-      // Missing required data — bump them back to login
       router.push('/login');
     }
   }, [router]);
 
-  // Resend cooldown timer
   useEffect(() => {
     if (countdown <= 0) return;
     const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
     return () => clearTimeout(timer);
   }, [countdown]);
 
-  // ─── Input handling ──────────────────────────────────────────────────────────
-
   const handleChange = (value: string, index: number) => {
-    if (!/^\d*$/.test(value)) return; // digits only
+    if (!/^\d*$/.test(value)) return;
 
     const newOtp = [...otp];
 
     if (value.length > 1) {
-      // Handle paste: distribute digits across boxes
       const digits = value.split('').slice(0, OTP_LENGTH - index);
       digits.forEach((d, i) => {
         if (index + i < OTP_LENGTH) newOtp[index + i] = d;
@@ -80,8 +74,6 @@ export default function VerifyOTPPage() {
     }
   };
 
-  // ─── Verify ──────────────────────────────────────────────────────────────────
-
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     const fullOtp = otp.join('');
@@ -107,7 +99,6 @@ export default function VerifyOTPPage() {
 
     setVerifying(true);
     try {
-      // 1. Verify custom OTP token via API
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -119,7 +110,6 @@ export default function VerifyOTPPage() {
         throw new Error(data.error || 'Verification failed.');
       }
 
-      // 2. If verification is successful, log them into PostgreSQL backend
       const loginRes = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -130,19 +120,17 @@ export default function VerifyOTPPage() {
         throw new Error('Failed to create session');
       }
       
-      // Cleanup sensitive data immediately
       sessionStorage.removeItem('pending_email');
       sessionStorage.removeItem('pending_password');
       sessionStorage.removeItem('pending_otp_token');
 
-      // Update auth context
       await refresh();
 
       toast({
         title: "Access Granted",
         description: "Identity confirmed. Welcome to the Shaikh & Sons inner circle.",
       });
-      router.push('/profile');
+      router.push('/');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Verification failed.';
       toast({
@@ -150,15 +138,12 @@ export default function VerifyOTPPage() {
         description: message,
         variant: "destructive",
       });
-      // Clear OTP inputs on failure
       setOtp(Array(OTP_LENGTH).fill(''));
       inputRefs.current[0]?.focus();
     } finally {
       setVerifying(false);
     }
   };
-
-  // ─── Resend ───────────────────────────────────────────────────────────────────
 
   const handleResend = async () => {
     if (countdown > 0 || !pendingEmail) return;
@@ -173,7 +158,6 @@ export default function VerifyOTPPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to resent code');
 
-      // Update token with new one
       sessionStorage.setItem('pending_otp_token', data.token);
 
       setCountdown(60);
@@ -190,30 +174,36 @@ export default function VerifyOTPPage() {
   };
 
   return (
-    <div className="container mx-auto px-6 py-32 flex-1 flex items-center justify-center relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -z-10"></div>
-      
-      <Card className="w-full max-w-md border-white/10 bg-black/40 backdrop-blur-xl">
-        <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-            <ShieldCheck className="h-6 w-6 text-primary" />
-          </div>
-          <CardTitle className="font-headline text-3xl font-black uppercase tracking-tighter">
-            Verify <span className="text-primary">Identity</span>
-          </CardTitle>
-          <CardDescription>
-            Enter the 6-digit code sent to your email.
-          </CardDescription>
+    <div className="min-h-[calc(100vh-80px)] relative flex items-center justify-center overflow-hidden bg-background pt-8 pb-12">
+      {/* Dynamic Background Accents */}
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse" />
+      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -z-10" />
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full max-w-md px-6 z-10"
+      >
+        <div className="mb-10 text-center">
+          <h1 className="font-headline text-5xl md:text-6xl font-black text-foreground tracking-tighter uppercase mb-2">
+            Verify <span className="text-primary italic">Identity</span>
+          </h1>
+          <p className="text-muted-foreground text-xs font-bold tracking-[0.2em] uppercase">
+            A secure handshake is required
+          </p>
           {pendingEmail && (
-            <div className="flex items-center justify-center gap-2 pt-1">
-              <Mail className="h-3.5 w-3.5 text-primary" />
-              <span className="text-xs text-primary font-medium truncate max-w-[260px]">{pendingEmail}</span>
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <Mail className="h-3 w-3 text-primary/60" />
+              <span className="text-[10px] text-primary font-bold tracking-widest truncate max-w-[200px]">{pendingEmail}</span>
             </div>
           )}
-        </CardHeader>
+        </div>
 
-        <form onSubmit={handleVerify}>
-          <CardContent className="space-y-6">
+        <div className="bg-card/40 backdrop-blur-xl border border-border/50 rounded-3xl p-8 shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          
+          <form onSubmit={handleVerify} className="space-y-8">
             <div className="flex justify-between gap-2">
               {otp.map((digit, index) => (
                 <Input
@@ -222,7 +212,7 @@ export default function VerifyOTPPage() {
                   type="text"
                   inputMode="numeric"
                   maxLength={OTP_LENGTH}
-                  className="w-12 h-14 text-center text-2xl font-black border-white/10 bg-white/5 focus:border-primary transition-colors"
+                  className="w-12 h-16 text-center text-2xl font-black border-border bg-background/50 focus:border-primary focus:bg-background/80 transition-all rounded-xl text-foreground selection:bg-primary/30"
                   value={digit}
                   onChange={(e) => handleChange(e.target.value, index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
@@ -239,29 +229,35 @@ export default function VerifyOTPPage() {
                 type="button"
                 onClick={handleResend}
                 disabled={countdown > 0 || resending}
-                className="text-muted-foreground hover:text-primary transition-colors text-xs uppercase tracking-widest font-bold"
+                className="text-muted-foreground/60 hover:text-primary transition-colors text-[10px] uppercase tracking-[0.2em] font-bold"
               >
                 {resending ? (
                   <Loader2 className="mr-2 h-3 w-3 animate-spin" />
                 ) : (
                   <RefreshCw className="mr-2 h-3 w-3" />
                 )}
-                {countdown > 0 ? `Resend in ${countdown}s` : 'Resend Code'}
+                {countdown > 0 ? `Retry in ${countdown}s` : 'Request New Code'}
               </Button>
             </div>
-          </CardContent>
 
-          <CardFooter className="pt-6">
-            <Button
-              type="submit"
-              className="w-full font-bold uppercase tracking-widest h-12"
+            <Button 
+              type="submit" 
+              className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-[0.2em] text-xs rounded-xl shadow-lg shadow-primary/20 group/btn overflow-hidden relative" 
               disabled={verifying || otp.join('').length < OTP_LENGTH}
             >
-              {verifying ? <Loader2 className="animate-spin mr-2" /> : "Authorize Handshake"}
+              <span className="relative z-10 flex items-center justify-center">
+                {verifying ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : (
+                  <>
+                    Complete Handshake
+                    <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
             </Button>
-          </CardFooter>
-        </form>
-      </Card>
+          </form>
+        </div>
+      </motion.div>
     </div>
   );
 }

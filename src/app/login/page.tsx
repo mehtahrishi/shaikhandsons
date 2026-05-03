@@ -6,9 +6,9 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Mail, Lock } from 'lucide-react';
+import { Loader2, Mail, Lock, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -24,7 +24,7 @@ export default function LoginPage() {
         const res = await fetch('/api/auth/me');
         if (res.ok) {
           const data = await res.json();
-          if (data.user) router.push('/profile');
+          if (data.user) router.push('/');
         }
       } catch (err) {
         console.error('Auth check failed:', err);
@@ -38,7 +38,6 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // 1. Validate credentials with our API
       const validateRes = await fetch('/api/auth/validate-credentials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -49,7 +48,6 @@ export default function LoginPage() {
         throw new Error('Invalid email or password');
       }
 
-      // 2. Request OTP from our custom SMTP route
       const res = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -62,9 +60,8 @@ export default function LoginPage() {
         throw new Error(data.error || 'Failed to send OTP email.');
       }
 
-      // 3. Stash the token and credentials temporarily for Verify page
       sessionStorage.setItem('pending_email', email);
-      sessionStorage.setItem('pending_password', password); // Temporary! Will be cleared soon
+      sessionStorage.setItem('pending_password', password); 
       sessionStorage.setItem('pending_otp_token', data.token);
 
       toast({
@@ -86,62 +83,89 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="container mx-auto px-6 py-24 flex-1 flex items-center justify-center relative overflow-hidden min-h-[calc(100vh-200px)]">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -z-10"></div>
-      
-      <Card className="w-full max-w-md border-white/10 bg-black/40 backdrop-blur-xl mt-8">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="font-headline text-3xl font-black uppercase tracking-tighter">
-            Sign <span className="text-primary">In</span>
-          </CardTitle>
-          <CardDescription>Enter your credentials to access your garage.</CardDescription>
-        </CardHeader>
-        <form onSubmit={handleLogin}>
-          <CardContent className="space-y-4">
+    <div className="min-h-[calc(100vh-80px)] relative flex items-center justify-center overflow-hidden bg-background pt-8 pb-12">
+      {/* Dynamic Background Accents */}
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse" />
+      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -z-10" />
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full max-w-md px-6 z-10"
+      >
+        <div className="mb-10 text-center">
+          <h1 className="font-headline text-5xl md:text-6xl font-black text-foreground tracking-tighter uppercase mb-2">
+            Sign <span className="text-primary italic">In</span>
+          </h1>
+          <p className="text-muted-foreground text-xs font-bold tracking-[0.2em] uppercase">
+            Access your high-performance garage
+          </p>
+        </div>
+
+        <div className="bg-card/40 backdrop-blur-xl border border-border/50 rounded-3xl p-8 shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          
+          <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Label htmlFor="email" className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground ml-1">Email Identifier</Label>
+              <div className="relative group/input">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 group-focus-within/input:text-primary transition-colors" />
                 <Input
                   id="email"
-                  placeholder="julian.vane@example.com"
+                  placeholder="johndoe@gmail.com"
                   type="email"
                   required
-                  className="pl-10"
+                  className="bg-background/50 border-border h-14 pl-12 focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all rounded-xl text-foreground placeholder:text-muted-foreground/50"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
             </div>
+
             <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label htmlFor="password">Password</Label>
-                <Link href="#" className="text-xs text-primary hover:underline">Forgot password?</Link>
+              <div className="flex justify-between items-center ml-1">
+                <Label htmlFor="password" className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">Passcode</Label>
+                <Link href="#" className="text-[10px] text-primary/60 hover:text-primary uppercase tracking-widest font-bold transition-colors">Recover</Link>
               </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <div className="relative group/input">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 group-focus-within/input:text-primary transition-colors" />
                 <Input
                   id="password"
                   type="password"
                   required
-                  className="pl-10"
+                  className="bg-background/50 border-border h-14 pl-12 focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all rounded-xl text-foreground placeholder:text-muted-foreground/50"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4 pt-6">
-            <Button type="submit" className="w-full font-bold uppercase tracking-widest h-12" disabled={loading}>
-              {loading ? <Loader2 className="animate-spin mr-2" /> : "Authorize Entry"}
+
+            <Button 
+              type="submit" 
+              className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-[0.2em] text-xs rounded-xl shadow-lg shadow-primary/20 group/btn overflow-hidden relative" 
+              disabled={loading}
+            >
+              <span className="relative z-10 flex items-center justify-center">
+                {loading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : (
+                  <>
+                    Authorize Entry
+                    <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
             </Button>
-            <p className="text-center text-sm text-muted-foreground">
+          </form>
+
+          <div className="mt-8 pt-8 border-t border-border/50 text-center">
+            <p className="text-muted-foreground text-[10px] uppercase tracking-widest font-bold">
               New to the fleet?{" "}
-              <Link href="/signup" className="text-primary font-bold hover:underline italic">Create Account</Link>
+              <Link href="/signup" className="text-primary hover:text-primary/80 transition-colors">Create Account</Link>
             </p>
-          </CardFooter>
-        </form>
-      </Card>
-    </div>
-  );
-}
+          </div>
+          </div>
+          </motion.div>
+          </div>
+          );
+          }

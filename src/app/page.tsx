@@ -1,7 +1,6 @@
 
 "use client"
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { VehicleShowroom } from '@/components/vehicles/VehicleShowroom';
@@ -9,6 +8,8 @@ import { ShieldCheck, Leaf, BatteryCharging, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 const BikeIcon = ({ className }: { className?: string }) => (
   <svg 
@@ -70,6 +71,27 @@ const ScootyIcon = ({ className }: { className?: string }) => (
 );
 
 export default function Home() {
+  const { user, loading } = useAuth();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!loading && user) {
+      const isProfileIncomplete = !user.fullName || !user.phone || !user.address;
+      
+      if (isProfileIncomplete) {
+        toast({
+          title: "Complete Your Profile",
+          description: "Please fill in your details to get the full experience.",
+          action: (
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/profile">Go to Profile</Link>
+            </Button>
+          ),
+        });
+      }
+    }
+  }, [user, loading, toast]);
+
   return (
     <div className="flex flex-col">
       {/* Hero Section */}

@@ -63,14 +63,14 @@ function buildEmailHtml(otp: string): string {
       width:44px;height:56px;
       line-height:56px;
       text-align:center;
-      background:#1a1a1a;
-      border:1px solid #c9a84c;
-      border-radius:6px;
+      background:#f8f8f8;
+      border:1px solid #CE1212;
+      border-radius:4px;
       font-size:28px;
       font-weight:900;
-      color:#c9a84c;
+      color:#000;
       margin:0 4px;
-      font-family:monospace;
+      font-family:'Courier New', Courier, monospace;
     ">${d}</span>`
   ).join('');
 
@@ -81,55 +81,46 @@ function buildEmailHtml(otp: string): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shaikh &amp; Sons — Verification Code</title>
 </head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:'Helvetica Neue',Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:48px 0;">
+<body style="margin:0;padding:0;background:#ffffff;font-family:'Poppins', 'Helvetica Neue', Arial, sans-serif;color:#000000;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:48px 0;">
     <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="background:#111;border:1px solid #222;border-radius:12px;overflow:hidden;max-width:560px;">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;max-width:560px;">
 
         <!-- Header -->
         <tr>
-          <td style="background:linear-gradient(135deg,#161616,#0d0d0d);padding:36px 40px;text-align:center;border-bottom:1px solid #222;">
-            <div style="font-size:22px;font-weight:900;letter-spacing:5px;text-transform:uppercase;color:#c9a84c;">
-              SHAIKH &amp; SONS
-            </div>
-            <div style="font-size:10px;letter-spacing:3px;color:#555;text-transform:uppercase;margin-top:6px;">
-              High-Performance Electronic Mobility
+          <td style="padding:40px 40px;text-align:center;">
+            <div style="font-size:24px;font-weight:900;letter-spacing:4px;text-transform:uppercase;color:#000;font-family:'Playfair Display', serif;white-space:nowrap;">
+              SHAIKH <span style="color:#CE1212;">&amp;</span> SONS
             </div>
           </td>
         </tr>
 
         <!-- Body -->
         <tr>
-          <td style="padding:48px 40px;text-align:center;">
-            <div style="width:52px;height:52px;background:#1a1a1a;border:1px solid #c9a84c;border-radius:50%;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;">
-              <span style="font-size:24px;">🔐</span>
-            </div>
-            <h2 style="color:#fff;font-size:20px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">
-              Security Verification
+          <td style="padding:40px 40px;text-align:center;">
+            <h2 style="color:#000;font-size:22px;font-weight:700;letter-spacing:1px;margin:0 0 12px;font-family:'Playfair Display', serif;">
+              Identity Verification
             </h2>
-            <p style="color:#888;font-size:14px;line-height:1.6;margin:0 0 36px;">
-              Use the code below to complete your sign-in.<br/>
-              It expires in <strong style="color:#c9a84c;">10 minutes</strong>.
+            <p style="color:#333;font-size:14px;line-height:1.6;margin:0 0 40px;font-weight:400;">
+              A code has been requested to login.
             </p>
 
             <!-- OTP Boxes -->
-            <div style="margin:0 auto 36px;">
+            <div style="margin:0 auto 40px;">
               ${digits}
             </div>
 
-            <p style="color:#555;font-size:12px;line-height:1.7;margin:0;">
-              If you did not request this code, you can safely ignore this email.<br/>
-              Never share this code with anyone.
+            <p style="color:#666;font-size:12px;line-height:1.8;margin:0;max-width:320px;margin-left:auto;margin-right:auto;">
+              Code expires in 10 minutes. If you did not initiate this request, please ignore this email.
             </p>
           </td>
         </tr>
 
         <!-- Footer -->
         <tr>
-          <td style="background:#0d0d0d;padding:24px 40px;text-align:center;border-top:1px solid #1a1a1a;">
-            <p style="color:#3a3a3a;font-size:11px;margin:0;line-height:1.6;">
-              © ${new Date().getFullYear()} Shaikh &amp; Sons. All rights reserved.<br/>
-              This is an automated security notification — please do not reply.
+          <td style="padding:32px 40px;text-align:center;border-top:1px solid #f0f0f0;">
+            <p style="color:#999;font-size:10px;margin:0;line-height:1.6;letter-spacing:1px;text-transform:uppercase;font-weight:700;">
+              © ${new Date().getFullYear()} Shaikh and Sons Private Limited.
             </p>
           </td>
         </tr>
@@ -140,3 +131,4 @@ function buildEmailHtml(otp: string): string {
 </body>
 </html>`;
 }
+

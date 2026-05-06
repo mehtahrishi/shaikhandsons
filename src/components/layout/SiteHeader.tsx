@@ -108,6 +108,7 @@ export function SiteHeader() {
     { name: 'Performance', href: '/#performance' },
     { name: 'Philosophy', href: '/#philosophy' },
     { name: 'Inquiry', href: '/#inquiry' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   const userInitial = user?.fullName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "C";
@@ -212,9 +213,14 @@ export function SiteHeader() {
                       </div>
                     </div>
                   ) : (
-                    <Button asChild className="w-full h-12 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">
-                      <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Authorize Entry</Link>
-                    </Button>
+                    <div className="flex flex-col gap-3">
+                      <Button asChild className="w-full h-12 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">
+                        <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
+                      </Button>
+                      <Button asChild className="w-full h-12 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">
+                        <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>Sign Up</Link>
+                      </Button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -293,11 +299,18 @@ export function SiteHeader() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link href="/login">
-                <Button variant="ghost" size="sm" className="flex gap-2 text-[9px] uppercase font-bold tracking-widest h-8 md:h-9 px-3">
-                  <LogIn className="h-4 w-4 text-primary" /> Sign In
-                </Button>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link href="/login">
+                  <Button variant="ghost" size="sm" className="text-[9px] uppercase font-bold tracking-widest h-8 md:h-9 px-3">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button variant="default" size="sm" className="text-[9px] uppercase font-bold tracking-widest h-8 md:h-9 px-3 bg-primary text-primary-foreground hover:bg-primary/90">
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
         </div>

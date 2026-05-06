@@ -19,22 +19,6 @@ export const users = pgTable(
   })
 );
 
-// OTP tokens table
-export const otpTokens = pgTable(
-  'otp_tokens',
-  {
-    id: serial('id').primaryKey(),
-    email: varchar('email', { length: 255 }).notNull(),
-    token: varchar('token', { length: 255 }).notNull().unique(),
-    expiresAt: timestamp('expires_at').notNull(),
-    createdAt: timestamp('created_at').defaultNow(),
-  },
-  (table) => ({
-    emailIdx: index('idx_otp_tokens_email').on(table.email),
-    expiresIdx: index('idx_otp_tokens_expires').on(table.expiresAt),
-  })
-);
-
 // Brands table
 export const brands = pgTable(
   'brands',
@@ -111,22 +95,6 @@ export const vehicles = pgTable(
     brandIdx: index('idx_vehicles_brand').on(table.brandId),
     yearIdx: index('idx_vehicles_year').on(table.year),
     categoryIdx: index('idx_vehicles_category').on(table.category),
-  })
-);
-
-// Sessions table (for JWT refresh tokens)
-export const sessions = pgTable(
-  'sessions',
-  {
-    id: serial('id').primaryKey(),
-    userId: integer('user_id').notNull(),
-    tokenHash: varchar('token_hash', { length: 255 }).notNull().unique(),
-    expiresAt: timestamp('expires_at').notNull(),
-    createdAt: timestamp('created_at').defaultNow(),
-  },
-  (table) => ({
-    userIdx: index('idx_sessions_user').on(table.userId),
-    expiresIdx: index('idx_sessions_expires').on(table.expiresAt),
   })
 );
 

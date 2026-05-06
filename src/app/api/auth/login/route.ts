@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserByEmail, verifyOTPToken, verifyUser } from '@/lib/db/auth';
+import { getUserByEmail, verifyUser } from '@/lib/db/auth';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       userId: user.id,
       email: user.email,
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60, // 7 days
+      exp: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60, // 30 days
     };
 
     const sessionToken = jwt.sign(jwtPayload, secret);
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: 30 * 24 * 60 * 60, // 30 days
       path: '/',
     });
 

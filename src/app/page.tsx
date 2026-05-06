@@ -142,7 +142,7 @@ export default function Home() {
                   Intelligence <br /> <span className="text-primary italic">In Every Fiber.</span>
                 </h2>
                 <p className="text-muted-foreground text-xl leading-relaxed font-light">
-                  Shaikh & Sons is more than a vehicle; it's a mobile sanctuary engineered with computational precision. Our solid-state battery architecture and neural-link interfaces redefine the boundary between driver and machine.
+                  Shaikh & Sons is more than a vehicle; it's a mobile sanctuary engineered with precise detail. Our advanced battery architecture and smart interfaces redefine the boundary between driver and machine.
                 </p>
               </div>
               
@@ -208,14 +208,14 @@ export default function Home() {
             The Future <br /> <span className="text-primary">Is An Inquiry Away</span>
           </h2>
           <p className="text-xl mb-12 text-white/60 font-light">
-            Each commission is a bespoke masterpiece by Shaikh & Sons. Join the waitlist for our next production cycle.
+            Each vehicle is a custom masterpiece by Shaikh & Sons. Join the waitlist for our next production cycle.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="rounded-full px-16 h-16 text-lg font-black uppercase tracking-tighter shadow-[0_0_20px_rgba(var(--primary),0.3)]">
               Begin Configuration
             </Button>
-            <Button size="lg" variant="outline" className="rounded-full px-16 h-16 text-lg font-bold border-white/10 text-white hover:bg-white/5">
-              Contact Concierge
+            <Button size="lg" variant="outline" className="rounded-full px-16 h-16 text-lg font-bold border-white/10 text-white hover:bg-white/5" asChild>
+              <Link href="/contact">Contact Support</Link>
             </Button>
           </div>
         </div>

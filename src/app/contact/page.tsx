@@ -1,172 +1,159 @@
 "use client"
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, Activity, MessageSquare } from 'lucide-react';
+import { Mail, Send, Activity, MessageSquare, Loader2, User, Type, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ContactPage() {
-  const contactMethods = [
-    {
-      icon: Mail,
-      label: "Inquiries",
-      value: "concierge@shaikh-sons.com",
-      desc: "Response within 2 hours"
-    },
-    {
-      icon: Phone,
-      label: "Direct Line",
-      value: "+1 (800) LUX-EV-SS",
-      desc: "24/7 Concierge Support"
-    },
-    {
-      icon: MapPin,
-      label: "Headquarters",
-      value: "Innovation Way, Silicon Valley",
-      desc: "Global Operations Center"
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast({
+          title: "Message Sent",
+          description: "Your message has been sent successfully.",
+        });
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        throw new Error(data.error || 'Failed to send message');
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error Sending Message",
+        description: error.message || "An unexpected error occurred. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-  ];
+  };
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* Hero Header */}
-      <section className="relative pt-32 pb-16 overflow-hidden border-b border-border/40">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(var(--primary-rgb),0.1),transparent_50%)] pointer-events-none" />
-        <div className="container mx-auto px-6 relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Activity className="h-4 w-4 text-primary animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/80">Communication Link Active</span>
-            </div>
-            <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-none mb-6">
-              Establish <span className="text-primary">Contact</span>
-            </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-              Our concierge team is standing by to assist with fleet inquiries, 
-              custom commissions, and technical support.
-            </p>
-          </motion.div>
+    <div className="min-h-[calc(100vh-80px)] relative flex items-center justify-center overflow-hidden bg-background py-12">
+      {/* Dynamic Background Accents - Matching Login Page */}
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse" />
+      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -z-10" />
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full max-w-2xl px-6 z-10"
+      >
+        <div className="mb-10 text-center">
+          <h1 className="font-headline text-5xl md:text-6xl font-black text-foreground tracking-tighter uppercase mb-2">
+            Contact <span className="text-primary italic">Us</span>
+          </h1>
+          <p className="text-muted-foreground text-xs font-bold tracking-[0.2em] uppercase">
+            We'd love to hear from you
+          </p>
         </div>
-      </section>
 
-      {/* Contact Grid */}
-      <section className="py-24 bg-card/30">
-        <div className="container mx-auto px-6">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16">
-            
-            {/* Left: Info HUD */}
-            <div className="lg:col-span-5 space-y-12">
-              <div className="space-y-6">
-                <h2 className="text-3xl font-black uppercase tracking-tight">Global <br /><span className="text-primary">Network Nodes</span></h2>
-                <p className="text-muted-foreground text-sm leading-relaxed max-w-md">
-                  We maintain a decentralized support infrastructure to ensure 
-                  uninterrupted service for our global fleet owners.
-                </p>
+        <div className="bg-card/40 backdrop-blur-xl border border-border/50 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground ml-1">Full Name</Label>
+                <div className="relative group/input">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 group-focus-within/input:text-primary transition-colors" />
+                  <Input
+                    required
+                    placeholder="John Doe"
+                    className="bg-background/50 border-border h-14 pl-12 focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all rounded-xl text-foreground placeholder:text-muted-foreground/50 text-xs font-bold tracking-widest"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  />
+                </div>
               </div>
 
-              <div className="space-y-4">
-                {contactMethods.map((method, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="flex items-center gap-6 p-6 rounded-3xl bg-card border border-border/40 hover:border-primary/40 transition-all group"
-                  >
-                    <div className="h-12 w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:bg-primary transition-all duration-300">
-                      <method.icon className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 mb-1">{method.label}</p>
-                      <p className="text-lg font-black text-foreground mb-0.5">{method.value}</p>
-                      <p className="text-[10px] font-bold text-primary/60 uppercase tracking-tighter">{method.desc}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              <div className="pt-8 border-t border-border/40">
-                <div className="flex items-center gap-4 p-6 rounded-3xl bg-primary/5 border border-primary/10">
-                  <MessageSquare className="h-6 w-6 text-primary" />
-                  <p className="text-xs font-medium text-muted-foreground leading-relaxed">
-                    Prefer immediate assistance? Our <span className="text-primary font-bold">AI Concierge</span> is active 24/7 in the bottom right corner.
-                  </p>
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground ml-1">Email Address</Label>
+                <div className="relative group/input">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 group-focus-within/input:text-primary transition-colors" />
+                  <Input
+                    required
+                    type="email"
+                    placeholder="john@example.com"
+                    className="bg-background/50 border-border h-14 pl-12 focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all rounded-xl text-foreground placeholder:text-muted-foreground/50 text-xs font-bold tracking-widest"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
                 </div>
               </div>
             </div>
 
-            {/* Right: Message Form HUD */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="lg:col-span-7"
+            <div className="space-y-2">
+              <Label className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground ml-1">Subject</Label>
+              <div className="relative group/input">
+                <Type className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 group-focus-within/input:text-primary transition-colors" />
+                <Input
+                  required
+                  placeholder="Inquiry about fleet"
+                  className="bg-background/50 border-border h-14 pl-12 focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all rounded-xl text-foreground placeholder:text-muted-foreground/50 text-xs font-bold tracking-widest"
+                  value={formData.subject}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground ml-1">Message</Label>
+              <div className="relative group/input">
+                <MessageSquare className="absolute left-4 top-6 h-4 w-4 text-muted-foreground/60 group-focus-within/input:text-primary transition-colors" />
+                <Textarea
+                  required
+                  placeholder="How can we assist you?"
+                  className="bg-background/50 border-border min-h-[160px] pl-12 pt-5 focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all rounded-2xl text-foreground placeholder:text-muted-foreground/50 text-xs font-bold tracking-widest resize-none"
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <Button 
+              type="submit" 
+              className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-[0.2em] text-xs rounded-xl shadow-lg shadow-primary/20 group/btn overflow-hidden relative" 
+              disabled={isSubmitting}
             >
-              <div className="bg-card border border-border/60 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-8 opacity-5">
-                  <Send className="h-32 w-32" />
-                </div>
-                
-                <form className="space-y-8 relative z-10">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Assigned Name</label>
-                      <Input 
-                        placeholder="IDENTIFY YOURSELF" 
-                        className="bg-background/50 border-border/60 h-14 rounded-2xl text-xs font-bold tracking-widest focus-visible:ring-primary/40 uppercase"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Return Frequency</label>
-                      <Input 
-                        type="email" 
-                        placeholder="EMAIL@PROTOCOL.COM" 
-                        className="bg-background/50 border-border/60 h-14 rounded-2xl text-xs font-bold tracking-widest focus-visible:ring-primary/40 uppercase"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Transmission Subject</label>
-                    <Input 
-                      placeholder="FLEET INQUIRY / CUSTOM COMMISSION" 
-                      className="bg-background/50 border-border/60 h-14 rounded-2xl text-xs font-bold tracking-widest focus-visible:ring-primary/40 uppercase"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Data Payload</label>
-                    <Textarea 
-                      placeholder="ENTER MESSAGE CONTENT..." 
-                      className="bg-background/50 border-border/60 min-h-[180px] rounded-3xl text-xs font-bold tracking-widest focus-visible:ring-primary/40 p-6 uppercase"
-                    />
-                  </div>
-
-                  <Button className="w-full h-16 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl font-black uppercase tracking-[0.3em] text-xs transition-all duration-300 shadow-[0_10px_30px_rgba(var(--primary-rgb),0.3)] group/btn">
-                    Execute Transmission 
-                    <Send className="ml-3 h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-                  </Button>
-                  
-                  <p className="text-[8px] text-center font-black uppercase tracking-[0.3em] text-muted-foreground/40">
-                    Encrypted End-to-End Transmission Protocol v2.4.0
-                  </p>
-                </form>
-              </div>
-            </motion.div>
-
-          </div>
+              <span className="relative z-10 flex items-center justify-center">
+                {isSubmitting ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : (
+                  <>
+                    Send Message
+                    <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
+            </Button>
+          </form>
         </div>
-      </section>
-
-      {/* Scanline Effect Overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%] z-50" />
+      </motion.div>
     </div>
   );
 }

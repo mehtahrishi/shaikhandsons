@@ -3,7 +3,7 @@ import './globals.css';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { Toaster } from '@/components/ui/toaster';
-import { InitialLoaderV2 as InitialLoader } from '@/components/common/InitialLoaderV2';
+import { InitialLoaderEV as InitialLoader } from '@/components/common/InitialLoaderEV';
 import { CookieConsent } from '@/components/common/CookieConsent';
 import { AuthProvider } from '@/context/AuthContext';
 

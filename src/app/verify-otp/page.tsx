@@ -174,7 +174,7 @@ export default function VerifyOTPPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-80px)] relative flex items-center justify-center overflow-hidden bg-background pt-8 pb-12">
+    <div className="min-h-[calc(100vh-80px)] relative flex items-center justify-center overflow-hidden bg-background py-12">
       {/* Dynamic Background Accents */}
       <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse" />
       <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -z-10" />

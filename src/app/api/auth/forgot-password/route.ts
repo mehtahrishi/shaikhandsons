@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { generateOtp, signOtpToken } from '@/lib/otp';
+import { getUserByEmail } from '@/lib/db/auth';
 
-export const runtime = 'nodejs'; // Ensure Node.js runtime for crypto + nodemailer
+export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,15 +13,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'A valid email is required.' }, { status: 400 });
     }
 
-    // 1. Generate OTP and sign it into a stateless token (no DB storage needed)
+    const existingUser = await getUserByEmail(email);
+    if (!existingUser) {
+      return NextResponse.json({ error: 'No account found with this email.' }, { status: 404 });
+    }
+
     const otp = generateOtp();
     const token = signOtpToken(email.toLowerCase().trim(), otp);
 
-    // 3. Send OTP email via Gmail SMTP
+    // Database storage not needed - stateless token contains everything
+
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT ?? 587),
-      secure: false, // STARTTLS
+      secure: false,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
@@ -30,24 +36,21 @@ export async function POST(req: NextRequest) {
     await transporter.sendMail({
       from: `"Shaikh & Sons" <${process.env.SMTP_USER}>`,
       to: email,
-      subject: '🔐 Your Verification Code — Shaikh & Sons',
-      html: buildEmailHtml(otp, 'Verification'),
+      subject: '🔑 Password Reset Code — Shaikh & Sons',
+      html: buildForgotPasswordEmailHtml(otp),
     });
 
-    // 4. Return signed token to client (otp is NEVER returned — only in token)
     return NextResponse.json({ token });
   } catch (err) {
-    console.error('[send-otp]', err);
+    console.error('[forgot-password]', err);
     return NextResponse.json(
-      { error: 'Failed to send verification code. Please try again.' },
+      { error: 'Failed to send password reset code. Please try again.' },
       { status: 500 }
     );
   }
 }
 
-// ─── Premium HTML Email Template (Unified for OTP & Password Reset) ─────────
-
-function buildEmailHtml(otp: string, purpose: 'Verification' | 'PasswordReset' = 'Verification'): string {
+function buildForgotPasswordEmailHtml(otp: string): string {
   const digits = otp.split('').map(
     (d) => `<span style="
       display:inline-block;
@@ -70,7 +73,7 @@ function buildEmailHtml(otp: string, purpose: 'Verification' | 'PasswordReset' =
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shaikh &amp; Sons — Verification Code</title>
+  <title>Shaikh &amp; Sons — Password Reset</title>
 </head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:'Poppins', 'Helvetica Neue', Arial, sans-serif;color:#000000;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:48px 0;">
@@ -90,12 +93,10 @@ function buildEmailHtml(otp: string, purpose: 'Verification' | 'PasswordReset' =
         <tr>
           <td style="padding:40px 40px;text-align:center;">
             <h2 style="color:#000;font-size:22px;font-weight:700;letter-spacing:1px;margin:0 0 12px;font-family:'Playfair Display', serif;">
-              ${purpose === 'PasswordReset' ? 'Password Recovery' : 'Identity Verification'}
+              Password Recovery
             </h2>
             <p style="color:#333;font-size:14px;line-height:1.6;margin:0 0 40px;font-weight:400;">
-              ${purpose === 'PasswordReset' 
-                ? 'A password reset has been requested. Use the code below to proceed.'
-                : 'A code has been requested to login.'}
+              A password reset has been requested. Use the code below to proceed.
             </p>
 
             <!-- OTP Boxes -->
@@ -124,4 +125,3 @@ function buildEmailHtml(otp: string, purpose: 'Verification' | 'PasswordReset' =
 </body>
 </html>`;
 }
-

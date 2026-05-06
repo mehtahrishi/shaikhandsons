@@ -90,7 +90,7 @@ export default function ProfilePage() {
 
       toast({
         title: "Identity Updated",
-        description: "Your bespoke details have been securely saved.",
+        description: "Your saved details have been securely saved.",
       });
     } catch (err: any) {
       toast({
@@ -199,7 +199,7 @@ export default function ProfilePage() {
                         {/* Address Field */}
                         <div className="space-y-3">
                           <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                            <MapPin className="h-3 w-3" /> Bespoke Address
+                            <MapPin className="h-3 w-3" /> Saved Address
                           </Label>
                           <Input 
                             value={address} 
@@ -239,7 +239,7 @@ export default function ProfilePage() {
                       {/* Address Field */}
                       <div className="space-y-3">
                         <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                          <MapPin className="h-3 w-3" /> Bespoke Address
+                          <MapPin className="h-3 w-3" /> Saved Address
                         </Label>
                         <p className="text-base font-medium text-foreground/90 leading-relaxed">{address || "No address registered"}</p>
                       </div>
@@ -263,14 +263,14 @@ export default function ProfilePage() {
                     <Lock className="h-4 w-4 text-primary mt-1 shrink-0" />
                     <p className="text-[11px] text-muted-foreground leading-relaxed">
                       <strong className="text-foreground uppercase tracking-widest block mb-1">Encrypted Persistence</strong>
-                      Your bespoke credentials are protected via AES-256 cloud encryption layers within our production servers.
+                      Your account credentials are protected via AES-256 cloud encryption layers within our production servers.
                     </p>
                   </li>
                   <li className="flex items-start gap-4 p-4 rounded-2xl bg-muted/20 border border-border/50">
                     <EyeOff className="h-4 w-4 text-primary mt-1 shrink-0" />
                     <p className="text-[11px] text-muted-foreground leading-relaxed">
-                      <strong className="text-foreground uppercase tracking-widest block mb-1">Confidential Liaison</strong>
-                      Residence data is accessible only to authorized fleet production managers during the commission process.
+                      <strong className="text-foreground uppercase tracking-widest block mb-1">Privacy Protection</strong>
+                      Residence data is accessible only to authorized fleet production managers during the ordering process.
                     </p>
                   </li>
                 </ul>

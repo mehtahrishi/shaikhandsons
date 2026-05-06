@@ -237,7 +237,7 @@ export default function AdminDashboardPage() {
               <CardTitle className="font-headline text-xl font-bold flex items-center gap-2">
                 <Mail className="h-5 w-5 text-primary" /> Recent Enquiries
               </CardTitle>
-              <CardDescription className="text-[10px] uppercase tracking-widest">Latest concierge requests.</CardDescription>
+              <CardDescription className="text-[10px] uppercase tracking-widest">Latest support requests.</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>

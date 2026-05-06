@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Scale, Gavel, AlertCircle, FileCheck, Landmark, CheckCircle2 } from 'lucide-react';
+import { Scale, Gavel, AlertCircle, FileCheck, Landmark, CheckCircle2, ChevronRight } from 'lucide-react';
 
 export default function TermsPage() {
   const sections = [
@@ -10,144 +10,88 @@ export default function TermsPage() {
       id: "usage",
       icon: Scale,
       title: "1. Terms of Use",
-      content: [
-        "By accessing and using our website or vehicles, you agree to be bound by these terms of service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing our products and services."
-      ]
+      content: "By accessing and using our website or vehicles, you agree to be bound by these terms of service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using our products."
     },
     {
       id: "license",
       icon: FileCheck,
       title: "2. Use License",
-      content: [
-        "Permission is granted to temporarily download one copy of the materials on our website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title.",
-        "Under this license you may not:",
-        "Modify or copy the materials.",
-        "Use the materials for any commercial purpose or public display.",
-        "Attempt to decompile or reverse engineer any software contained on our website or within our vehicles.",
-        "Remove any copyright or other proprietary notations from the materials."
-      ],
-      isList: true
+      content: "We grant you permission to temporarily use our website for personal, non-commercial viewing only. You may not modify or copy our materials, use them for commercial purposes, or attempt to reverse engineer our software."
     },
     {
       id: "disclaimer",
       icon: AlertCircle,
       title: "3. Disclaimer",
-      content: [
-        "The materials on our website and our vehicles are provided on an 'as is' basis. Shaikh & Sons makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights."
-      ]
+      content: "Our materials and vehicles are provided on an 'as is' basis. Shaikh & Sons makes no warranties and hereby disclaims all other warranties including fitness for a particular purpose or non-infringement of rights."
     },
     {
       id: "limitations",
       icon: Gavel,
       title: "4. Limitations",
-      content: [
-        "In no event shall Shaikh & Sons or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use our products or services, even if we have been notified orally or in writing of the possibility of such damage."
-      ]
+      content: "Shaikh & Sons shall not be liable for any damages arising out of the use or inability to use our products, even if we have been notified of the possibility of such damage."
     },
     {
       id: "governing",
       icon: Landmark,
       title: "5. Governing Law",
-      content: [
-        "These terms and conditions are governed by and construed in accordance with the laws of the jurisdiction in which Shaikh & Sons operates, and you irrevocably submit to the exclusive jurisdiction of the courts in that State or location."
-      ]
+      content: "These terms are governed by the laws of our operating jurisdiction, and you submit to the exclusive jurisdiction of the local courts."
     }
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* Hero Section */}
-      <section className="relative pt-24 pb-16 overflow-hidden border-b border-border/40">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(var(--primary-rgb),0.1),transparent_50%)] pointer-events-none" />
-        <div className="container mx-auto px-6 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="max-w-3xl mx-auto text-center"
-          >
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/80">Legal Framework</span>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none mb-6">
-              Terms of <span className="text-primary">Service</span>
-            </h1>
-            <p className="text-muted-foreground text-base md:text-lg leading-relaxed">
-              The operational agreement between you and Shaikh & Sons. 
-              Review the legal parameters governing our advanced mobility solutions.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+    <div className="min-h-[calc(100vh-80px)] relative flex flex-col items-center overflow-hidden bg-background py-12">
+      {/* Dynamic Background Accents - Matching Login/Contact Pages */}
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse" />
+      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -z-10" />
 
-      {/* Content Section */}
-      <section className="py-16 bg-card/30">
-        <div className="container mx-auto px-6">
-          <div className="max-w-3xl mx-auto space-y-20">
-            {sections.map((section, index) => (
-              <motion.section
-                key={section.id}
-                id={section.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="relative"
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-                    <section.icon className="h-5 w-5 text-primary" />
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full max-w-4xl px-6 z-10 space-y-16"
+      >
+        {/* Header Section */}
+        <div className="text-center space-y-6">
+          <h1 className="font-headline text-6xl md:text-8xl font-black text-foreground tracking-tighter uppercase leading-[0.9]">
+            Terms of <span className="text-primary italic">Service</span>
+          </h1>
+          <p className="text-muted-foreground text-xs md:text-sm font-bold tracking-[0.3em] uppercase max-w-2xl mx-auto">
+            The agreement between you and Shaikh & Sons
+          </p>
+        </div>
+
+        {/* Main Content Card */}
+        <div className="bg-card/40 backdrop-blur-xl border border-border/50 rounded-[2.5rem] p-8 md:p-16 shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          
+          <div className="space-y-16">
+            {sections.map((section, idx) => (
+              <div key={section.id} className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="h-10 w-10 rounded-xl bg-primary/5 border border-primary/20 flex items-center justify-center text-primary">
+                    <section.icon className="h-5 w-5" />
                   </div>
-                  <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-foreground">
+                  <h2 className="font-headline text-2xl font-black text-foreground uppercase tracking-tight">
                     {section.title}
                   </h2>
                 </div>
-
-                <div className="space-y-6 text-muted-foreground leading-relaxed">
-                  {section.isList ? (
-                    <div className="space-y-6">
-                      <p className="text-sm md:text-base">{section.content[0]}</p>
-                      <p className="text-sm font-bold uppercase tracking-widest text-foreground">{section.content[1]}</p>
-                      <ul className="grid grid-cols-1 gap-3">
-                        {section.content.slice(2).map((item, i) => (
-                          <li key={i} className="flex gap-3 p-4 rounded-xl bg-card border border-border/40 hover:border-primary/40 transition-colors">
-                            <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-1" />
-                            <span className="text-sm font-medium">{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : (
-                    section.content.map((text, i) => (
-                      <p key={i} className="text-sm md:text-base">
-                        {text}
-                      </p>
-                    ))
-                  )}
-                </div>
-              </motion.section>
+                <p className="text-muted-foreground text-base leading-relaxed font-light pl-14">
+                  {section.content}
+                </p>
+              </div>
             ))}
 
-            <div className="pt-20 border-t border-border/40 flex flex-col md:flex-row justify-between items-center gap-6">
-              <div className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/60">
-                Last Updated: March 24, 2026
-              </div>
-              <div className="flex items-center gap-6">
-                <span className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline cursor-pointer">
-                  Agreement Archive
-                </span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline cursor-pointer">
-                  Legal Council Contact
-                </span>
-              </div>
+            {/* Footer Actions */}
+            <div className="pt-2 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-8">
+             
+
             </div>
           </div>
         </div>
-      </section>
 
-      {/* Scanline Effect Overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%] z-50" />
+        {/* Global Scanline Overlay */}
+        <div className="fixed inset-0 pointer-events-none opacity-[0.04] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%] z-[60]" />
+      </motion.div>
     </div>
   );
 }

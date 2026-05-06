@@ -9,6 +9,10 @@ config({ path: '.env.local' });
 async function runMigrations() {
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false,
+    },
+    connectionTimeoutMillis: 30000,
   });
 
   const db = drizzle(pool);

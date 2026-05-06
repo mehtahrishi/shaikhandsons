@@ -12,7 +12,7 @@ export function HeroSection() {
     {
       id: 'aether',
       title: 'AETHER',
-      subtitle: 'TRANSCENDENTAL SEDAN',
+      subtitle: 'ADVANCED SEDAN',
       image: 'https://picsum.photos/seed/ev2/1536/1024',
       hint: 'luxury electric sedan teal',
     },

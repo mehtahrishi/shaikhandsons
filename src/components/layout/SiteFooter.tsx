@@ -37,7 +37,7 @@ export function SiteFooter() {
               </span>
             </Link>
             <p className="text-muted-foreground max-w-xs text-sm leading-relaxed">
-              Defining the pinnacle of electric luxury through transcendental engineering and uncompromising sustainable design.
+              Defining the pinnacle of electric luxury through advanced engineering and uncompromising sustainable design.
             </p>
           </div>
           <div className="space-y-4">

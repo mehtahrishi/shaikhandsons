@@ -83,7 +83,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-80px)] relative flex items-center justify-center overflow-hidden bg-background pt-8 pb-12">
+    <div className="min-h-[calc(100vh-80px)] relative flex items-center justify-center overflow-hidden bg-background py-12">
       {/* Dynamic Background Accents */}
       <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse" />
       <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -z-10" />
@@ -126,7 +126,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex justify-between items-center ml-1">
                 <Label htmlFor="password" className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">Passcode</Label>
-                <Link href="#" className="text-[10px] text-primary/60 hover:text-primary uppercase tracking-widest font-bold transition-colors">Recover</Link>
+                <Link href="/forgot-password" className="text-[10px] text-primary/60 hover:text-primary uppercase tracking-widest font-bold transition-colors">Recover</Link>
               </div>
               <div className="relative group/input">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 group-focus-within/input:text-primary transition-colors" />

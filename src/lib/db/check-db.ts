@@ -7,6 +7,10 @@ dotenv.config({ path: '.env.local' });
 async function checkTables() {
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false,
+    },
+    connectionTimeoutMillis: 30000,
   });
 
   try {

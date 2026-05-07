@@ -65,14 +65,14 @@ export default function AdminLoginPage() {
         <Card className="border-border/50 bg-card/40 backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-primary" /> Administrative Entry
+              <ShieldCheck className="h-5 w-5 text-primary" /> Admin Login
             </CardTitle>
-            <CardDescription className="text-xs uppercase tracking-widest opacity-60">Enter secure bypass credentials.</CardDescription>
+            <CardDescription className="text-xs uppercase tracking-widest opacity-60">Enter Admin Credentials</CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-4 pt-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-[10px] uppercase tracking-widest text-muted-foreground">Admin Identifier</Label>
+                <Label htmlFor="email" className="text-[10px] uppercase tracking-widest text-muted-foreground">Admin Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -87,7 +87,7 @@ export default function AdminLoginPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-[10px] uppercase tracking-widest text-muted-foreground">Security Token</Label>
+                <Label htmlFor="password" className="text-[10px] uppercase tracking-widest text-muted-foreground">Admin Password</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -104,7 +104,7 @@ export default function AdminLoginPage() {
             </CardContent>
             <CardFooter className="pt-6 pb-8">
               <Button type="submit" className="w-full h-12 font-black uppercase tracking-widest text-xs" disabled={loading}>
-                {loading ? <Loader2 className="animate-spin mr-2" /> : "Initiate Authorization"}
+                {loading ? <Loader2 className="animate-spin mr-2" /> : "Authorize Access"}
               </Button>
             </CardFooter>
           </form>

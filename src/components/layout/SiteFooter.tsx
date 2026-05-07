@@ -1,7 +1,6 @@
-"use client"
-
 import React from 'react';
 import Link from 'next/link';
+import { Instagram, MessageCircle } from 'lucide-react';
 
 const CrownIcon = () => (
   <svg viewBox="0 0 512 512" fill="currentColor" className="w-full h-full">
@@ -18,57 +17,113 @@ const CrownIcon = () => (
 
 export function SiteFooter() {
   return (
-    <footer className="py-20 bg-background border-t">
+    <footer className="bg-background border-t border-muted">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
-          <div className="md:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-6 group whitespace-nowrap">
-              <span className="font-headline font-black text-3xl tracking-tighter text-foreground uppercase transition-colors">
-                SHAIKH
-              </span>
-              <span className="font-headline font-light text-3xl tracking-widest text-foreground uppercase flex items-center transition-colors">
-                <span className="relative inline-flex items-center justify-center mr-1">
-                  <span className="text-primary font-bold italic">&</span>
-                  <span className="absolute -top-2 -left-1 w-4 h-4 -rotate-[15deg] text-primary transition-transform group-hover:scale-110">
-                    <CrownIcon />
-                  </span>
+        {/* Main Footer Content */}
+        <div className="py-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-16">
+            {/* Brand Section */}
+            <div className="md:col-span-1 lg:col-span-1">
+              <Link href="/" className="flex items-center gap-2 mb-6 whitespace-nowrap">
+                <span className="font-headline font-black text-3xl tracking-tighter text-foreground uppercase">
+                  SHAIKH
                 </span>
-                SONS
-              </span>
-            </Link>
-            <p className="text-muted-foreground max-w-xs text-sm leading-relaxed">
-              Defining the pinnacle of electric luxury through advanced engineering and uncompromising sustainable design.
-            </p>
-          </div>
-          <div className="space-y-4">
-            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary">The Fleet</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/#showroom" className="hover:text-primary transition-colors">Aether Sedan</Link></li>
-              <li><Link href="/#showroom" className="hover:text-primary transition-colors">Lumina SUV</Link></li>
-              <li><Link href="/#showroom" className="hover:text-primary transition-colors">Spectre GT</Link></li>
-            </ul>
-          </div>
-          <div className="space-y-4">
-            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary">Company</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
-            </ul>
+                <span className="font-headline font-light text-3xl tracking-widest text-foreground uppercase flex items-center">
+                  <span className="relative inline-flex items-center justify-center mr-1">
+                    <span className="text-primary font-bold italic">&</span>
+                    <span className="absolute -top-2 -left-1 w-4 h-4 -rotate-[15deg] text-primary">
+                      <CrownIcon />
+                    </span>
+                  </span>
+                  SONS
+                </span>
+              </Link>
+              <p className="text-muted-foreground max-w-xs text-sm leading-relaxed font-light">
+                Redefining electric luxury through cutting-edge engineering and uncompromising commitment to sustainable innovation.
+              </p>
+              {/* Social Icons */}
+              <div className="flex gap-4 mt-6">
+                <Link href="#" className="w-10 h-10 flex items-center justify-center rounded-full border border-primary/30 text-muted-foreground hover:text-primary hover:bg-primary/10 hover:border-primary transition-all duration-300">
+                  <Instagram size={18} />
+                </Link>
+                <Link href="#" className="w-10 h-10 flex items-center justify-center rounded-full border border-primary/30 text-muted-foreground hover:text-primary hover:bg-primary/10 hover:border-primary transition-all duration-300" aria-label="WhatsApp">
+                  <MessageCircle size={18} />
+                </Link>
+              </div>
+            </div>
+
+            {/* Company */}
+            <div className="space-y-6">
+              <div>
+                <h4 className="text-[11px] uppercase tracking-[0.4em] font-bold text-primary mb-1">COMPANY</h4>
+                <div className="w-8 h-0.5 bg-muted/20"></div>
+              </div>
+              <ul className="space-y-3">
+                <li>
+                  <Link href="/about" className="text-sm text-muted-foreground hover:text-primary transition-all duration-300 relative inline-block group">
+                    About Us
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contact" className="text-sm text-muted-foreground hover:text-primary transition-all duration-300 relative inline-block group">
+                    Contact
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/" className="text-sm text-muted-foreground hover:text-primary transition-all duration-300 relative inline-block group">
+                    Vehicles
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Support */}
+            <div className="space-y-6">
+              <div>
+                <h4 className="text-[11px] uppercase tracking-[0.4em] font-bold text-primary mb-1">SUPPORT</h4>
+                <div className="w-8 h-0.5 bg-muted/20"></div>
+              </div>
+              <ul className="space-y-3">
+                <li>
+                  <Link href="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-all duration-300 relative inline-block group">
+                    Privacy Policy
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="text-sm text-muted-foreground hover:text-primary transition-all duration-300 relative inline-block group">
+                    Terms of Service
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                  </Link>
+                </li>
+                <li>
+              
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-        
-        <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-muted gap-4 text-center md:text-left">
-          <p className="text-muted-foreground text-[10px] uppercase tracking-widest font-bold">
-            © {new Date().getFullYear()} Shaikh and Sons Private Limited. All Rights Reserved.
-          </p>
-          
-          <div className="text-muted-foreground text-xs font-medium">
-            Developed By <a href="https://hrishi-portfolio-two.vercel.app/" target="_blank" rel="noopener noreferrer" className="font-headline font-black text-red-600 tracking-normal text-sm bg-gradient-to-r from-foreground to-foreground bg-no-repeat [background-position:0_100%] [background-size:0_2px] hover:[background-size:100%_2px] transition-all duration-300">Hrishi Mehta</a>
-          </div>
 
-          <div className="flex gap-8 text-[10px] uppercase tracking-widest font-bold">
-            <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link>
+        {/* Divider */}
+        <div className="h-px bg-muted"></div>
+
+        {/* Bottom Footer */}
+        <div className="py-8 border-t border-muted/20">
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4 text-center">
+            <p className="text-muted-foreground text-[11px] uppercase tracking-[0.2em] font-medium">
+              © {new Date().getFullYear()} Shaikh and Sons. All rights reserved.
+            </p>
+
+            <div className="hidden md:block w-px h-3 bg-muted/40 mx-2"></div>
+
+            <div className="text-muted-foreground text-[11px] font-medium uppercase tracking-[0.2em]">
+              Crafted by <a href="https://hrishi-portfolio-two.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-primary transition-colors duration-300 font-semibold tracking-wider">
+                Hrishi Mehta
+              </a>
+            </div>
           </div>
         </div>
       </div>

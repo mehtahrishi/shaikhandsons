@@ -6,7 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Menu, Sun, Moon, User, LogIn, LogOut, ChevronRight, X, Home, Mail, UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,8 +38,8 @@ const CrownIcon = () => (
   </svg>
 );
 
-const BrandIdentity = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => (
-  <div className="flex items-center gap-2 group whitespace-nowrap">
+const BrandIdentity = ({ size = "md", className = "" }: { size?: "sm" | "md" | "lg", className?: string }) => (
+  <div className={cn("flex items-center gap-2 group whitespace-nowrap", className)}>
     <span className={cn(
       "font-headline font-black tracking-tighter text-foreground uppercase transition-colors",
       size === "sm" ? "text-xs" : size === "md" ? "text-sm md:text-lg" : "text-lg md:text-2xl"
@@ -133,227 +133,170 @@ export function SiteHeader() {
   const userInitial = user?.fullName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "C";
 
   return (
-    <>
-      <header 
-        className={cn(
-          "fixed top-0 left-0 w-full z-40 transition-all duration-300 bg-background/95 backdrop-blur-md border-b border-border/50",
-          isScrolled ? "py-2 shadow-sm" : "py-4"
-        )}
-      >
-        <div className="container mx-auto px-6 flex items-center justify-between h-10 md:h-12">
-          <Link href="/" className="flex items-center justify-center md:justify-start flex-1 md:flex-initial">
-            <BrandIdentity size="md" />
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.name} 
-                href={link.href}
-                className="text-[9px] font-bold tracking-[0.2em] hover:text-primary transition-colors uppercase"
-              >
-                {link.name}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex md:flex items-center gap-3">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleTheme} 
-              className="text-foreground shrink-0 hover:bg-transparent hover:text-foreground focus-visible:ring-0"
-            >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+    <header 
+      className={cn(
+        "fixed top-0 left-0 w-full z-40 transition-all duration-300 bg-background/95 backdrop-blur-md border-b border-border/50",
+        isScrolled ? "py-2 shadow-sm" : "py-4"
+      )}
+    >
+      <div className="container mx-auto px-6 flex items-center justify-between h-10 md:h-12">
+        {/* Mobile Menu Trigger */}
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="md:hidden mr-2 -ml-2 hover:bg-transparent">
+              <Menu className="h-5 w-5" />
             </Button>
-
-            <div className="hidden md:block">
-              {!mounted ? (
-                <div className="w-8 h-8" />
-              ) : isAuthenticated ? (
-                <DropdownMenu modal={false}>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-9 w-9 p-0 overflow-visible focus-visible:ring-offset-0 focus-visible:ring-0 hover:bg-transparent group">
-                      <span className="text-3xl font-headline font-black text-foreground group-hover:text-primary transition-colors select-none leading-none">
-                        {userInitial}
-                      </span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-48 mt-2 bg-background/95 backdrop-blur-xl border-border/50" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal p-3">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-xs font-black leading-none tracking-tight capitalize">{user?.fullName || user?.email?.split('@')[0] || "Collector"}</p>
-                        <p className="text-[10px] text-muted-foreground">{user?.email}</p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-border/50" />
-                    <DropdownMenuItem asChild className="cursor-pointer focus:bg-primary/10 p-2">
-                      <Link href="/profile" className="flex w-full items-center">
-                        <User className="mr-2 h-4 w-4 text-primary" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">My Garage</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-border/50" />
-                    <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer p-2">
-                      <div className="flex w-full items-center">
-                        <LogOut className="mr-2 h-4 w-4" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Secure Logout</span>
-                      </div>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link href="/login">
-                    <Button variant="ghost" size="sm" className="text-[9px] uppercase font-bold tracking-widest h-8 md:h-9 px-3">
-                      Sign In
-                    </Button>
-                  </Link>
-                  <Link href="/signup">
-                    <Button variant="default" size="sm" className="text-[9px] uppercase font-bold tracking-widest h-8 md:h-9 px-3 bg-primary text-primary-foreground hover:bg-primary/90">
-                      Sign Up
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Bottom Dock Navigation */}
-      <motion.div 
-        className="fixed bottom-0 left-0 right-0 z-30 md:hidden bg-background/95 backdrop-blur-xl border-t border-primary/20 safe-area-inset-bottom"
-        initial={{ y: 100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-      >
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-2">
-            {/* Navigation Items */}
-            <div className="flex items-center gap-1 flex-1 overflow-x-auto">
-              {navLinks.map((link, idx) => {
-                const Icon = link.icon;
-                return (
-                  <motion.div
-                    key={link.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className="flex-shrink-0"
-                  >
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[300px] bg-background/95 backdrop-blur-xl border-r-border/50 p-0 flex flex-col">
+            <SheetHeader className="px-6 h-16 flex flex-row items-center justify-between border-b border-border/50">
+              <SheetTitle>
+                <BrandIdentity size="sm" />
+              </SheetTitle>
+              <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className="hover:bg-transparent">
+                <X className="h-5 w-5" />
+              </Button>
+            </SheetHeader>
+            <div className="flex-1 px-8 py-10 space-y-8">
+              <div className="space-y-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Fleet</p>
+                <nav className="space-y-4">
+                  {navLinks.map((link) => (
                     <Link 
+                      key={link.name} 
                       href={link.href}
-                      className="flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-300 hover:bg-primary/20 active:bg-primary/30 text-muted-foreground hover:text-primary"
-                      title={link.name}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-between group"
                     >
-                      <Icon className="w-5 h-5" />
-                      <span className="text-[7px] font-bold uppercase tracking-wider mt-0.5 truncate px-1">
+                      <span className="font-headline text-lg font-bold tracking-tight uppercase group-hover:text-primary transition-colors">
                         {link.name}
                       </span>
+                      <link.icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                     </Link>
-                  </motion.div>
-                );
-              })}
+                  ))}
+                </nav>
+              </div>
+
+              <div className="h-px bg-border/50" />
+
+              <div className="space-y-6">
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Handshake</p>
+                {isAuthenticated ? (
+                  <div className="space-y-4">
+                    <Link 
+                      href="/profile" 
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-3 group"
+                    >
+                      <UserCircle className="h-5 w-5 text-primary" />
+                      <span className="font-headline text-lg font-bold tracking-tight uppercase group-hover:text-primary transition-colors">My Garage</span>
+                    </Link>
+                    <button 
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 group text-destructive"
+                    >
+                      <LogOut className="h-5 w-5" />
+                      <span className="font-headline text-lg font-bold tracking-tight uppercase">Secure Logout</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button asChild className="font-black uppercase tracking-widest text-[9px] h-11 rounded-xl">
+                      <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
+                    </Button>
+                    <Button asChild variant="outline" className="font-black uppercase tracking-widest text-[9px] h-11 rounded-xl">
+                      <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>Sign Up</Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
+            <div className="p-8 border-t border-border/50 bg-muted/20">
+              <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-bold leading-relaxed">
+                © {new Date().getFullYear()} Shaikh & Sons <br />
+                Electric Mobility Atelier
+              </p>
+            </div>
+          </SheetContent>
+        </Sheet>
 
-            {/* Divider */}
-            <div className="w-px h-10 bg-primary/20 mx-1"></div>
+        <Link href="/" className="flex items-center flex-1 md:flex-initial">
+          <BrandIdentity size="md" />
+        </Link>
 
-            {/* User/Auth Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="flex-shrink-0"
+        <nav className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <Link 
+              key={link.name} 
+              href={link.href}
+              className="text-[9px] font-black tracking-[0.3em] hover:text-primary transition-colors uppercase"
             >
-              {!mounted ? (
-                <div className="w-14 h-14" />
-              ) : isAuthenticated ? (
-                <DropdownMenu modal={false}>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      className="relative w-14 h-14 p-0 rounded-2xl flex flex-col items-center justify-center gap-0.5 hover:bg-primary/20 focus-visible:ring-0"
-                    >
-                      <span className="text-lg font-headline font-black text-primary leading-none">
-                        {userInitial}
-                      </span>
-                      <span className="text-[7px] font-bold uppercase tracking-wider text-muted-foreground">
-                        Profile
-                      </span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent 
-                    className="w-48 mb-2 bg-background/95 backdrop-blur-xl border-border/50 animate-in fade-in slide-in-from-bottom-2" 
-                    align="end" 
-                    forceMount
-                  >
-                    <DropdownMenuLabel className="font-normal p-3">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-xs font-black leading-none tracking-tight capitalize">{user?.fullName || user?.email?.split('@')[0] || "Collector"}</p>
-                        <p className="text-[10px] text-muted-foreground">{user?.email}</p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-border/50" />
-                    <DropdownMenuItem asChild className="cursor-pointer focus:bg-primary/10 p-2">
-                      <Link href="/profile" className="flex w-full items-center">
-                        <User className="mr-2 h-4 w-4 text-primary" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">My Garage</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-border/50" />
-                    <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer p-2">
-                      <div className="flex w-full items-center">
-                        <LogOut className="mr-2 h-4 w-4" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Logout</span>
-                      </div>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                  <SheetTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      className="relative w-14 h-14 p-0 rounded-2xl flex flex-col items-center justify-center gap-0.5 hover:bg-primary/20 focus-visible:ring-0"
-                    >
-                      <UserCircle className="w-5 h-5 text-primary" />
-                      <span className="text-[7px] font-bold uppercase tracking-wider text-muted-foreground">
-                        Login
-                      </span>
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="bottom" className="w-full h-auto bg-background/95 backdrop-blur-md border-t border-primary/20 rounded-t-3xl">
-                    <div className="py-6 space-y-4">
-                      <div className="space-y-2">
-                        <h2 className="text-lg font-black uppercase tracking-tight">Sign In or Create Account</h2>
-                        <p className="text-xs text-muted-foreground">Join our elite collector community</p>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <Button asChild className="h-12 rounded-xl font-black uppercase tracking-[0.1em] text-[10px]">
-                          <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
-                        </Button>
-                        <Button asChild variant="outline" className="h-12 rounded-xl font-black uppercase tracking-[0.1em] text-[10px]">
-                          <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>Sign Up</Link>
-                        </Button>
-                      </div>
+              {link.name}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleTheme} 
+            className="text-foreground shrink-0 hover:bg-transparent hover:text-foreground focus-visible:ring-0"
+          >
+            {mounted ? (isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />) : <Sun className="h-4 w-4" />}
+          </Button>
+
+          <div className="hidden md:block">
+            {!mounted ? (
+              <div className="w-9 h-9" />
+            ) : isAuthenticated ? (
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 p-0 overflow-visible focus-visible:ring-offset-0 focus-visible:ring-0 hover:bg-transparent group">
+                    <span className="text-3xl font-headline font-black text-foreground group-hover:text-primary transition-colors select-none leading-none">
+                      {userInitial}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-52 mt-4 bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal p-4">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-xs font-black leading-none tracking-tight capitalize">{user?.fullName || user?.email?.split('@')[0] || "Collector"}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{user?.email}</p>
                     </div>
-                  </SheetContent>
-                </Sheet>
-              )}
-            </motion.div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-border/50" />
+                  <DropdownMenuItem asChild className="cursor-pointer focus:bg-primary/10 p-3">
+                    <Link href="/profile" className="flex w-full items-center">
+                      <User className="mr-3 h-4 w-4 text-primary" />
+                      <span className="text-[10px] font-black uppercase tracking-widest">My Garage</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-border/50" />
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer p-3">
+                    <div className="flex w-full items-center">
+                      <LogOut className="mr-3 h-4 w-4" />
+                      <span className="text-[10px] font-black uppercase tracking-widest">Secure Logout</span>
+                    </div>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link href="/login">
+                  <Button variant="ghost" size="sm" className="text-[9px] uppercase font-black tracking-widest h-9 px-4 hover:bg-primary/5">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button variant="default" size="sm" className="text-[9px] uppercase font-black tracking-widest h-9 px-5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl">
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
-      </motion.div>
-
-      <style jsx global>{`
-        @media (max-width: 768px) {
-          main {
-            padding-bottom: 80px;
-          }
-        }
-      `}</style>
-    </>
+      </div>
+    </header>
   );
 }

@@ -11,8 +11,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Poppins', 'sans-serif'],
+        body: ['IBM Plex Sans', 'sans-serif'],
         headline: ['Playfair Display', 'serif'],
+        accent: ['Space Mono', 'monospace'],
         code: ['monospace'],
       },
       colors: {

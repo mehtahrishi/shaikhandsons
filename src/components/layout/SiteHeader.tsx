@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Menu, Sun, Moon, User, LogIn, LogOut, ChevronRight, X, Home, Zap, BookOpen, MessageSquare, Mail, UserCircle } from 'lucide-react';
+import { Menu, Sun, Moon, User, LogIn, LogOut, ChevronRight, X, Home, Mail, UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -38,6 +38,29 @@ const CrownIcon = () => (
   </svg>
 );
 
+const BrandIdentity = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => (
+  <div className="flex items-center gap-2 group whitespace-nowrap">
+    <span className={cn(
+      "font-headline font-black tracking-tighter text-foreground uppercase transition-colors",
+      size === "sm" ? "text-xs" : size === "md" ? "text-sm md:text-lg" : "text-lg md:text-2xl"
+    )}>
+      SHAIKH
+    </span>
+    <span className={cn(
+      "font-headline tracking-widest text-foreground uppercase flex items-center transition-colors",
+      size === "sm" ? "text-xs" : size === "md" ? "text-sm md:text-lg" : "text-lg md:text-2xl"
+    )}>
+      <span className="relative inline-flex items-center justify-center mr-1">
+        <span className="font-headline text-primary font-bold italic">&</span>
+        <span className="absolute -top-1.5 -left-0.5 w-2.5 h-2.5 -rotate-[15deg] text-primary transition-transform group-hover:scale-110">
+          <CrownIcon />
+        </span>
+      </span>
+      <span className="font-headline">SONS</span>
+    </span>
+  </div>
+);
+
 export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDark, setIsDark] = useState(true);
@@ -50,7 +73,6 @@ export function SiteHeader() {
   const { user, logout } = useAuth();
   
   const isAuthenticated = !!user;
-
   const isAdminRoute = pathname?.startsWith('/admin');
 
   useEffect(() => {
@@ -104,37 +126,11 @@ export function SiteHeader() {
   if (isAdminRoute && pathname !== '/admin/login') return null;
 
   const navLinks = [
-    { name: 'Showroom', href: '/#showroom', icon: Home },
-    { name: 'Performance', href: '/#performance', icon: Zap },
-    { name: 'Philosophy', href: '/#philosophy', icon: BookOpen },
-    { name: 'Inquiry', href: '/#inquiry', icon: MessageSquare },
+    { name: 'Vehicles', href: '/#showroom', icon: Home },
     { name: 'Contact', href: '/contact', icon: Mail },
   ];
 
   const userInitial = user?.fullName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "C";
-
-  const BrandIdentity = ({ className, size = "md" }: { className?: string, size?: "sm" | "md" | "lg" }) => (
-    <div className={cn("flex items-center gap-2 group whitespace-nowrap", className)}>
-      <span className={cn(
-        "font-headline font-black tracking-tighter text-foreground uppercase transition-colors",
-        size === "sm" ? "text-xs" : size === "md" ? "text-sm md:text-lg" : "text-lg md:text-2xl"
-      )}>
-        SHAIKH
-      </span>
-      <span className={cn(
-        "font-headline tracking-widest text-foreground uppercase flex items-center transition-colors",
-        size === "sm" ? "text-xs" : size === "md" ? "text-sm md:text-lg" : "text-lg md:text-2xl"
-      )}>
-        <span className="relative inline-flex items-center justify-center mr-1">
-          <span className="font-headline text-primary font-bold italic">&</span>
-          <span className="absolute -top-1.5 -left-0.5 w-2.5 h-2.5 -rotate-[15deg] text-primary transition-transform group-hover:scale-110">
-            <CrownIcon />
-          </span>
-        </span>
-        <span className="font-headline">SONS</span>
-      </span>
-    </div>
-  );
 
   return (
     <>
@@ -236,7 +232,7 @@ export function SiteHeader() {
           <div className="flex items-center justify-between gap-2">
             {/* Navigation Items */}
             <div className="flex items-center gap-1 flex-1 overflow-x-auto">
-              {navLinks.slice(0, 4).map((link, idx) => {
+              {navLinks.map((link, idx) => {
                 const Icon = link.icon;
                 return (
                   <motion.div
@@ -253,7 +249,7 @@ export function SiteHeader() {
                     >
                       <Icon className="w-5 h-5" />
                       <span className="text-[7px] font-bold uppercase tracking-wider mt-0.5 truncate px-1">
-                        {link.name.split(' ')[0]}
+                        {link.name}
                       </span>
                     </Link>
                   </motion.div>
@@ -351,7 +347,6 @@ export function SiteHeader() {
         </div>
       </motion.div>
 
-      {/* Add padding to main content for mobile dock */}
       <style jsx global>{`
         @media (max-width: 768px) {
           main {

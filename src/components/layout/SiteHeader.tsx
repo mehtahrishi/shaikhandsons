@@ -52,7 +52,7 @@ const BrandIdentity = ({ size = "md", className = "" }: { size?: "sm" | "md" | "
     )}>
       <span className="relative inline-flex items-center justify-center mr-1">
         <span className="font-headline text-primary font-bold italic">&</span>
-        <span className="absolute -top-1.5 -left-0.5 w-2.5 h-2.5 -rotate-[15deg] text-primary transition-transform group-hover:scale-110">
+        <span className="absolute -top-1.5 -left-0.5 w-2.5 h-2.5 -rotate-[15deg] text-primary">
           <CrownIcon />
         </span>
       </span>
@@ -139,8 +139,8 @@ export function SiteHeader() {
         isScrolled ? "py-2 shadow-sm" : "py-4"
       )}
     >
-      <div className="container mx-auto px-6 flex items-center justify-between h-10 md:h-12">
-        {/* Mobile Menu Trigger */}
+      <div className="container mx-auto px-4 md:px-6 flex items-center justify-between h-10 md:h-12">
+        {/* Left Action Area: Mobile Menu Trigger */}
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="md:hidden mr-2 -ml-2 hover:bg-transparent">
@@ -219,10 +219,12 @@ export function SiteHeader() {
           </SheetContent>
         </Sheet>
 
+        {/* Center: Branding Identity */}
         <Link href="/" className="flex items-center flex-1 md:flex-initial">
           <BrandIdentity size="md" />
         </Link>
 
+        {/* Desktop Links */}
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <Link 
@@ -235,7 +237,8 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        {/* Right Action Area: Toggle + Auth (Unified for Mobile & Desktop) */}
+        <div className="flex items-center gap-2 md:gap-3">
           <Button 
             variant="ghost" 
             size="icon" 
@@ -245,7 +248,7 @@ export function SiteHeader() {
             {mounted ? (isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />) : <Sun className="h-4 w-4" />}
           </Button>
 
-          <div className="hidden md:block">
+          <div className="flex items-center gap-2">
             {!mounted ? (
               <div className="w-9 h-9" />
             ) : isAuthenticated ? (
@@ -281,13 +284,13 @@ export function SiteHeader() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1 md:gap-3">
                 <Link href="/login">
-                  <Button variant="ghost" size="sm" className="text-[9px] uppercase font-black tracking-widest h-9 px-4 hover:bg-primary/5">
+                  <Button variant="ghost" size="sm" className="text-[9px] uppercase font-black tracking-widest h-9 px-2 md:px-4 hover:bg-primary/5">
                     Sign In
                   </Button>
                 </Link>
-                <Link href="/signup">
+                <Link href="/signup" className="hidden sm:block">
                   <Button variant="default" size="sm" className="text-[9px] uppercase font-black tracking-widest h-9 px-5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl">
                     Sign Up
                   </Button>

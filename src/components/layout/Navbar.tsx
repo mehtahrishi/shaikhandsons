@@ -62,6 +62,8 @@ export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const { toast } = useToast();
+  const [showAuthPopover, setShowAuthPopover] = useState(false);
+  const [showVehiclesPopover, setShowVehiclesPopover] = useState(false);
   const { user, logout } = useAuth();
   
   const isAuthenticated = !!user;
@@ -176,14 +178,12 @@ export function Navbar() {
 
             {/* Right: Theme + Auth */}
             <div className="flex items-center gap-2 md:gap-3 ml-auto">
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <button 
                 onClick={toggleTheme} 
-                className="h-9 w-9 hover:bg-muted/50 text-foreground rounded-lg"
+                className="h-9 w-9 flex items-center justify-center text-foreground hover:text-primary transition-colors rounded-lg"
               >
                 {mounted ? (isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />) : <Sun className="h-4 w-4" />}
-              </Button>
+              </button>
 
               {/* Desktop Auth */}
               {!mounted ? (
@@ -256,17 +256,31 @@ export function Navbar() {
       <nav className="fixed bottom-0 left-0 right-0 md:hidden z-40 bg-background/95 backdrop-blur-md border-t border-border/50 safe-area-inset-bottom">
         <div className="flex items-center justify-around px-2 py-1.5">
           {mobileNavLinks.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              className={cn(
-                "flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary",
-                pathname === link.href ? "text-primary" : "hover:bg-muted/50"
-              )}
-            >
-              <link.icon className="h-5 w-5" />
-              <span className="text-[6px] font-body font-black uppercase tracking-widest">{link.name}</span>
-            </Link>
+            link.name === 'Vehicles' ? (
+              <button 
+                key="vehicles"
+                onClick={() => { setShowAuthPopover(false); setShowVehiclesPopover(!showVehiclesPopover); }}
+                className={cn(
+                  "flex flex-col items-center gap-0.5 p-1.5 rounded-lg text-foreground hover:text-primary",
+                  showVehiclesPopover ? "text-primary" : "hover:bg-muted/50"
+                )}
+              >
+                <link.icon className="h-5 w-5" />
+                <span className="text-[6px] font-body font-black uppercase tracking-widest">{link.name}</span>
+              </button>
+            ) : (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={cn(
+                  "flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary",
+                  pathname === link.href ? "text-primary" : "hover:bg-muted/50"
+                )}
+              >
+                <link.icon className="h-5 w-5" />
+                <span className="text-[6px] font-body font-black uppercase tracking-widest">{link.name}</span>
+              </Link>
+            )
           ))}
           
           {/* Auth/Profile Icon */}
@@ -308,16 +322,83 @@ export function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link
-              href="/login"
-              className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary hover:bg-muted/50"
+            <button 
+              onClick={() => { setShowVehiclesPopover(false); setShowAuthPopover(!showAuthPopover); }}
+              className={cn(
+                "flex flex-col items-center gap-0.5 p-1.5 rounded-lg text-foreground hover:text-primary transition-all",
+                showAuthPopover ? "text-primary" : "hover:bg-muted/50"
+              )}
             >
               <User className="h-5 w-5" />
               <span className="text-[6px] font-body font-black uppercase tracking-widest">Sign In</span>
-            </Link>
+            </button>
           )}
         </div>
       </nav>
+
+      {/* Auth Bottom Sheet - Expands Upward */}
+      <div className={cn(
+        "fixed left-0 right-0 bottom-[56px] md:hidden z-30 bg-background/95 backdrop-blur-xl border-t border-border/50 overflow-hidden transition-all duration-300 ease-in-out",
+        showAuthPopover ? "max-h-60" : "max-h-0"
+      )}>
+        <div className="px-4 py-6">
+          <div className="px-2 mb-4">
+            <h3 className="text-sm font-body font-black uppercase">Account Access</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Link 
+              href="/login" 
+              onClick={() => setShowAuthPopover(false)}
+              className="block"
+            >
+              <button className="w-full text-[12px] font-body font-black uppercase tracking-widest h-12 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl">
+                Sign In
+              </button>
+            </Link>
+            <Link 
+              href="/signup" 
+              onClick={() => setShowAuthPopover(false)}
+              className="block"
+            >
+              <button className="w-full text-[12px] font-body font-black uppercase tracking-widest h-12 bg-primary/20 text-primary hover:bg-primary/30 rounded-xl">
+                Sign Up
+              </button>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Vehicles Bottom Sheet - Expands Upward */}
+      <div className={cn(
+        "fixed left-0 right-0 bottom-[56px] md:hidden z-30 bg-background/95 backdrop-blur-xl border-t border-border/50 overflow-hidden transition-all duration-300 ease-in-out",
+        showVehiclesPopover ? "max-h-60" : "max-h-0"
+      )}>
+        <div className="px-4 py-6">
+          <div className="px-2 mb-4">
+            <h3 className="text-sm font-body font-black uppercase">Select Vehicle Type</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Link 
+              href="/?type=bikes" 
+              onClick={() => setShowVehiclesPopover(false)}
+              className="block"
+            >
+              <button className="w-full text-[12px] font-body font-black uppercase tracking-widest h-12 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl">
+                🏍️ Bikes
+              </button>
+            </Link>
+            <Link 
+              href="/?type=scooters" 
+              onClick={() => setShowVehiclesPopover(false)}
+              className="block"
+            >
+              <button className="w-full text-[12px] font-body font-black uppercase tracking-widest h-12 bg-primary/20 text-primary hover:bg-primary/30 rounded-xl">
+                🛴 Scooters
+              </button>
+            </Link>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

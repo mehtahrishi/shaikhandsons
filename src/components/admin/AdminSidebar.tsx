@@ -81,14 +81,6 @@ export function AdminSidebar() {
           ))}
         </div>
       </nav>
-
-      {/* Terminal Node */}
-      <div className="p-6 border-t bg-muted/20">
-        <div className="p-4 rounded-xl bg-background/50 border border-border/50">
-          <p className="text-[8px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Authenticated Terminal</p>
-          <p className="text-[10px] font-black text-primary uppercase">v2.5.0-STABLE</p>
-        </div>
-      </div>
     </aside>
   );
 }

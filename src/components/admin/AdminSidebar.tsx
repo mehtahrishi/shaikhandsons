@@ -36,8 +36,8 @@ const BrandIdentity = ({ collapsed }: { collapsed: boolean }) => (
   <div className="flex items-center gap-2 group whitespace-nowrap overflow-hidden transition-all duration-300">
     {collapsed ? (
       <div className="relative flex items-center justify-center w-full h-10">
-        <span className="font-headline font-black text-3xl tracking-tighter text-foreground uppercase select-none">S</span>
-        <span className="absolute -top-1.5 -right-0.5 w-3.5 h-3.5 -rotate-[15deg] text-primary">
+        <span className="font-headline text-primary font-bold italic text-3xl select-none">&</span>
+        <span className="absolute -top-2 -left-1 w-3.5 h-3.5 -rotate-[15deg] text-primary">
           <CrownIcon />
         </span>
       </div>

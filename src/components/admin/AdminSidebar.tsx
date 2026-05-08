@@ -7,10 +7,7 @@ import {
   LayoutDashboard, 
   ShoppingCart, 
   Package, 
-  Users,
-  Sparkles,
-  Activity,
-  History
+  Users
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -82,22 +79,6 @@ export function AdminSidebar() {
               {item.name}
             </Link>
           ))}
-        </div>
-
-        <div className="mt-12 space-y-1.5">
-          <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-6 px-4">
-            System Diagnostics
-          </p>
-          <div className="px-4 space-y-4">
-            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest opacity-60">
-              <span className="flex items-center gap-2"><Activity className="h-3 w-3" /> API Status</span>
-              <span className="text-green-500">Live</span>
-            </div>
-            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest opacity-60">
-              <span className="flex items-center gap-2"><History className="h-3 w-3" /> Logs</span>
-              <span className="text-primary">Syncing</span>
-            </div>
-          </div>
         </div>
       </nav>
 

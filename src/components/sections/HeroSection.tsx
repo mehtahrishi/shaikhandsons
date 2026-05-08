@@ -139,7 +139,7 @@ export function HeroSection() {
 
         {/* Mobile View: Normal Carousel with Buttons - Full Width */}
         <div className="flex md:hidden flex-col items-center w-full px-0">
-          <div className="relative w-full aspect-[3/2] overflow-hidden group/mobile shadow-2xl">
+          <div className="relative w-full aspect-[3/2] overflow-hidden group/mobile">
             <AnimatePresence mode="wait">
               <motion.div
                 key={slides[currentIndex].id}

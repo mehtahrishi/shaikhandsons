@@ -68,7 +68,7 @@ export default function TermsPage() {
 
         <Accordion type="single" collapsible defaultValue={sections[0].id} className="space-y-4">
           {sections.map((section) => (
-            <AccordionItem key={section.id} value={section.id} className="rounded-2xl border border-border/50 bg-card/40 backdrop-blur-xl px-5 md:px-6 shadow-xl">
+            <AccordionItem key={section.id} value={section.id} className="rounded-2xl border border-border/50 bg-card/40 backdrop-blur-xl px-5 md:px-6">
               <AccordionTrigger className="gap-4 py-5 text-left hover:no-underline">
                 <span className="flex min-w-0 items-center gap-4">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center text-primary">

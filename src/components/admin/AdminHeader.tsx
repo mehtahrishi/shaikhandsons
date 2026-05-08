@@ -71,7 +71,7 @@ export function AdminHeader() {
                 <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-background rounded-full" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64 mt-2 bg-background/95 backdrop-blur-xl border-border/50 p-2 rounded-2xl shadow-2xl" align="end">
+            <DropdownMenuContent className="w-64 mt-2 bg-background/95 backdrop-blur-xl border-border/50 p-2 rounded-2xl" align="end">
               <DropdownMenuLabel className="p-4">
                 <div className="flex flex-col space-y-1">
                   <p className="text-[10px] font-black uppercase tracking-widest text-primary">Administrator</p>

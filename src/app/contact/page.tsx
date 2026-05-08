@@ -73,7 +73,7 @@ export default function ContactPage() {
           </p>
         </div>
 
-        <div className="bg-card/40 backdrop-blur-xl border border-border/50 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden group">
+        <div className="bg-card/40 backdrop-blur-xl border border-border/50 rounded-3xl p-8 md:p-12 relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -138,7 +138,7 @@ export default function ContactPage() {
 
             <Button 
               type="submit" 
-              className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-[0.2em] text-xs rounded-xl shadow-lg shadow-primary/20 group/btn overflow-hidden relative" 
+              className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-[0.2em] text-xs rounded-xl group/btn overflow-hidden relative" 
               disabled={isSubmitting}
             >
               <span className="relative z-10 flex items-center justify-center">

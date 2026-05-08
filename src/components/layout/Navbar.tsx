@@ -213,8 +213,7 @@ export function Navbar() {
       {/* Top Header */}
       <header className="fixed top-0 left-0 w-full z-50">
         <div className={cn(
-          "transition-all duration-300 bg-background/95 backdrop-blur-md border-b border-border/50",
-          isScrolled && "shadow-md"
+          "transition-all duration-300 bg-background/95 backdrop-blur-md border-b border-border/50"
         )}>
           <div className="px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
             {/* Left: Brand */}
@@ -222,19 +221,21 @@ export function Navbar() {
               <BrandIdentity size="md" />
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-8 flex-1 justify-center">
-              {navLinks.map((link) => (
-                <Link 
-                  key={link.name} 
-                  href={link.href}
-                  className="text-[10px] font-body font-black tracking-widest text-foreground hover:text-primary transition-colors uppercase relative group"
-                >
-                  {link.name}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-                </Link>
-              ))}
-            </nav>
+            {/* Desktop Navigation - Hidden on Admin Login */}
+            {!isAdminRoute && (
+              <nav className="hidden md:flex items-center gap-8 flex-1 justify-center">
+                {navLinks.map((link) => (
+                  <Link 
+                    key={link.name} 
+                    href={link.href}
+                    className="text-[10px] font-body font-black tracking-widest text-foreground hover:text-primary transition-colors uppercase relative group"
+                  >
+                    {link.name}
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                  </Link>
+                ))}
+              </nav>
+            )}
 
             {/* Right: Theme + Auth */}
             <div className="flex items-center gap-2 md:gap-3 ml-auto">
@@ -245,161 +246,167 @@ export function Navbar() {
                 {mounted ? (isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />) : <Sun className="h-4 w-4" />}
               </button>
 
-              {/* Desktop Auth */}
-              {!mounted ? (
-                <div className="w-9 h-9" />
-              ) : isAuthenticated ? (
+              {/* Auth - Hidden on Admin Login */}
+              {!isAdminRoute && (
                 <>
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setShowVehiclesPopover(false);
-                      setShowAuthPopover(false);
-                      setShowProfileSheet(!showProfileSheet);
-                    }}
-                    className={cn(
-                      "relative h-9 w-9 p-0 rounded-lg bg-transparent transition-colors hover:bg-transparent md:hidden",
-                      showProfileSheet ? "text-primary" : "hover:text-primary"
-                    )}
-                  >
-                    <span className="text-xl font-headline font-black text-foreground">
-                      {userInitial}
-                    </span>
-                  </Button>
-
-                  <div className="hidden md:block">
-                    <DropdownMenu modal={false}>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="relative h-9 w-9 p-0 bg-transparent hover:bg-transparent group transition-colors rounded-lg"
-                        >
-                          <span className="text-xl font-headline font-black text-foreground group-hover:text-primary">
-                            {userInitial}
-                          </span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        className="w-64 rounded-2xl border border-border/50 bg-background/95 p-2 shadow-2xl shadow-black/15 backdrop-blur-xl"
-                        align="end"
-                        sideOffset={12}
-                        forceMount
+                  {!mounted ? (
+                    <div className="w-9 h-9" />
+                  ) : isAuthenticated ? (
+                    <>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          setShowVehiclesPopover(false);
+                          setShowAuthPopover(false);
+                          setShowProfileSheet(!showProfileSheet);
+                        }}
+                        className={cn(
+                          "relative h-9 w-9 p-0 rounded-lg bg-transparent transition-colors hover:bg-transparent md:hidden",
+                          showProfileSheet ? "text-primary" : "hover:text-primary"
+                        )}
                       >
-                        <DropdownMenuLabel className="font-normal p-3">
-                          <div className="flex items-center gap-3">
-                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/20 text-2xl font-headline font-black text-primary">
-                              {userInitial}
-                            </span>
-                            <div className="min-w-0">
-                              <p className="truncate text-sm font-headline font-black capitalize text-foreground">
-                                {user?.fullName || user?.email?.split('@')[0] || "Collector"}
-                              </p>
-                              <p className="truncate text-[10px] font-body text-muted-foreground">{user?.email}</p>
-                            </div>
-                          </div>
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator className="my-1 bg-border/50" />
-                        <DropdownMenuItem asChild className="cursor-pointer rounded-xl p-0 font-body hover:bg-red-500 focus:bg-red-500 group">
-                          <Link href="/profile" className="flex h-11 w-full items-center gap-3 px-3">
-                            <User className="h-4 w-4 text-primary group-hover:text-white" />
-                            <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-white">My Profile</span>
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleLogout} className="mt-1 h-11 cursor-pointer rounded-xl px-3 font-body text-destructive focus:bg-destructive/10 focus:text-destructive">
-                          <div className="flex items-center gap-3">
-                            <LogOut className="h-4 w-4" />
-                            <span className="text-[10px] font-black uppercase tracking-widest">Logout</span>
-                          </div>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+                        <span className="text-xl font-headline font-black text-foreground">
+                          {userInitial}
+                        </span>
+                      </Button>
+
+                      <div className="hidden md:block">
+                        <DropdownMenu modal={false}>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="relative h-9 w-9 p-0 bg-transparent hover:bg-transparent group transition-colors rounded-lg"
+                            >
+                              <span className="text-xl font-headline font-black text-foreground group-hover:text-primary">
+                                {userInitial}
+                              </span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            className="w-64 rounded-2xl border border-border/50 bg-background/95 p-2 backdrop-blur-xl"
+                            align="end"
+                            sideOffset={12}
+                            forceMount
+                          >
+                            <DropdownMenuLabel className="font-normal p-3">
+                              <div className="flex items-center gap-3">
+                                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/20 text-2xl font-headline font-black text-primary">
+                                  {userInitial}
+                                </span>
+                                <div className="min-w-0">
+                                  <p className="truncate text-sm font-headline font-black capitalize text-foreground">
+                                    {user?.fullName || user?.email?.split('@')[0] || "Collector"}
+                                  </p>
+                                  <p className="truncate text-[10px] font-body text-muted-foreground">{user?.email}</p>
+                                </div>
+                              </div>
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator className="my-1 bg-border/50" />
+                            <DropdownMenuItem asChild className="cursor-pointer rounded-xl p-0 font-body hover:bg-red-500 focus:bg-red-500 group">
+                              <Link href="/profile" className="flex h-11 w-full items-center gap-3 px-3">
+                                <User className="h-4 w-4 text-primary group-hover:text-white" />
+                                <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-white">My Profile</span>
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={handleLogout} className="mt-1 h-11 cursor-pointer rounded-xl px-3 font-body text-destructive focus:bg-destructive/10 focus:text-destructive">
+                              <div className="flex items-center gap-3">
+                                <LogOut className="h-4 w-4" />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Logout</span>
+                              </div>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="hidden sm:flex items-center gap-1">
+                      <Link href="/login">
+                        <Button 
+                          size="sm" 
+                          className="text-[10px] font-body font-black uppercase tracking-widest h-9 px-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
+                        >
+                          Sign In
+                        </Button>
+                      </Link>
+                      <Link href="/signup">
+                        <Button 
+                          size="sm" 
+                          className="text-[10px] font-body font-black uppercase tracking-widest h-9 px-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg hidden md:inline-flex"
+                        >
+                          Sign Up
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
                 </>
-              ) : (
-                <div className="hidden sm:flex items-center gap-1">
-                  <Link href="/login">
-                    <Button 
-                      size="sm" 
-                      className="text-[10px] font-body font-black uppercase tracking-widest h-9 px-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
-                    >
-                      Sign In
-                    </Button>
-                  </Link>
-                  <Link href="/signup">
-                    <Button 
-                      size="sm" 
-                      className="text-[10px] font-body font-black uppercase tracking-widest h-9 px-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg hidden md:inline-flex"
-                    >
-                      Sign Up
-                    </Button>
-                  </Link>
-                </div>
               )}
             </div>
           </div>
         </div>
       </header>
 
-      {/* Mobile Bottom Dock */}
-      <nav className="fixed bottom-0 left-0 right-0 md:hidden z-40 bg-background/95 backdrop-blur-md border-t border-border/50 safe-area-inset-bottom">
-        <div className="flex items-center justify-around px-2 py-1.5">
-          {mobileNavLinks.map((link) => (
-            link.name === 'Vehicles' ? (
+      {/* Mobile Bottom Dock - Hidden on Admin Login */}
+      {!isAdminRoute && (
+        <nav className="fixed bottom-0 left-0 right-0 md:hidden z-40 bg-background/95 backdrop-blur-md border-t border-border/50 safe-area-inset-bottom">
+          <div className="flex items-center justify-around px-2 py-1.5">
+            {mobileNavLinks.map((link) => (
+              link.name === 'Vehicles' ? (
+                <button 
+                  key="vehicles"
+                  onClick={() => { setShowAuthPopover(false); setShowProfileSheet(false); setShowVehiclesPopover(!showVehiclesPopover); }}
+                  className={cn(
+                    "flex flex-col items-center gap-0.5 p-1.5 rounded-lg text-foreground hover:text-primary",
+                    showVehiclesPopover ? "text-primary" : "hover:bg-muted/50"
+                  )}
+                >
+                  <link.icon className="h-5 w-5" />
+                  <span className="text-[6px] font-body font-black uppercase tracking-widest">{link.name}</span>
+                </button>
+              ) : (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => { setShowVehiclesPopover(false); setShowAuthPopover(false); setShowProfileSheet(false); }}
+                  className={cn(
+                    "flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary",
+                    pathname === link.href ? "text-primary" : "hover:bg-muted/50"
+                  )}
+                >
+                  <link.icon className="h-5 w-5" />
+                  <span className="text-[6px] font-body font-black uppercase tracking-widest">{link.name}</span>
+                </Link>
+              )
+            ))}
+            
+            {/* Auth/Profile Icon */}
+            {!mounted ? (
+              <div className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg" />
+            ) : isAuthenticated ? (
               <button 
-                key="vehicles"
-                onClick={() => { setShowAuthPopover(false); setShowProfileSheet(false); setShowVehiclesPopover(!showVehiclesPopover); }}
-                className={cn(
-                  "flex flex-col items-center gap-0.5 p-1.5 rounded-lg text-foreground hover:text-primary",
-                  showVehiclesPopover ? "text-primary" : "hover:bg-muted/50"
-                )}
-              >
-                <link.icon className="h-5 w-5" />
-                <span className="text-[6px] font-body font-black uppercase tracking-widest">{link.name}</span>
-              </button>
-            ) : (
-              <Link
-                key={link.name}
-                href={link.href}
-                onClick={() => { setShowVehiclesPopover(false); setShowAuthPopover(false); setShowProfileSheet(false); }}
+                onClick={() => { setShowVehiclesPopover(false); setShowAuthPopover(false); setShowProfileSheet(!showProfileSheet); }}
                 className={cn(
                   "flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary",
-                  pathname === link.href ? "text-primary" : "hover:bg-muted/50"
+                  showProfileSheet ? "text-primary" : "hover:bg-muted/50"
                 )}
               >
-                <link.icon className="h-5 w-5" />
-                <span className="text-[6px] font-body font-black uppercase tracking-widest">{link.name}</span>
-              </Link>
-            )
-          ))}
-          
-          {/* Auth/Profile Icon */}
-          {!mounted ? (
-            <div className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg" />
-          ) : isAuthenticated ? (
-            <button 
-              onClick={() => { setShowVehiclesPopover(false); setShowAuthPopover(false); setShowProfileSheet(!showProfileSheet); }}
-              className={cn(
-                "flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary",
-                showProfileSheet ? "text-primary" : "hover:bg-muted/50"
-              )}
-            >
-              <User className="h-5 w-5" />
-              <span className="text-[6px] font-body font-black uppercase tracking-widest">Profile</span>
-            </button>
-          ) : (
-            <button 
-              onClick={() => { setShowVehiclesPopover(false); setShowProfileSheet(false); setShowAuthPopover(!showAuthPopover); }}
-              className={cn(
-                "flex flex-col items-center gap-0.5 p-1.5 rounded-lg text-foreground hover:text-primary transition-all",
-                showAuthPopover ? "text-primary" : "hover:bg-muted/50"
-              )}
-            >
-              <User className="h-5 w-5" />
-              <span className="text-[6px] font-body font-black uppercase tracking-widest">Sign In</span>
-            </button>
-          )}
-        </div>
-      </nav>
+                <User className="h-5 w-5" />
+                <span className="text-[6px] font-body font-black uppercase tracking-widest">Profile</span>
+              </button>
+            ) : (
+              <button 
+                onClick={() => { setShowVehiclesPopover(false); setShowProfileSheet(false); setShowAuthPopover(!showAuthPopover); }}
+                className={cn(
+                  "flex flex-col items-center gap-0.5 p-1.5 rounded-lg text-foreground hover:text-primary transition-all",
+                  showAuthPopover ? "text-primary" : "hover:bg-muted/50"
+                )}
+              >
+                <User className="h-5 w-5" />
+                <span className="text-[6px] font-body font-black uppercase tracking-widest">Sign In</span>
+              </button>
+            )}
+          </div>
+        </nav>
+      )}
 
       {/* Auth Bottom Sheet - Expands Upward */}
       <div className={cn(

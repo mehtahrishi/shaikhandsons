@@ -125,7 +125,7 @@ export default function ProfilePage() {
           className="w-full max-w-lg"
         >
           {/* Profile Card */}
-          <Card className="bg-card/40 backdrop-blur-3xl border border-border/50 rounded-[2.5rem] overflow-hidden shadow-xl">
+          <Card className="bg-card/40 backdrop-blur-3xl border border-border/50 rounded-[2.5rem] overflow-hidden">
             <CardHeader className="text-center pt-8 pb-6 space-y-5">
               <div className="mx-auto">
                 <div className="h-28 w-28 flex items-center justify-center pointer-events-none">
@@ -260,7 +260,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Privacy Manifest Card */}
-          <Card className="mt-3 bg-card/40 backdrop-blur-3xl border border-border/50 rounded-[2.5rem] overflow-hidden shadow-xl">
+          <Card className="mt-3 bg-card/40 backdrop-blur-3xl border border-border/50 rounded-[2.5rem] overflow-hidden">
             <CardContent className="px-6 md:px-12 py-10">
               <div className="flex flex-col gap-6">
                 <div className="flex items-center gap-3 text-primary">

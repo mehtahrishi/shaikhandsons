@@ -823,7 +823,7 @@ export default function AdminInventoryPage() {
           </p>
         </motion.div>
         
-        <div className="flex w-full sm:w-auto items-center gap-2 rounded-2xl border border-border/50 bg-card/40 backdrop-blur-xl p-2 shadow-[0_12px_32px_-20px_rgba(0,0,0,0.7)]">
+        <div className="flex w-full sm:w-auto items-center gap-2 rounded-2xl border border-border/50 bg-card/40 backdrop-blur-xl p-2">
           <Dialog open={isBulkModalOpen} onOpenChange={setIsBulkModalOpen}>
             <DialogTrigger asChild>
               <Button
@@ -1305,7 +1305,7 @@ export default function AdminInventoryPage() {
             if (!open) setColorsInput('');
           }}>
             <DialogTrigger asChild>
-              <Button className="h-12 flex-1 sm:flex-none px-4 sm:px-8 font-black uppercase tracking-[0.16em] text-[10px] rounded-xl shadow-[0_10px_24px_-12px_hsl(var(--primary))] hover:shadow-[0_14px_30px_-14px_hsl(var(--primary))] transition-all">
+              <Button className="h-12 flex-1 sm:flex-none px-4 sm:px-8 font-black uppercase tracking-[0.16em] text-[10px] rounded-xl transition-all">
                 <Plus className="h-4 w-4 mr-2" /> Add New Asset
               </Button>
             </DialogTrigger>
@@ -2718,12 +2718,11 @@ export default function AdminInventoryPage() {
               onClick={(e) => {
                 e.preventDefault();
                 handleDeleteConfirm();
-              }} 
+              }}
               disabled={isUploading}
-              className="h-12 w-12 rounded-full bg-red-600 hover:bg-red-700 text-white border-none p-0 flex items-center justify-center transition-all hover:scale-110 shadow-lg shadow-red-600/20"
-            >
-              {isUploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5" />}
-            </AlertDialogAction>
+              className="h-12 w-12 rounded-full bg-red-600 hover:bg-red-700 text-white border-none p-0 flex items-center justify-center transition-all hover:scale-110"
+              >
+              {isUploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5" />}            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

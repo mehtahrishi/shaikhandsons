@@ -76,7 +76,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
   return (
     <Link href={`/vehicles/${liveData.id}`} className="block w-full h-full">
       <motion.div 
-        className="group relative w-full h-[420px] sm:h-[520px] bg-card rounded-[1.5rem] sm:rounded-[2.5rem] border border-border/40 overflow-hidden shadow-2xl transition-all duration-500 hover:border-primary/30"
+        className="group relative w-full h-[420px] sm:h-[520px] bg-card rounded-[1.5rem] sm:rounded-[2.5rem] border border-border/40 overflow-hidden transition-all duration-500 hover:border-primary/30"
         initial={{ opacity: 0, scale: 0.95 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
@@ -153,7 +153,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
               </div>
             </div>
             
-            <div className="h-10 w-10 sm:h-14 sm:w-14 rounded-full bg-secondary border border-border flex items-center justify-center transition-all duration-300 group-hover:bg-primary group-hover:border-primary group-hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)]">
+            <div className="h-10 w-10 sm:h-14 sm:w-14 rounded-full bg-secondary border border-border flex items-center justify-center transition-all duration-300 group-hover:bg-primary group-hover:border-primary">
               <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-foreground group-hover:text-primary-foreground transition-transform group-hover:translate-x-1" />
             </div>
           </div>

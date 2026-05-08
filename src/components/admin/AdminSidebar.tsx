@@ -57,7 +57,7 @@ export function AdminSidebar() {
               className={cn(
                 "flex items-center gap-3 px-4 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 group",
                 pathname === item.href 
-                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
+                  ? "bg-primary text-primary-foreground" 
                   : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
                 isCollapsed && "justify-center px-0 h-12 w-12 mx-auto"
               )}
@@ -79,7 +79,7 @@ export function AdminSidebar() {
         {/* Repositioned Toggle Button - Moved Up */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-8 h-6 w-6 rounded-full border bg-background flex items-center justify-center hover:bg-muted transition-colors shadow-sm z-50"
+          className="absolute -right-3 top-8 h-6 w-6 rounded-full border bg-background flex items-center justify-center hover:bg-muted transition-colors z-50"
           aria-label={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
           {isCollapsed ? (

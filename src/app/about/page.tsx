@@ -36,7 +36,7 @@ export default function AboutPage() {
         </div>
 
         {/* Main Content Card */}
-        <div className="bg-card/40 backdrop-blur-xl border border-border/50 rounded-[2.5rem] p-8 md:p-16 shadow-2xl relative overflow-hidden group">
+        <div className="bg-card/40 backdrop-blur-xl border border-border/50 rounded-[2.5rem] p-8 md:p-16 relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           
           <div className="space-y-12">
@@ -67,7 +67,7 @@ export default function AboutPage() {
 
             {/* CTA Section */}
             <div className="pt-12 flex flex-col sm:flex-row gap-6 justify-center">
-              <Button asChild size="lg" className="h-14 px-10 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-[0.2em] text-xs rounded-xl shadow-lg shadow-primary/20 transition-all">
+              <Button asChild size="lg" className="h-14 px-10 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-[0.2em] text-xs rounded-xl transition-all">
                 <Link href="/#showroom">
                   Explore Collection
                   <ChevronRight className="ml-2 h-4 w-4" />

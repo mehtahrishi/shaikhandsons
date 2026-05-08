@@ -179,7 +179,7 @@ export default function Home() {
             </div>
 
             <div className="relative">
-              <div className="aspect-[4/5] relative rounded-3xl overflow-hidden shadow-2xl">
+              <div className="aspect-[4/5] relative rounded-3xl overflow-hidden">
                 <Image 
                   src="https://picsum.photos/seed/ev5/1200/1500" 
                   alt="Interior Luxury Technology" 
@@ -211,7 +211,7 @@ export default function Home() {
             Each vehicle is a custom masterpiece by Shaikh & Sons. Join the waitlist for our next production cycle.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="rounded-full px-16 h-16 text-lg font-black uppercase tracking-tighter shadow-[0_0_20px_rgba(var(--primary),0.3)]">
+            <Button size="lg" className="rounded-full px-16 h-16 text-lg font-black uppercase tracking-tighter">
               Begin Configuration
             </Button>
             <Button size="lg" variant="outline" className="rounded-full px-16 h-16 text-lg font-bold border-white/10 text-white hover:bg-white/5" asChild>
@@ -223,3 +223,4 @@ export default function Home() {
     </div>
   );
 }
+

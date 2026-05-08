@@ -7,9 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldCheck, Lock, Mail, ChevronLeft } from 'lucide-react';
+import { Loader2, Lock, Mail, ChevronRight } from 'lucide-react';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
@@ -51,65 +52,88 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-background relative overflow-hidden p-6">
-      {/* Red ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px] -z-10"></div>
-      
-      <div className="absolute top-8 left-8">
-        <Button asChild variant="ghost" className="text-xs font-bold uppercase tracking-widest gap-2">
-          <Link href="/"><ChevronLeft className="h-3 w-3" /> Back to Showroom</Link>
-        </Button>
-      </div>
+    <div className="min-h-[calc(100vh-80px)] relative flex flex-col items-center justify-start overflow-hidden bg-background pt-16 md:pt-24 pb-8 px-6">
+      {/* Dynamic Background Accents */}
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse" />
+      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -z-10" />
 
-      <div className="w-full max-w-sm">
-        <Card className="border-border/50 bg-card/40 backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-primary" /> Admin Login
-            </CardTitle>
-            <CardDescription className="text-xs uppercase tracking-widest opacity-60">Enter Admin Credentials</CardDescription>
-          </CardHeader>
-          <form onSubmit={handleLogin}>
-            <CardContent className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-[10px] uppercase tracking-widest text-muted-foreground">Admin Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="admin@shaikh.sons"
-                    required
-                    className="pl-10 h-12 bg-muted/20 border-border focus:border-primary transition-all text-sm"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full max-w-md z-10"
+      >
+        <div className="mb-4 md:mb-6 text-center">
+          <h1 className="font-headline text-5xl md:text-6xl font-black text-foreground tracking-tighter uppercase mb-2">
+            Admin <span className="text-primary italic">Core</span>
+          </h1>
+          <p className="text-muted-foreground text-xs font-bold tracking-[0.2em] uppercase">
+            Authorized Personnel Access Only
+          </p>
+        </div>
+
+        <div className="bg-card/40 backdrop-blur-xl border border-border/50 rounded-3xl p-8 relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground ml-1">Admin Identifier</Label>
+              <div className="relative group/input">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 group-focus-within/input:text-primary transition-colors" />
+                <Input
+                  id="email"
+                  placeholder="admin@shaikh.sons"
+                  type="email"
+                  required
+                  className="bg-background/50 border-border h-14 pl-12 focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all rounded-xl text-foreground placeholder:text-muted-foreground/50"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-[10px] uppercase tracking-widest text-muted-foreground">Admin Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type="password"
-                    required
-                    placeholder="••••••••"
-                    className="pl-10 h-12 bg-muted/20 border-border focus:border-primary transition-all text-sm"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center ml-1">
+                <Label htmlFor="password" className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">Encryption Key</Label>
               </div>
-            </CardContent>
-            <CardFooter className="pt-6 pb-8">
-              <Button type="submit" className="w-full h-12 font-black uppercase tracking-widest text-xs" disabled={loading}>
-                {loading ? <Loader2 className="animate-spin mr-2" /> : "Authorize Access"}
-              </Button>
-            </CardFooter>
+              <div className="relative group/input">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 group-focus-within/input:text-primary transition-colors" />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  placeholder="••••••••"
+                  className="bg-background/50 border-border h-14 pl-12 focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all rounded-xl text-foreground placeholder:text-muted-foreground/50"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <Button 
+              type="submit" 
+              className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-[0.2em] text-xs rounded-xl group/btn overflow-hidden relative" 
+              disabled={loading}
+            >
+              <span className="relative z-10 flex items-center justify-center">
+                {loading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : (
+                  <>
+                    Authorize Entry
+                    <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
+            </Button>
           </form>
-        </Card>
-      </div>
+
+          <div className="mt-8 pt-8 border-t border-border/50 text-center">
+            <p className="text-muted-foreground text-[10px] uppercase tracking-widest font-bold">
+              Restricted Area — All Access is Logged
+            </p>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }

@@ -1,8 +1,12 @@
+"use client"
+
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Instagram, MessageCircle } from 'lucide-react';
 
 const CrownIcon = () => (
+// ... existing CrownIcon ...
   <svg viewBox="0 0 512 512" fill="currentColor" className="w-full h-full">
     <g>
       <path d="M124.536,178.991c12.892,0,23.33-10.438,23.33-23.322s-10.438-23.322-23.33-23.322 c-12.876,0-23.314,10.438-23.314,23.322S111.66,178.991,124.536,178.991z"/>
@@ -16,6 +20,11 @@ const CrownIcon = () => (
 );
 
 export function SiteFooter() {
+  const pathname = usePathname();
+  const isAdminRoute = pathname?.startsWith('/admin');
+
+  if (isAdminRoute && pathname !== '/admin/login') return null;
+
   return (
     <footer className="bg-background border-t border-muted">
       <div className="container mx-auto px-6">

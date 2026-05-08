@@ -112,10 +112,10 @@ export function AdminSidebar() {
           ))}
         </div>
 
-        {/* Technical Toggle Button */}
+        {/* Repositioned Toggle Button - Moved Up */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full border bg-background flex items-center justify-center hover:bg-muted transition-colors shadow-sm z-50"
+          className="absolute -right-3 top-24 h-6 w-6 rounded-full border bg-background flex items-center justify-center hover:bg-muted transition-colors shadow-sm z-50"
           aria-label={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
           {isCollapsed ? (

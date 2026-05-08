@@ -222,13 +222,4 @@
       opacity: 0;
     }
   }
-  
-  /* Mobile menu animations */
-  [data-state="open"] {
-    animation: slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }
-  
-  [data-state="closed"] {
-    animation: slideOutLeft 0.2s cubic-bezier(0.7, 0, 0.84, 0) !important;
-  }
 }

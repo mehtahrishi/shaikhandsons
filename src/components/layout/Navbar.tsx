@@ -123,6 +123,7 @@ export function Navbar() {
   const { toast } = useToast();
   const [showAuthPopover, setShowAuthPopover] = useState(false);
   const [showVehiclesPopover, setShowVehiclesPopover] = useState(false);
+  const [showProfileSheet, setShowProfileSheet] = useState(false);
   const { user, logout } = useAuth();
   
   const isAuthenticated = !!user;
@@ -248,44 +249,65 @@ export function Navbar() {
               {!mounted ? (
                 <div className="w-9 h-9" />
               ) : isAuthenticated ? (
-                <DropdownMenu modal={false}>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      className="relative h-9 w-9 p-0 hover:bg-muted/50 group transition-all rounded-lg"
-                    >
-                      <span className="text-xl font-headline font-black text-foreground group-hover:text-primary">
-                        {userInitial}
-                      </span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent 
-                    className="w-52 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-lg" 
-                    align="end" 
-                    forceMount
+                <>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setShowVehiclesPopover(false);
+                      setShowAuthPopover(false);
+                      setShowProfileSheet(!showProfileSheet);
+                    }}
+                    className={cn(
+                      "relative h-9 w-9 p-0 rounded-lg bg-transparent transition-colors hover:bg-transparent md:hidden",
+                      showProfileSheet ? "text-primary" : "hover:text-primary"
+                    )}
                   >
-                    <DropdownMenuLabel className="font-normal p-3">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-xs font-headline font-black">{user?.fullName || user?.email?.split('@')[0] || "Collector"}</p>
-                        <p className="text-[10px] font-body text-muted-foreground truncate">{user?.email}</p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-border/50" />
-                    <DropdownMenuItem asChild className="cursor-pointer focus:bg-primary/10 p-2 rounded font-body">
-                      <Link href="/profile" className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-primary" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">My Garage</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-border/50" />
-                    <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer p-2 rounded font-body">
-                      <div className="flex items-center gap-2">
-                        <LogOut className="h-4 w-4" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Logout</span>
-                      </div>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    <span className="text-xl font-headline font-black text-foreground">
+                      {userInitial}
+                    </span>
+                  </Button>
+
+                  <div className="hidden md:block">
+                    <DropdownMenu modal={false}>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="relative h-9 w-9 p-0 bg-transparent hover:bg-transparent group transition-colors rounded-lg"
+                        >
+                          <span className="text-xl font-headline font-black text-foreground group-hover:text-primary">
+                            {userInitial}
+                          </span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        className="w-52 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-lg"
+                        align="end"
+                        forceMount
+                      >
+                        <DropdownMenuLabel className="font-normal p-3">
+                          <div className="flex flex-col space-y-1">
+                            <p className="text-xs font-headline font-black">{user?.fullName || user?.email?.split('@')[0] || "Collector"}</p>
+                            <p className="text-[10px] font-body text-muted-foreground truncate">{user?.email}</p>
+                          </div>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-border/50" />
+                        <DropdownMenuItem asChild className="cursor-pointer focus:bg-primary/10 p-2 rounded font-body">
+                          <Link href="/profile" className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-primary" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">My Garage</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-border/50" />
+                        <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer p-2 rounded font-body">
+                          <div className="flex items-center gap-2">
+                            <LogOut className="h-4 w-4" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Logout</span>
+                          </div>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </>
               ) : (
                 <div className="hidden sm:flex items-center gap-1">
                   <Link href="/login">
@@ -318,7 +340,7 @@ export function Navbar() {
             link.name === 'Vehicles' ? (
               <button 
                 key="vehicles"
-                onClick={() => { setShowAuthPopover(false); setShowVehiclesPopover(!showVehiclesPopover); }}
+                onClick={() => { setShowAuthPopover(false); setShowProfileSheet(false); setShowVehiclesPopover(!showVehiclesPopover); }}
                 className={cn(
                   "flex flex-col items-center gap-0.5 p-1.5 rounded-lg text-foreground hover:text-primary",
                   showVehiclesPopover ? "text-primary" : "hover:bg-muted/50"
@@ -331,6 +353,7 @@ export function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
+                onClick={() => { setShowVehiclesPopover(false); setShowAuthPopover(false); setShowProfileSheet(false); }}
                 className={cn(
                   "flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary",
                   pathname === link.href ? "text-primary" : "hover:bg-muted/50"
@@ -346,43 +369,19 @@ export function Navbar() {
           {!mounted ? (
             <div className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg" />
           ) : isAuthenticated ? (
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <button className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary hover:bg-muted/50">
-                  <User className="h-5 w-5" />
-                  <span className="text-[6px] font-body font-black uppercase tracking-widest">Profile</span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                className="w-48 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-lg" 
-                align="end" 
-                forceMount
-              >
-                <DropdownMenuLabel className="font-normal p-3">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-xs font-headline font-black">{user?.fullName || user?.email?.split('@')[0] || "Collector"}</p>
-                    <p className="text-[10px] font-body text-muted-foreground truncate">{user?.email}</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-border/50" />
-                <DropdownMenuItem asChild className="cursor-pointer focus:bg-primary/10 p-2 rounded font-body">
-                  <Link href="/profile" className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-primary" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">My Garage</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-border/50" />
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer p-2 rounded font-body">
-                  <div className="flex items-center gap-2">
-                    <LogOut className="h-4 w-4" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Logout</span>
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <button 
+              onClick={() => { setShowVehiclesPopover(false); setShowAuthPopover(false); setShowProfileSheet(!showProfileSheet); }}
+              className={cn(
+                "flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary",
+                showProfileSheet ? "text-primary" : "hover:bg-muted/50"
+              )}
+            >
+              <User className="h-5 w-5" />
+              <span className="text-[6px] font-body font-black uppercase tracking-widest">Profile</span>
+            </button>
           ) : (
             <button 
-              onClick={() => { setShowVehiclesPopover(false); setShowAuthPopover(!showAuthPopover); }}
+              onClick={() => { setShowVehiclesPopover(false); setShowProfileSheet(false); setShowAuthPopover(!showAuthPopover); }}
               className={cn(
                 "flex flex-col items-center gap-0.5 p-1.5 rounded-lg text-foreground hover:text-primary transition-all",
                 showAuthPopover ? "text-primary" : "hover:bg-muted/50"
@@ -457,6 +456,44 @@ export function Navbar() {
                 <span>Scooty</span>
               </button>
             </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Profile Bottom Sheet - Expands Upward */}
+      <div className={cn(
+        "fixed left-0 right-0 bottom-[56px] md:hidden z-30 bg-background/95 backdrop-blur-xl border-t border-border/50 overflow-hidden transition-all duration-300 ease-in-out",
+        showProfileSheet ? "max-h-80" : "max-h-0"
+      )}>
+        <div className="px-4 py-6">
+          <div className="px-2 flex items-center justify-between">
+            <div className="flex flex-col">
+              <h3 className="text-sm font-body font-black leading-tight">{user?.fullName || user?.email?.split('@')[0] || "Collector"}</h3>
+              <p className="text-[10px] font-body text-muted-foreground truncate max-w-[200px]">{user?.email}</p>
+            </div>
+            <span className="text-3xl font-headline font-black text-primary leading-none">
+              {userInitial}
+            </span>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3 mt-6">
+            <Link 
+              href="/profile" 
+              onClick={() => setShowProfileSheet(false)}
+              className="block"
+            >
+              <button className="w-full text-[12px] font-body font-black uppercase tracking-widest h-12 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl flex items-center justify-center gap-2">
+                <User className="h-4 w-4" />
+                <span>My Profile</span>
+              </button>
+            </Link>
+            <button 
+              onClick={() => { handleLogout(); setShowProfileSheet(false); }}
+              className="w-full text-[12px] font-body font-black uppercase tracking-widest h-12 bg-destructive/10 text-destructive hover:bg-destructive/20 rounded-xl flex items-center justify-center gap-2 border border-destructive/20"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </button>
           </div>
         </div>
       </div>

@@ -45,15 +45,8 @@ export default function ProfilePage() {
       // Initialize from user data
       setPhone(user.phone || "");
       setAddress(user.address || "");
-
-      // Notify if profile is incomplete
-      toast({
-        title: "Welcome",
-        description: "You're logged in as " + user.email,
-        variant: "default",
-      });
     }
-  }, [user, loading, router, toast]);
+  }, [user, loading, router]);
 
   // Timeout to prevent stuck loading state
   useEffect(() => {
@@ -117,7 +110,7 @@ export default function ProfilePage() {
   const userInitial = user.fullName?.charAt(0).toUpperCase() || user.email.charAt(0).toUpperCase();
 
   return (
-    <div className="min-h-screen bg-background pt-20 pb-24 relative overflow-hidden">
+    <div className="min-h-screen bg-background pt-10 pb-8 relative overflow-hidden">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--primary),0.05)_0%,transparent_100%)] opacity-30" />
@@ -133,7 +126,7 @@ export default function ProfilePage() {
         >
           {/* Profile Card */}
           <Card className="bg-card/40 backdrop-blur-3xl border border-border/50 rounded-[2.5rem] overflow-hidden shadow-xl">
-            <CardHeader className="text-center pt-12 pb-8 space-y-6">
+            <CardHeader className="text-center pt-8 pb-6 space-y-5">
               <div className="mx-auto">
                 <div className="h-28 w-28 flex items-center justify-center pointer-events-none">
                   <span className="text-8xl font-headline font-black text-primary select-none">
@@ -156,7 +149,7 @@ export default function ProfilePage() {
               </div>
             </CardHeader>
 
-            <CardContent className="px-6 md:px-12 pb-12">
+            <CardContent className="px-6 md:px-12 pb-8">
               <div className="space-y-6">
                 <div className="flex items-center justify-between border-b border-border/50 pb-4">
                   <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Identity Details</h3>
@@ -165,7 +158,7 @@ export default function ProfilePage() {
                       variant="ghost" 
                       size="sm" 
                       onClick={() => setIsEditing(true)}
-                      className="text-[10px] font-bold uppercase tracking-widest h-8 px-4 hover:bg-muted"
+                      className="text-[10px] font-bold uppercase tracking-widest h-8 px-4"
                     >
                       <Edit3 className="h-3 w-3 mr-2" /> Modify
                     </Button>
@@ -185,37 +178,49 @@ export default function ProfilePage() {
                       <div className="grid gap-8 pt-4">
                         {/* Phone Field */}
                         <div className="space-y-3">
-                          <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                          <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2 min-w-0">
                             <Phone className="h-3 w-3" /> Phone Number
                           </Label>
                           <Input 
                             value={phone} 
                             onChange={(e) => setPhone(e.target.value)} 
                             placeholder="+1 (555) 000-0000"
-                            className="bg-muted/30 border-border h-14 font-bold focus:border-primary transition-all text-sm"
+                            className="h-11 rounded-none border-0 border-b border-border bg-transparent px-0 font-bold text-sm outline-none transition-colors duration-150 focus:border-primary focus-visible:border-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0 placeholder:text-muted-foreground/50"
                           />
                         </div>
 
                         {/* Address Field */}
                         <div className="space-y-3">
-                          <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                          <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2 min-w-0">
                             <MapPin className="h-3 w-3" /> Saved Address
                           </Label>
                           <Input 
                             value={address} 
                             onChange={(e) => setAddress(e.target.value)} 
                             placeholder="123 Elite Avenue, Dubai"
-                            className="bg-muted/30 border-border h-14 font-bold focus:border-primary transition-all text-sm"
+                            className="h-11 rounded-none border-0 border-b border-border bg-transparent px-0 font-bold text-sm outline-none transition-colors duration-150 focus:border-primary focus-visible:border-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0 placeholder:text-muted-foreground/50"
                           />
                         </div>
                       </div>
 
-                      <div className="flex gap-4 pt-6">
-                        <Button onClick={handleSave} disabled={saving} className="flex-1 font-bold uppercase tracking-widest h-14 text-xs">
-                          {saving ? <Loader2 className="animate-spin h-4 w-4" /> : <><Check className="h-4 w-4 mr-2" /> Save Changes</>}
+                      <div className="flex justify-center gap-3 pt-6 pb-4">
+                        <Button
+                          onClick={handleSave}
+                          disabled={saving}
+                          size="icon"
+                          aria-label="Save changes"
+                          className="h-12 w-12 rounded-full"
+                        >
+                          {saving ? <Loader2 className="animate-spin h-4 w-4" /> : <Check className="h-5 w-5" />}
                         </Button>
-                        <Button variant="ghost" onClick={() => setIsEditing(false)} className="px-6 hover:bg-destructive/10 hover:text-destructive border border-border h-14">
-                          <X className="h-4 w-4" />
+                        <Button
+                          variant="ghost"
+                          onClick={() => setIsEditing(false)}
+                          size="icon"
+                          aria-label="Cancel editing"
+                          className="h-12 w-12 rounded-full border border-border hover:bg-destructive/10 hover:text-destructive"
+                        >
+                          <X className="h-5 w-5" />
                         </Button>
                       </div>
                     </motion.div>
@@ -230,18 +235,22 @@ export default function ProfilePage() {
                     >
                       {/* Phone Field */}
                       <div className="space-y-3">
-                        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2 min-w-0">
                           <Phone className="h-3 w-3" /> Phone Number
                         </Label>
-                        <p className="text-base font-medium text-foreground/90">{phone || "No phone registered"}</p>
+                        <p className="min-h-11 border-b border-border pb-3 text-sm sm:text-base font-medium text-foreground/90 break-words">
+                          {phone || "No phone registered"}
+                        </p>
                       </div>
 
                       {/* Address Field */}
                       <div className="space-y-3">
-                        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2 min-w-0">
                           <MapPin className="h-3 w-3" /> Saved Address
                         </Label>
-                        <p className="text-base font-medium text-foreground/90 leading-relaxed">{address || "No address registered"}</p>
+                        <p className="min-h-11 border-b border-border pb-3 text-sm sm:text-base font-medium text-foreground/90 leading-relaxed break-words">
+                          {address || "No address registered"}
+                        </p>
                       </div>
                     </motion.div>
                   )}
@@ -251,7 +260,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Privacy Manifest Card */}
-          <Card className="mt-6 bg-card/40 backdrop-blur-3xl border border-border/50 rounded-[2.5rem] overflow-hidden shadow-xl">
+          <Card className="mt-3 bg-card/40 backdrop-blur-3xl border border-border/50 rounded-[2.5rem] overflow-hidden shadow-xl">
             <CardContent className="px-6 md:px-12 py-10">
               <div className="flex flex-col gap-6">
                 <div className="flex items-center gap-3 text-primary">

@@ -132,7 +132,7 @@ export function Navbar() {
   useEffect(() => {
     setMounted(true);
     
-    const savedTheme = localStorage.getItem('shaikh_theme');
+    const savedTheme = sessionStorage.getItem('shaikh_theme');
     if (savedTheme) {
       const isCurrentlyDark = savedTheme === 'dark';
       setIsDark(isCurrentlyDark);
@@ -186,10 +186,10 @@ export function Navbar() {
     setIsDark(nextIsDark);
     if (nextIsDark) {
       document.documentElement.classList.add('dark');
-      localStorage.setItem('shaikh_theme', 'dark');
+      sessionStorage.setItem('shaikh_theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
-      localStorage.setItem('shaikh_theme', 'light');
+      sessionStorage.setItem('shaikh_theme', 'light');
     }
   };
 
@@ -280,26 +280,33 @@ export function Navbar() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
-                        className="w-52 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-lg"
+                        className="w-64 rounded-2xl border border-border/50 bg-background/95 p-2 shadow-2xl shadow-black/15 backdrop-blur-xl"
                         align="end"
+                        sideOffset={12}
                         forceMount
                       >
                         <DropdownMenuLabel className="font-normal p-3">
-                          <div className="flex flex-col space-y-1">
-                            <p className="text-xs font-headline font-black">{user?.fullName || user?.email?.split('@')[0] || "Collector"}</p>
-                            <p className="text-[10px] font-body text-muted-foreground truncate">{user?.email}</p>
+                          <div className="flex items-center gap-3">
+                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/20 text-2xl font-headline font-black text-primary">
+                              {userInitial}
+                            </span>
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-headline font-black capitalize text-foreground">
+                                {user?.fullName || user?.email?.split('@')[0] || "Collector"}
+                              </p>
+                              <p className="truncate text-[10px] font-body text-muted-foreground">{user?.email}</p>
+                            </div>
                           </div>
                         </DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-border/50" />
-                        <DropdownMenuItem asChild className="cursor-pointer focus:bg-primary/10 p-2 rounded font-body">
-                          <Link href="/profile" className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-primary" />
-                            <span className="text-[10px] font-black uppercase tracking-widest">My Garage</span>
+                        <DropdownMenuSeparator className="my-1 bg-border/50" />
+                        <DropdownMenuItem asChild className="cursor-pointer rounded-xl p-0 font-body hover:bg-red-500 focus:bg-red-500 group">
+                          <Link href="/profile" className="flex h-11 w-full items-center gap-3 px-3">
+                            <User className="h-4 w-4 text-primary group-hover:text-white" />
+                            <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-white">My Profile</span>
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-border/50" />
-                        <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer p-2 rounded font-body">
-                          <div className="flex items-center gap-2">
+                        <DropdownMenuItem onClick={handleLogout} className="mt-1 h-11 cursor-pointer rounded-xl px-3 font-body text-destructive focus:bg-destructive/10 focus:text-destructive">
+                          <div className="flex items-center gap-3">
                             <LogOut className="h-4 w-4" />
                             <span className="text-[10px] font-black uppercase tracking-widest">Logout</span>
                           </div>
@@ -482,7 +489,7 @@ export function Navbar() {
               onClick={() => setShowProfileSheet(false)}
               className="block"
             >
-              <button className="w-full text-[12px] font-body font-black uppercase tracking-widest h-12 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl flex items-center justify-center gap-2">
+              <button className="w-full text-[12px] font-body font-black uppercase tracking-widest h-12 bg-primary text-primary-foreground hover:bg-red-500 rounded-xl flex items-center justify-center gap-2">
                 <User className="h-4 w-4" />
                 <span>My Profile</span>
               </button>

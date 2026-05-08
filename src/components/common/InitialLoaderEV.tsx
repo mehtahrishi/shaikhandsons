@@ -98,13 +98,13 @@ export function InitialLoaderEV() {
                 scale: [0.9, 0.9, 1, 1.02]
               }}
               transition={{ duration: 4.0, times: [0, 0.5, 0.75, 1], ease: "easeOut" }}
-              className="absolute z-30 flex flex-col items-center"
+              className="absolute z-30 flex flex-col items-center px-4 w-full"
             >
-              <h1 className="font-headline text-3xl md:text-5xl font-black tracking-[0.4em] text-foreground whitespace-nowrap ml-[0.4em]">
+              <h1 className="font-headline text-2xl sm:text-3xl md:text-5xl font-black tracking-[0.2em] sm:tracking-[0.4em] text-foreground whitespace-nowrap flex items-center">
                 SHAIKH
-                <span className="relative inline-flex items-center justify-center mx-4">
+                <span className="relative inline-flex items-center justify-center mx-2 sm:mx-4">
                   <span className="text-primary italic font-bold">&</span>
-                  <span className="absolute -top-3 md:-top-4 -left-1 w-4 h-4 md:w-6 md:h-6 -rotate-[15deg] text-primary">
+                  <span className="absolute -top-2.5 sm:-top-3 md:-top-4 -left-0.5 sm:-left-1 w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6 -rotate-[15deg] text-primary">
                     <CrownIcon />
                   </span>
                 </span>
@@ -114,13 +114,13 @@ export function InitialLoaderEV() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: [0, 0, 1, 1] }}
                 transition={{ duration: 4.0, times: [0, 0.6, 0.7, 1] }}
-                className="mt-4 flex items-center gap-4"
+                className="mt-4 flex items-center gap-2 sm:gap-4"
               >
-                <div className="h-[1px] w-8 bg-primary/50" />
-                <p className="text-[9px] tracking-[0.6em] text-primary/80 uppercase font-code">
+                <div className="h-[1px] w-4 sm:w-8 bg-primary/50" />
+                <p className="text-[7px] sm:text-[9px] tracking-[0.3em] sm:tracking-[0.6em] text-primary/80 uppercase font-code">
                   Electric Performance
                 </p>
-                <div className="h-[1px] w-8 bg-primary/50" />
+                <div className="h-[1px] w-4 sm:w-8 bg-primary/50" />
               </motion.div>
             </motion.div>
 
@@ -132,7 +132,7 @@ export function InitialLoaderEV() {
                 scale: [0, 0, 1.5, 2]
               }}
               transition={{ duration: 3.0, times: [0, 0.5, 0.6, 1], ease: "easeOut" }}
-              className="absolute w-[400px] h-[200px] bg-primary/30 rounded-[100%] blur-[80px] z-0 pointer-events-none"
+              className="absolute w-[280px] sm:w-[400px] h-[150px] sm:h-[200px] bg-primary/30 rounded-[100%] blur-[60px] sm:blur-[80px] z-0 pointer-events-none"
             />
           </div>
         </motion.div>

@@ -112,7 +112,6 @@ export function Navbar() {
 
   const handleLogout = async () => {
     await logout();
-    setMobileMenuOpen(false);
     toast({
       title: "Signed Out",
       description: "Secure session terminated.",
@@ -255,30 +254,30 @@ export function Navbar() {
 
       {/* Mobile Bottom Dock */}
       <nav className="fixed bottom-0 left-0 right-0 md:hidden z-40 bg-background/95 backdrop-blur-md border-t border-border/50 safe-area-inset-bottom">
-        <div className="flex items-center justify-around px-2 py-3">
+        <div className="flex items-center justify-around px-2 py-1.5">
           {mobileNavLinks.map((link) => (
             <Link
               key={link.name}
               href={link.href}
               className={cn(
-                "flex flex-col items-center gap-1 p-2.5 rounded-lg transition-all text-foreground hover:text-primary",
+                "flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary",
                 pathname === link.href ? "text-primary" : "hover:bg-muted/50"
               )}
             >
               <link.icon className="h-5 w-5" />
-              <span className="text-[7px] font-body font-black uppercase tracking-widest">{link.name}</span>
+              <span className="text-[6px] font-body font-black uppercase tracking-widest">{link.name}</span>
             </Link>
           ))}
           
           {/* Auth/Profile Icon */}
           {!mounted ? (
-            <div className="flex flex-col items-center gap-1 p-2.5 rounded-lg" />
+            <div className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg" />
           ) : isAuthenticated ? (
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <button className="flex flex-col items-center gap-1 p-2.5 rounded-lg transition-all text-foreground hover:text-primary hover:bg-muted/50">
+                <button className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary hover:bg-muted/50">
                   <User className="h-5 w-5" />
-                  <span className="text-[7px] font-body font-black uppercase tracking-widest">Profile</span>
+                  <span className="text-[6px] font-body font-black uppercase tracking-widest">Profile</span>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent 
@@ -311,10 +310,10 @@ export function Navbar() {
           ) : (
             <Link
               href="/login"
-              className="flex flex-col items-center gap-1 p-2.5 rounded-lg transition-all text-foreground hover:text-primary hover:bg-muted/50"
+              className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary hover:bg-muted/50"
             >
               <User className="h-5 w-5" />
-              <span className="text-[7px] font-body font-black uppercase tracking-widest">Sign In</span>
+              <span className="text-[6px] font-body font-black uppercase tracking-widest">Sign In</span>
             </Link>
           )}
         </div>

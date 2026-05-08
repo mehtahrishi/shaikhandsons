@@ -30,7 +30,7 @@ export default function RootLayout({
         <AuthProvider>
           <InitialLoader />
           <Navbar />
-          <main className="flex-1 pt-14 md:pt-16 pb-20 md:pb-0">
+          <main className="flex-1 pt-14 md:pt-16 pb-16 md:pb-0">
             {children}
           </main>
           <SiteFooter />

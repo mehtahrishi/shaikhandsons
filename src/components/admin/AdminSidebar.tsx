@@ -8,15 +8,17 @@ import {
   ShoppingCart, 
   Package, 
   Users,
-  Sparkles
+  Sparkles,
+  Activity,
+  History
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
-  { name: "Products", href: "/admin/inventory", icon: Package },
-  { name: "Users", href: "/admin/users", icon: Users },
+  { name: "Inventory", href: "/admin/inventory", icon: Package },
+  { name: "Customers", href: "/admin/users", icon: Users },
 ]
 
 const CrownIcon = () => (
@@ -30,47 +32,82 @@ const CrownIcon = () => (
   </svg>
 );
 
-export function AdminSidebar({ className }: { className?: string }) {
+const BrandIdentity = ({ className }: { className?: string }) => (
+  <div className={cn("flex items-center gap-2 group whitespace-nowrap", className)}>
+    <span className="font-headline font-black text-lg tracking-tighter text-foreground uppercase">SHAIKH</span>
+    <span className="font-headline font-light text-lg tracking-widest text-foreground uppercase flex items-center">
+      <span className="relative inline-flex items-center justify-center mr-1">
+        <span className="text-primary font-bold italic">&</span>
+        <span className="absolute -top-1.5 -left-0.5 w-2.5 h-2.5 -rotate-[15deg] text-primary">
+          <CrownIcon />
+        </span>
+      </span>
+      SONS
+    </span>
+  </div>
+);
+
+export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className={cn("hidden md:flex flex-col w-64 lg:w-72 bg-muted/40 border-r min-h-screen", className)}>
-      {/* Brand Header: Aligned with AdminHeader (h-20) */}
-      <div className="h-20 flex items-center px-6 border-b">
-        <Link href="/" className="flex items-center gap-2 group whitespace-nowrap">
-          <span className="font-headline font-black text-lg tracking-tighter text-foreground uppercase">SHAIKH</span>
-          <span className="font-headline font-light text-lg tracking-widest text-foreground uppercase flex items-center">
-            <span className="relative inline-flex items-center justify-center mr-1">
-              <span className="text-primary font-bold italic">&</span>
-              <span className="absolute -top-1.5 -left-0.5 w-2.5 h-2.5 -rotate-[15deg] text-primary">
-                <CrownIcon />
-              </span>
-            </span>
-            SONS
-          </span>
+    <aside className="hidden md:flex flex-col w-72 bg-card/40 border-r min-h-screen sticky top-0">
+      {/* Brand Section */}
+      <div className="h-20 flex items-center px-8 border-b">
+        <Link href="/" className="hover:opacity-80 transition-opacity">
+          <BrandIdentity />
         </Link>
       </div>
 
-      <nav className="flex-1 px-4 py-8 space-y-1">
-        <p className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-4 px-4">
-          Fleet Command
+      <nav className="flex-1 px-4 py-10 space-y-1">
+        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-6 px-4">
+          Fleet Management
         </p>
-        {navItems.map((item) => (
-          <Link
-            key={item.name}
-            href={item.href}
-            className={cn(
-              "flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all group",
-              pathname === item.href 
-                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            )}
-          >
-            <item.icon className={cn("h-4 w-4 shrink-0", pathname === item.href ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary")} />
-            {item.name}
-          </Link>
-        ))}
+        <div className="space-y-1.5">
+          {navItems.map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-3 px-4 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 group",
+                pathname === item.href 
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
+                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+              )}
+            >
+              <item.icon className={cn(
+                "h-4 w-4 shrink-0 transition-colors", 
+                pathname === item.href ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary"
+              )} />
+              {item.name}
+            </Link>
+          ))}
+        </div>
+
+        <div className="mt-12 space-y-1.5">
+          <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground mb-6 px-4">
+            System Diagnostics
+          </p>
+          <div className="px-4 space-y-4">
+            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest opacity-60">
+              <span className="flex items-center gap-2"><Activity className="h-3 w-3" /> API Status</span>
+              <span className="text-green-500">Live</span>
+            </div>
+            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest opacity-60">
+              <span className="flex items-center gap-2"><History className="h-3 w-3" /> Logs</span>
+              <span className="text-primary">Syncing</span>
+            </div>
+          </div>
+        </div>
       </nav>
+
+      {/* Terminal Node */}
+      <div className="p-6 border-t bg-muted/20">
+        <div className="p-4 rounded-xl bg-background/50 border border-border/50">
+          <p className="text-[8px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Authenticated Terminal</p>
+          <p className="text-[10px] font-black text-primary uppercase">v2.5.0-STABLE</p>
+        </div>
+      </div>
     </aside>
   );
 }

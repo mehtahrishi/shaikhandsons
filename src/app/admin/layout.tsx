@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
+import { AdminFooter } from "@/components/admin/AdminFooter";
 import { AdminAuthProvider, useAdminAuth } from '@/context/AdminAuthContext';
 import { Loader2 } from 'lucide-react';
 
@@ -19,25 +20,24 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   }, [user, loading, router, pathname]);
 
   if (pathname === '/admin/login') {
-    return <div className="-mt-16 md:-mt-20">{children}</div>;
+    return <div className="min-h-screen bg-background">{children}</div>;
   }
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground overflow-x-hidden -mt-16 md:-mt-20">
-      {/* 1. Sidebar (Desktop) - PERSISTENT SHELL */}
+    <div className="flex min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/30">
+      {/* 1. Technical Sidebar */}
       <AdminSidebar />
       
-      {/* Right Column (Header + Content) */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* 2. Header - PERSISTENT SHELL */}
+        {/* 2. Command Header */}
         <AdminHeader />
         
-        {/* 3. Main Content Area */}
-        <main className="flex-1 p-6 md:p-10 flex flex-col gap-10">
+        {/* 3. Operational Content */}
+        <main className="flex-1 p-6 md:p-12 lg:p-16 flex flex-col gap-10 bg-background">
           {loading && !user ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4">
               <Loader2 className="h-10 w-10 text-primary animate-spin" />
-              <p className="font-headline text-[10px] uppercase tracking-[0.4em] text-muted-foreground">Initializing Command...</p>
+              <p className="font-headline text-[10px] uppercase tracking-[0.4em] text-muted-foreground">Initializing Registry...</p>
             </div>
           ) : !user && pathname !== '/admin/login' ? (
             <div className="flex-1 flex items-center justify-center">
@@ -47,6 +47,9 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
             children
           )}
         </main>
+
+        {/* 4. Technical Footer */}
+        <AdminFooter />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import type {Metadata} from 'next';
 import './globals.css';
-import { SiteHeader } from '@/components/layout/SiteHeader';
+import { Navbar } from '@/components/layout/Navbar';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { Toaster } from '@/components/ui/toaster';
 import { InitialLoaderEV as InitialLoader } from '@/components/common/InitialLoaderEV';
@@ -29,8 +29,8 @@ export default function RootLayout({
       <body className="font-body antialiased selection:bg-primary/30 min-h-screen flex flex-col">
         <AuthProvider>
           <InitialLoader />
-          <SiteHeader />
-          <main className="flex-1 pt-16 md:pt-20">
+          <Navbar />
+          <main className="flex-1 pt-14 md:pt-16 pb-20 md:pb-0">
             {children}
           </main>
           <SiteFooter />

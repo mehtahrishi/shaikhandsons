@@ -181,4 +181,54 @@
   .group-hover\:rotate-y-180:group-hover {
     transform: rotateY(180deg);
   }
+  
+  /* Navbar scroll animations */
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes slideOutLeft {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+  }
+  
+  @keyframes fadeInBackdrop {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fadeOutBackdrop {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  
+  /* Mobile menu animations */
+  [data-state="open"] {
+    animation: slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  
+  [data-state="closed"] {
+    animation: slideOutLeft 0.2s cubic-bezier(0.7, 0, 0.84, 0) !important;
+  }
 }

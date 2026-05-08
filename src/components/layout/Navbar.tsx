@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Bike, Menu, Sun, Moon, User, LogOut, ChevronRight, X, Home, Mail } from 'lucide-react';
+import { Bike, Sun, Moon, User, LogOut, Home, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -14,56 +14,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
-
-// Custom styles for animations
-const headerStyles = `
-  @keyframes slideInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-100%);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  
-  @keyframes slideOutLeft {
-    from {
-      opacity: 1;
-      transform: translateX(0);
-    }
-    to {
-      opacity: 0;
-      transform: translateX(-100%);
-    }
-  }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-  
-  @media (prefers-reduced-motion: reduce) {
-    .sheet-overlay,
-    .sheet-content {
-      animation: none !important;
-    }
-  }
-`;
 
 const CrownIcon = () => (
   <svg viewBox="0 0 512 512" fill="currentColor" className="w-full h-full">
@@ -101,11 +53,10 @@ const BrandIdentity = ({ size = "md", className = "" }: { size?: "sm" | "md" | "
   </div>
 );
 
-export function SiteHeader() {
+export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDark, setIsDark] = useState(true);
   const [mounted, setMounted] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const scrollTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   
   const router = useRouter();
@@ -119,11 +70,6 @@ export function SiteHeader() {
   useEffect(() => {
     setMounted(true);
     
-    // Inject animation styles
-    const style = document.createElement('style');
-    style.textContent = headerStyles;
-    document.head.appendChild(style);
-    
     const savedTheme = localStorage.getItem('shaikh_theme');
     if (savedTheme) {
       const isCurrentlyDark = savedTheme === 'dark';
@@ -136,7 +82,9 @@ export function SiteHeader() {
     } else {
       document.documentElement.classList.add('dark');
     }
+  }, []);
 
+  useEffect(() => {
     let lastScrollY = window.scrollY;
     
     const handleScroll = () => {
@@ -197,100 +145,23 @@ export function SiteHeader() {
     { name: 'Contact', href: '/contact', icon: Mail },
   ];
 
+  const userInitial = user?.fullName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "C";
+
   return (
     <>
+      {/* Top Header */}
       <header className="fixed top-0 left-0 w-full z-50">
         <div className={cn(
-          "transition-all duration-300",
-          isScrolled
-            ? "rounded-3xl bg-background/95 backdrop-blur-md border border-border/50 shadow-lg m-4 md:m-6"
-            : "bg-background/95 backdrop-blur-md border-b border-border/50"
+          "transition-all duration-300 bg-background/95 backdrop-blur-md border-b border-border/50",
+          isScrolled && "shadow-md"
         )}>
           <div className="px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
-            {/* Left: Mobile Menu Trigger */}
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="md:hidden h-10 w-10 hover:bg-muted/50"
-                >
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent 
-                side="left" 
-                className="w-[280px] bg-background p-0 flex flex-col gap-0 border-r border-border/50"
-              >
-                <SheetHeader className="px-6 py-4 border-b border-border/50 text-left flex flex-row items-center justify-between">
-                  <SheetTitle className="font-headline text-lg"><BrandIdentity size="sm" /></SheetTitle>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="h-9 w-9 rounded-lg hover:bg-muted"
-                  >
-                    <X className="h-4 w-4" />
-                    <span className="sr-only">Close menu</span>
-                  </Button>
-                </SheetHeader>
-
-                <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
-                  {mobileNavLinks.map((link) => (
-                    <Link
-                      key={link.name}
-                      href={link.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-muted/50 text-sm font-body font-black uppercase tracking-wider text-foreground hover:text-primary transition-all"
-                    >
-                      <link.icon className="h-5 w-5 text-primary" />
-                      {link.name}
-                    </Link>
-                  ))}
-                </nav>
-
-                <div className="border-t border-border/50 p-4 space-y-3">
-                  {!isAuthenticated ? (
-                    <div className="space-y-2">
-                      <Button 
-                        asChild 
-                        className="w-full h-10 rounded-lg bg-primary text-primary-foreground text-[10px] font-body font-black uppercase tracking-widest hover:bg-primary/90"
-                      >
-                        <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
-                      </Button>
-                      <Button 
-                        asChild 
-                        className="w-full h-10 rounded-lg bg-primary/20 text-primary text-[10px] font-body font-black uppercase tracking-widest hover:bg-primary/30"
-                      >
-                        <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>Sign Up</Link>
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <Button 
-                        asChild 
-                        className="w-full h-10 rounded-lg bg-primary text-primary-foreground text-[10px] font-body font-black uppercase tracking-widest hover:bg-primary/90"
-                      >
-                        <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>My Garage</Link>
-                      </Button>
-                      <Button 
-                        onClick={handleLogout}
-                        className="w-full h-10 rounded-lg bg-destructive/20 text-destructive text-[10px] font-body font-black uppercase tracking-widest hover:bg-destructive/30"
-                      >
-                        Logout
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </SheetContent>
-            </Sheet>
-
-            {/* Center: Branding */}
-            <Link href="/" className="flex-1 md:flex-initial">
+            {/* Left: Brand */}
+            <Link href="/" className="flex items-center">
               <BrandIdentity size="md" />
             </Link>
 
-            {/* Desktop Nav */}
+            {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-8 flex-1 justify-center">
               {navLinks.map((link) => (
                 <Link 
@@ -304,7 +175,7 @@ export function SiteHeader() {
               ))}
             </nav>
 
-            {/* Right Actions */}
+            {/* Right: Theme + Auth */}
             <div className="flex items-center gap-2 md:gap-3 ml-auto">
               <Button 
                 variant="ghost" 
@@ -315,6 +186,7 @@ export function SiteHeader() {
                 {mounted ? (isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />) : <Sun className="h-4 w-4" />}
               </Button>
 
+              {/* Desktop Auth */}
               {!mounted ? (
                 <div className="w-9 h-9" />
               ) : isAuthenticated ? (
@@ -380,7 +252,73 @@ export function SiteHeader() {
           </div>
         </div>
       </header>
-      <style>{headerStyles}</style>
+
+      {/* Mobile Bottom Dock */}
+      <nav className="fixed bottom-0 left-0 right-0 md:hidden z-40 bg-background/95 backdrop-blur-md border-t border-border/50 safe-area-inset-bottom">
+        <div className="flex items-center justify-around px-2 py-3">
+          {mobileNavLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className={cn(
+                "flex flex-col items-center gap-1 p-2.5 rounded-lg transition-all text-foreground hover:text-primary",
+                pathname === link.href ? "text-primary" : "hover:bg-muted/50"
+              )}
+            >
+              <link.icon className="h-5 w-5" />
+              <span className="text-[7px] font-body font-black uppercase tracking-widest">{link.name}</span>
+            </Link>
+          ))}
+          
+          {/* Auth/Profile Icon */}
+          {!mounted ? (
+            <div className="flex flex-col items-center gap-1 p-2.5 rounded-lg" />
+          ) : isAuthenticated ? (
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <button className="flex flex-col items-center gap-1 p-2.5 rounded-lg transition-all text-foreground hover:text-primary hover:bg-muted/50">
+                  <User className="h-5 w-5" />
+                  <span className="text-[7px] font-body font-black uppercase tracking-widest">Profile</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                className="w-48 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-lg" 
+                align="end" 
+                forceMount
+              >
+                <DropdownMenuLabel className="font-normal p-3">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-xs font-headline font-black">{user?.fullName || user?.email?.split('@')[0] || "Collector"}</p>
+                    <p className="text-[10px] font-body text-muted-foreground truncate">{user?.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-border/50" />
+                <DropdownMenuItem asChild className="cursor-pointer focus:bg-primary/10 p-2 rounded font-body">
+                  <Link href="/profile" className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-primary" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">My Garage</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-border/50" />
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer p-2 rounded font-body">
+                  <div className="flex items-center gap-2">
+                    <LogOut className="h-4 w-4" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Logout</span>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link
+              href="/login"
+              className="flex flex-col items-center gap-1 p-2.5 rounded-lg transition-all text-foreground hover:text-primary hover:bg-muted/50"
+            >
+              <User className="h-5 w-5" />
+              <span className="text-[7px] font-body font-black uppercase tracking-widest">Sign In</span>
+            </Link>
+          )}
+        </div>
+      </nav>
     </>
   );
 }

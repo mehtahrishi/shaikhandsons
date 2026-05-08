@@ -32,8 +32,8 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         {/* 2. Command Header */}
         <AdminHeader />
         
-        {/* 3. Operational Content */}
-        <main className="flex-1 p-6 md:p-12 lg:p-16 flex flex-col gap-10 bg-background">
+        {/* 3. Operational Content Area */}
+        <div className="flex-1 p-6 md:p-12 lg:p-16 flex flex-col gap-10 bg-background relative z-0">
           {loading && !user ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4">
               <Loader2 className="h-10 w-10 text-primary animate-spin" />
@@ -46,7 +46,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           ) : (
             children
           )}
-        </main>
+        </div>
 
         {/* 4. Technical Footer */}
         <AdminFooter />

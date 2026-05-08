@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Sun, Moon, LogOut, Settings, Bell, ShieldCheck } from 'lucide-react';
+import { Sun, Moon, LogOut, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -42,7 +42,7 @@ export function AdminHeader() {
   if (!mounted) return <div className="h-20 border-b bg-background" />;
 
   return (
-    <header className="h-20 border-b bg-background/95 backdrop-blur-md sticky top-0 z-50 flex items-center justify-between px-6 md:px-10">
+    <header className="h-20 border-b bg-background/95 backdrop-blur-md fixed md:sticky top-12 md:top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10">
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
           <ShieldCheck className="h-3.5 w-3.5 text-primary" />
@@ -79,10 +79,6 @@ export function AdminHeader() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-border/50" />
-              <DropdownMenuItem className="h-11 cursor-pointer rounded-xl px-3 font-body focus:bg-primary/10 focus:text-primary">
-                <Settings className="h-4 w-4 mr-3" />
-                <span className="text-[10px] font-black uppercase tracking-widest">Core Settings</span>
-              </DropdownMenuItem>
               <DropdownMenuItem onClick={logout} className="mt-1 h-11 cursor-pointer rounded-xl px-3 font-body text-destructive focus:bg-destructive/10 focus:text-destructive">
                 <LogOut className="h-4 w-4 mr-3" />
                 <span className="text-[10px] font-black uppercase tracking-widest">Secure Logout</span>

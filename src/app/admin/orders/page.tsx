@@ -82,10 +82,10 @@ export default function AdminOrdersPage() {
             <CardTitle className="font-headline text-xl font-bold">Order History</CardTitle>
             <CardDescription className="text-[10px] uppercase tracking-widest">Real-time fulfillment tracking.</CardDescription>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 sm:flex-none">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
-              <Input placeholder="Search orders..." className="pl-9 h-9 text-xs w-64 bg-muted/20" />
+              <Input placeholder="Search orders..." className="pl-9 h-9 text-xs w-full sm:w-64 bg-muted/20" />
             </div>
             <Button variant="outline" size="sm" className="text-[10px] uppercase font-bold tracking-widest h-9">
               <Filter className="h-3 w-3 mr-2" /> Filter

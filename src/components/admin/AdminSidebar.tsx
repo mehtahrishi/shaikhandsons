@@ -30,14 +30,14 @@ const CrownIcon = () => (
     <rect x="80.101" y="399.236" width="351.815" height="36.296"/>
     <path d="M400.193,272.999c-33.932-23.322-14.839-82.694-14.839-82.694l-19.388-5.661 c-40.721,77.385-100.608,73.761-95.937-12.728v-27.715h33.686v-28.05h-33.686V76.468h-28.058v39.682h-33.702v28.05h33.702v27.715 c4.679,86.49-55.2,90.113-95.938,12.728l-19.371,5.661c0,0,19.076,59.372-14.839,82.694 c-33.932,23.321-63.626-33.923-63.626-33.923l-19.076,8.474L82.13,374.777H429.87l53.008-127.226l-19.076-8.474 C463.802,239.076,434.125,296.32,400.193,272.999z"/>
   </svg>
-);
+)
 
 const BrandIdentity = ({ collapsed }: { collapsed: boolean }) => (
-  <div className="flex items-center gap-2 group whitespace-nowrap overflow-hidden transition-all duration-300">
+  <div className="flex items-center gap-2 group whitespace-nowrap overflow-visible transition-all duration-300">
     {collapsed ? (
-      <div className="relative flex items-center justify-center w-full h-10">
-        <span className="font-headline text-primary font-bold italic text-3xl select-none">&</span>
-        <span className="absolute -top-2 -left-1 w-3.5 h-3.5 -rotate-[15deg] text-primary">
+      <div className="relative flex items-center justify-center w-10 h-10">
+        <span className="font-headline text-primary font-bold italic text-3xl select-none leading-none">&</span>
+        <span className="absolute -top-2.5 -left-1 w-4 h-4 -rotate-[15deg] text-primary">
           <CrownIcon />
         </span>
       </div>

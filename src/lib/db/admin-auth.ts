@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { NextRequest } from 'next/server';
+import { AdminJWTPayload } from '@/types/auth';
 
 /**
  * Validate admin credentials against environment variables
@@ -42,14 +43,14 @@ export function createAdminToken(adminEmail: string): string {
 /**
  * Verify admin token
  */
-export function verifyAdminToken(token: string): { adminEmail: string; role: string } | null {
+export function verifyAdminToken(token: string): AdminJWTPayload | null {
   try {
     const secret = process.env.OTP_JWT_SECRET;
     if (!secret) {
       throw new Error('JWT secret not configured');
     }
 
-    const decoded = jwt.verify(token, secret) as { adminEmail: string; role: string };
+    const decoded = jwt.verify(token, secret) as AdminJWTPayload;
     return decoded;
   } catch {
     return null;

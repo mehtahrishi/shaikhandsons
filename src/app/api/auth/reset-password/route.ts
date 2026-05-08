@@ -1,19 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { hashPassword, getUserByEmail, comparePassword } from '@/lib/db/auth';
-import { verifyOtpToken } from '@/lib/otp';
+import { verifyOtpToken } from '@/lib/auth/otp';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { resetPasswordSchema } from '@/lib/validations';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, otp, newPassword, token } = await req.json();
+    const body = await req.json();
 
-    if (!email || !otp || !newPassword || !token) {
-      return NextResponse.json({ error: 'Email, OTP, token, and new password are required.' }, { status: 400 });
+    // Validation using Zod
+    const validationResult = resetPasswordSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json({ error: validationResult.error.errors[0].message }, { status: 400 });
     }
+
+    const { email, otp, newPassword, token } = validationResult.data;
 
     // Verify OTP token (stateless - no DB lookup needed)
     const result = verifyOtpToken(token, otp);

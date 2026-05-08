@@ -65,7 +65,7 @@ import {
   deleteVehicleAPI,
   bulkUpdateVehicles,
   generatePlaceholderImages 
-} from '@/lib/admin-inventory-service';
+} from '@/lib/db/admin-inventory-service';
 import { 
   DropdownMenu,
   DropdownMenuContent,

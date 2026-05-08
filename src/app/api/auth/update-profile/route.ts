@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { updateUserProfile, getUserById } from '@/lib/db/auth';
 import jwt from 'jsonwebtoken';
-
-interface JWTPayload {
-  userId: number;
-  email: string;
-  iat: number;
-  exp: number;
-}
+import { JWTPayload } from '@/types/auth';
+import { updateProfileSchema } from '@/lib/validations';
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,10 +34,17 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { phone, address, fullName } = body;
+
+    // Validation using Zod
+    const result = updateProfileSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ error: result.error.errors[0].message }, { status: 400 });
+    }
+
+    const { phone, address, fullName } = result.data;
 
     // Update user profile
-    const updatedUser = await updateUserProfile(userId, phone, address, fullName);
+    const updatedUser = await updateUserProfile(userId, phone || undefined, address || undefined, fullName);
 
     if (!updatedUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });

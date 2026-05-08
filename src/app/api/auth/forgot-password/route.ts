@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-import { generateOtp, signOtpToken } from '@/lib/otp';
+import { generateOtp, signOtpToken } from '@/lib/auth/otp';
 import { getUserByEmail } from '@/lib/db/auth';
-import { buildOtpEmailHtml } from '@/lib/email-templates';
+import { buildOtpEmailHtml } from '@/lib/auth/email-templates';
 
 export const runtime = 'nodejs';
 

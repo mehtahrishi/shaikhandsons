@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, ShieldCheck, RefreshCw, Mail, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { verifyOTP, createSessionFromOTP, sendOTP } from '@/lib/auth/auth-client';
 import { useAuth } from '@/context/AuthContext';
 
 const OTP_LENGTH = 6;
@@ -99,26 +100,11 @@ export default function VerifyOTPPage() {
 
     setVerifying(true);
     try {
-      const res = await fetch('/api/auth/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, otp: fullOtp }),
-      });
+      // 1. Verify OTP
+      await verifyOTP(token, fullOtp);
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Verification failed.');
-      }
-
-      const loginRes = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!loginRes.ok) {
-        throw new Error('Failed to create session');
-      }
+      // 2. Create session
+      await createSessionFromOTP(email, password);
       
       sessionStorage.removeItem('pending_email');
       sessionStorage.removeItem('pending_password');
@@ -149,16 +135,9 @@ export default function VerifyOTPPage() {
     if (countdown > 0 || !pendingEmail) return;
     setResending(true);
     try {
-      const res = await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: pendingEmail }),
-      });
+      const { token } = await sendOTP(pendingEmail);
       
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to resent code');
-
-      sessionStorage.setItem('pending_otp_token', data.token);
+      sessionStorage.setItem('pending_otp_token', token);
 
       setCountdown(60);
       toast({

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-import { buildContactEmailHtml } from '@/lib/email-templates';
+import { buildContactEmailHtml } from '@/lib/auth/email-templates';
 
 export const runtime = 'nodejs';
 

@@ -2,15 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUserByEmail, verifyUser } from '@/lib/db/auth';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import { JWTPayload } from '@/types/auth';
 
 export const runtime = 'nodejs';
-
-interface JWTPayload {
-  userId: number;
-  email: string;
-  iat: number;
-  exp: number;
-}
 
 export async function POST(req: NextRequest) {
   try {

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { getCurrentUser, signOut, type AuthUser } from '@/lib/postgres/auth';
+import { getCurrentUser, signOut, type AuthUser } from '@/lib/auth/auth-client';
 
 // ─── Context Shape ────────────────────────────────────────────────────────────
 

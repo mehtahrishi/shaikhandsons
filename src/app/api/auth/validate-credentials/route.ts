@@ -1,22 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserByEmail, comparePassword } from '@/lib/db/auth';
+import { loginSchema } from '@/lib/validations';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const body = await req.json();
 
-    if (!email || typeof email !== 'string') {
-      return NextResponse.json({ error: 'Email is required.' }, { status: 400 });
+    // Validation using Zod
+    const result = loginSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ error: result.error.errors[0].message }, { status: 400 });
     }
 
-    if (!password || typeof password !== 'string') {
-      return NextResponse.json({ error: 'Password is required.' }, { status: 400 });
-    }
+    const { email, password } = result.data;
 
     const user = await getUserByEmail(email);
-
     if (!user) {
       return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
     }

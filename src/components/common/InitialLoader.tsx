@@ -17,284 +17,123 @@ const CrownIcon = () => (
 );
 
 export function InitialLoader() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [showText, setShowText] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [paths, setPaths] = useState<Record<string, string>>({});
-  const [sparkleValues, setSparkleValues] = useState<{ x: number, y: number, w: number, h: number }[]>([]);
 
   useEffect(() => {
     setMounted(true);
-
-    const generatePath = (startX: number, startY: number, endX: number, endY: number, segments: number = 8, jitter: number = 30) => {
-      let path = `M ${startX} ${startY}`;
-      const dx = (endX - startX) / segments;
-      const dy = (endY - startY) / segments;
-      for (let i = 1; i < segments; i++) {
-        const x = startX + dx * i + (Math.random() - 0.5) * jitter;
-        const y = startY + dy * i + (Math.random() - 0.5) * jitter;
-        path += ` L ${x} ${y}`;
-      }
-      path += ` L ${endX} ${endY}`;
-      return path;
-    };
-
-    setPaths({
-      tlCore: generatePath(0, 0, 50, 50),
-      tlGlow: generatePath(0, 0, 50, 50, 10, 40),
-      brCore: generatePath(100, 100, 50, 50),
-      brGlow: generatePath(100, 100, 50, 50, 10, 40)
-    });
-
-    const sparkles = Array.from({ length: 12 }).map(() => ({
-      x: (Math.random() - 0.5) * 300,
-      y: (Math.random() - 0.5) * 300,
-      w: Math.random() * 4 + 2,
-      h: Math.random() * 4 + 2,
-    }));
-    setSparkleValues(sparkles);
-
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 5500);
-
-    const textTimer = setTimeout(() => {
-      setShowText(true);
-    }, 2800);
-
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(textTimer);
-    };
+    // Total cinematic sequence duration
+    const timer = setTimeout(() => setIsComplete(true), 4000);
+    return () => clearTimeout(timer);
   }, []);
 
-  if (!mounted || !isLoading) {
-    return null;
-  }
-
-  const lightningBolts = [
-    { id: 'tl', delay: 0.5 },
-    { id: 'br', delay: 1.2 },
-  ];
+  if (!mounted) return null;
 
   return (
     <AnimatePresence>
-      {isLoading && (
+      {!isComplete && (
         <motion.div
-          key="loader"
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 1.1 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="fixed inset-0 z-[100] bg-background flex items-center justify-center overflow-hidden text-foreground"
+          exit={{ 
+            opacity: 0,
+            scale: 1.05,
+            transition: { duration: 0.8, ease: "easeInOut" }
+          }}
+          className="fixed inset-0 z-[100] bg-background flex items-center justify-center overflow-hidden"
         >
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <defs>
-              <filter id="lightning-glow">
-                <feGaussianBlur stdDeviation="1.5" result="coloredBlur" />
-                <feMerge>
-                  <feMergeNode in="coloredBlur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-            </defs>
-
-            {lightningBolts.map((bolt) => (
-              <React.Fragment key={bolt.id}>
-                {paths[`${bolt.id}Core`] && (
-                  <motion.path
-                    d={paths[`${bolt.id}Core`]}
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="0.5"
-                    filter="url(#lightning-glow)"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ 
-                      pathLength: [0, 1],
-                      opacity: [0, 1, 0, 1, 0],
-                    }}
-                    transition={{ 
-                      duration: 0.4, 
-                      delay: bolt.delay,
-                      times: [0, 0.2, 0.4, 0.6, 1]
-                    }}
-                  />
-                )}
-                {paths[`${bolt.id}Glow`] && (
-                  <motion.path
-                    d={paths[`${bolt.id}Glow`]}
-                    fill="none"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth="1.2"
-                    opacity="0.6"
-                    filter="url(#lightning-glow)"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ 
-                      pathLength: [0, 1],
-                      opacity: [0, 0.8, 0]
-                    }}
-                    transition={{ 
-                      duration: 0.4, 
-                      delay: bolt.delay + 0.05
-                    }}
-                  />
-                )}
-              </React.Fragment>
-            ))}
-          </svg>
-
-          <div className="relative flex items-center justify-center scale-90 md:scale-100 min-w-[300px] h-[400px]">
-            <AnimatePresence mode="wait">
-              {!showText ? (
-                <motion.div
-                  key="bike-container"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.2, filter: "blur(10px)" }}
-                  transition={{ duration: 0.5 }}
-                  className="relative flex items-center justify-center"
-                >
-                  {lightningBolts.map((bolt) => (
-                    <div key={`sparkles-${bolt.id}`} className="absolute inset-0 pointer-events-none">
-                      {sparkleValues.map((sparkle, i) => (
-                        <motion.div
-                          key={`${bolt.id}-sparkle-${i}`}
-                          className="absolute bg-foreground rounded-full shadow-[0_0_10px_currentColor]"
-                          style={{
-                            width: sparkle.w,
-                            height: sparkle.h,
-                            left: '50%',
-                            top: '50%',
-                          }}
-                          initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
-                          animate={{
-                            x: [0, sparkle.x],
-                            y: [0, sparkle.y],
-                            opacity: [0, 1, 0],
-                            scale: [0, 1.5, 0.2],
-                          }}
-                          transition={{
-                            duration: 0.6,
-                            delay: bolt.delay + 0.1,
-                            ease: "easeOut"
-                          }}
-                        />
-                      ))}
-                    </div>
-                  ))}
-
-                  <motion.div 
-                    className="absolute w-32 h-32 bg-primary/20 rounded-full blur-3xl"
-                    animate={{ 
-                      scale: [1, 1.4, 1],
-                      opacity: [0.1, 0.4, 0.1]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                  
-                  <div className="z-10">
-                    <svg 
-                      width="120" 
-                      height="120" 
-                      viewBox="0 0 64 64" 
-                      className="drop-shadow-[0_0_10px_rgba(var(--foreground),0.3)]"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <g transform="translate(-352,-326)">
-                        <g transform="translate(18.8303,326)">
-                          <g transform="translate(269.17,-192)">
-                            <motion.path 
-                              d="M103.754,214L102.523,210L98,210C96.896,210 96,209.104 96,208C96,206.896 96.896,206 98,206L104,206C104.878,206 105.653,206.573 105.912,207.412L107.939,214L112,214C113.104,214 114,214.896 114,216C114,217.104 113.104,218 112,218L109.169,218L111.634,226.008C111.755,226.003 111.877,226 112,226C116.415,226 120,229.585 120,234C120,238.415 116.415,242 112,242C107.585,242 104,238.415 104,234C104,231.12 105.525,228.594 107.811,227.185L106.609,223.278C102.69,225.254 100,229.315 100,234C100,234 100,234 100,234C100,235.105 99.105,236 98,236L87.748,236C86.858,239.449 83.725,242 80,242C75.585,242 72,238.415 72,234C72,230.275 74.551,227.142 78,226.252L78,224L76,224C75.47,224 74.961,223.789 74.586,223.414C74.211,223.039 74,222.53 74,222C74,221.47 74.211,220.961 74.586,220.586C74.961,220.211 75.47,220 76,220C79.685,220 87.172,220 87.172,220C87.172,220 91.076,216.095 92.586,214.586C92.961,214.211 93.47,214 94,214L103.754,214ZM112,230C114.208,230 116,231.792 116,234C116,236.208 114.208,238 112,238C109.792,238 108,236.208 108,234C108,231.792 109.792,230 112,230ZM80,230C82.208,230 84,231.792 84,234C84,236.208 82.208,238 80,238C77.792,238 76,236.208 76,234C76,231.792 77.792,230 80,230ZM104.984,218L94.828,218C94.828,218 90.924,221.905 89.414,223.414C89.039,223.789 88.53,224 88,224L82,224L82,226.252C84.81,226.977 87.023,229.191 87.748,232L96.124,232C96.826,226.381 100.447,221.663 105.419,219.414L104.984,218Z" 
-                              initial={{ fill: "hsl(var(--foreground))" }}
-                              animate={{
-                                fill: [
-                                  "hsl(var(--foreground))", 
-                                  "hsl(var(--primary))", 
-                                  "hsl(var(--foreground))",
-                                  "hsl(var(--primary))",
-                                  "hsl(var(--foreground))"
-                                ]
-                              }}
-                              transition={{
-                                duration: 2,
-                                delay: 0.5,
-                                ease: "linear",
-                                times: [0, 0.25, 0.35, 0.45, 0.55]
-                              }}
-                            />
-                          </g>
-                        </g>
-                      </g>
-                    </svg>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="shaikh-text-container"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.8 }}
-                  className="flex flex-col items-center justify-center"
-                >
+          <div className="relative w-full h-full flex items-center justify-center">
+            
+            {/* Phase 1: Vertical Battery Charge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ 
+                opacity: [0, 1, 1, 0],
+                scale: [0.8, 1, 1, 1.5],
+              }}
+              transition={{ duration: 2.0, times: [0, 0.1, 0.7, 1], ease: "easeInOut" }}
+              className="absolute flex flex-col items-center"
+            >
+              <div className="w-12 h-24 border-2 border-primary rounded-md p-1 relative">
+                {/* Battery Cap */}
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-2 bg-primary rounded-t-sm" />
+                
+                {/* Fill Animation */}
+                <div className="w-full h-full flex flex-col justify-end">
                   <motion.div
-                    key="shaikh-text"
-                    initial={{ opacity: 0, y: 10, letterSpacing: "1em" }}
-                    animate={{ opacity: 1, y: 0, letterSpacing: "0.2em" }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="flex flex-col items-center relative"
-                  >
-                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.4, duration: 1, ease: "easeOut" }}
-                        className="w-[110px] md:w-[130px] h-[110px] md:h-[130px] border-[2px] md:border-[3px] border-primary rounded-full z-0 flex items-center justify-center relative"
-                      >
-                        <motion.div 
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 0.2, scale: 1.2 }}
-                          transition={{ delay: 0.5, duration: 1.2 }}
-                          className="absolute inset-0 bg-primary/20 rounded-full blur-2xl z-0"
-                        />
-                      </motion.div>
-                    </div>
+                    initial={{ height: "0%" }}
+                    animate={{ height: ["0%", "100%"] }}
+                    transition={{ duration: 1.4, times: [0, 1], ease: "linear" }}
+                    className="w-full bg-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.8)]"
+                  />
+                </div>
+              </div>
+              <motion.span 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 1, 0] }}
+                transition={{ duration: 1.8, times: [0.1, 0.5, 0.9] }}
+                className="mt-4 font-code text-[10px] tracking-[0.3em] text-primary font-bold"
+              >
+                POWERING UP
+              </motion.span>
+            </motion.div>
 
-                    <div className="z-10 flex flex-col items-center justify-center py-12 px-8 md:px-16">
-                      <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: "100%" }}
-                        transition={{ delay: 0.5, duration: 1 }}
-                        className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mb-4"
-                      />
-                      <h2 className="font-headline text-xl md:text-3xl font-black text-foreground tracking-widest text-center whitespace-nowrap flex items-center gap-2">
-                        <span>SHAIKH</span>
-                        <span className="relative inline-flex items-center justify-center mx-1">
-                          <span className="text-primary italic font-bold">&</span>
-                          <span className="absolute -top-3 md:-top-4 -left-1 w-4 h-4 md:w-5 md:h-5 -rotate-[15deg] text-primary">
-                            <CrownIcon />
-                          </span>
-                        </span>
-                        <span>SONS</span>
-                      </h2>
-                      <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: "100%" }}
-                        transition={{ delay: 0.5, duration: 1 }}
-                        className="h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mt-4"
-                      />
-                      
-                      <motion.p
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 1.2, duration: 0.8 }}
-                        className="mt-6 text-[10px] md:text-[12px] font-headline font-medium italic uppercase tracking-[0.3em] text-primary/90 text-center max-w-[280px] md:max-w-none leading-relaxed"
-                      >
-                        Ride The Future With Our EV Scooters!
-                      </motion.p>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Phase 2: Energy Shockwave */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0, border: "2px solid hsl(var(--primary))" }}
+              animate={{ 
+                opacity: [0, 0, 1, 0],
+                scale: [0, 0, 4, 8],
+              }}
+              transition={{ duration: 2.5, times: [0, 0.5, 0.7, 1], ease: "easeOut" }}
+              className="absolute w-40 h-40 rounded-full z-10 pointer-events-none"
+              style={{ boxShadow: "0 0 50px rgba(var(--primary-rgb), 0.5)" }}
+            />
+
+            {/* Phase 3: Pristine Brand Reveal */}
+            <motion.div
+              initial={{ opacity: 0, filter: "blur(20px)", scale: 0.9 }}
+              animate={{ 
+                opacity: [0, 0, 1, 1], 
+                filter: ["blur(20px)", "blur(20px)", "blur(0px)", "blur(0px)"],
+                scale: [0.9, 0.9, 1, 1.02]
+              }}
+              transition={{ duration: 4.0, times: [0, 0.5, 0.75, 1], ease: "easeOut" }}
+              className="absolute z-30 flex flex-col items-center px-4 w-full"
+            >
+              <h1 className="font-headline text-2xl sm:text-3xl md:text-5xl font-black tracking-[0.2em] sm:tracking-[0.4em] text-foreground whitespace-nowrap flex items-center">
+                SHAIKH
+                <span className="relative inline-flex items-center justify-center mx-2 sm:mx-4">
+                  <span className="text-primary italic font-bold">&</span>
+                  <span className="absolute -top-2.5 sm:-top-3 md:-top-4 -left-0.5 sm:-left-1 w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6 -rotate-[15deg] text-primary">
+                    <CrownIcon />
+                  </span>
+                </span>
+                SONS
+              </h1>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 0, 1, 1] }}
+                transition={{ duration: 4.0, times: [0, 0.6, 0.7, 1] }}
+                className="mt-4 flex items-center gap-2 sm:gap-4"
+              >
+                <div className="h-[1px] w-4 sm:w-8 bg-primary/50" />
+                <p className="text-[7px] sm:text-[9px] tracking-[0.3em] sm:tracking-[0.6em] text-primary/80 uppercase font-code">
+                  Electric Performance
+                </p>
+                <div className="h-[1px] w-4 sm:w-8 bg-primary/50" />
+              </motion.div>
+            </motion.div>
+
+            {/* Subdued Energy Flare */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ 
+                opacity: [0, 0, 0.15, 0],
+                scale: [0, 0, 1.5, 2]
+              }}
+              transition={{ duration: 3.0, times: [0, 0.5, 0.6, 1], ease: "easeOut" }}
+              className="absolute w-[280px] sm:w-[400px] h-[150px] sm:h-[200px] bg-primary/30 rounded-[100%] blur-[60px] sm:blur-[80px] z-0 pointer-events-none"
+            />
           </div>
         </motion.div>
       )}

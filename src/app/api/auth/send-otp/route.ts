@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-import { generateOtp, signOtpToken } from '@/lib/otp';
-import { buildOtpEmailHtml } from '@/lib/email-templates';
+import { generateOtp, signOtpToken } from '@/lib/auth/otp';
+import { buildOtpEmailHtml } from '@/lib/auth/email-templates';
 
 export const runtime = 'nodejs'; // Ensure Node.js runtime for crypto + nodemailer
 

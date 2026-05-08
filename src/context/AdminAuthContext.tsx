@@ -2,12 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-
-interface AdminUser {
-  name: string;
-  email: string;
-  role: string;
-}
+import { AdminUser } from '@/types/auth';
 
 interface AdminSession {
   user: AdminUser;

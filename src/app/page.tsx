@@ -2,8 +2,8 @@
 "use client"
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { HeroSection } from '@/components/sections/HeroSection';
-import { VehicleShowroom } from '@/components/vehicles/VehicleShowroom';
+import { HeroSection } from '@/components/home/HeroSection';
+import { VehicleShowroom } from '@/components/shop/VehicleShowroom';
 import { ShieldCheck, Leaf, BatteryCharging, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';

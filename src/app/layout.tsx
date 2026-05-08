@@ -3,7 +3,7 @@ import './globals.css';
 import { Navbar } from '@/components/layout/Navbar';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { Toaster } from '@/components/ui/toaster';
-import { InitialLoaderEV as InitialLoader } from '@/components/common/InitialLoaderEV';
+import { InitialLoader } from '@/components/common/InitialLoader';
 import { CookieConsent } from '@/components/common/CookieConsent';
 import { AuthProvider } from '@/context/AuthContext';
 import { PageWrapper } from '@/components/layout/PageWrapper';
@@ -23,8 +23,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" style={{ colorScheme: 'dark' }}>
-      <head />
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const savedTheme = localStorage.getItem('shaikh_theme');
+                  const theme = savedTheme || 'dark';
+                  if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.style.colorScheme = 'dark';
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.style.colorScheme = 'light';
+                  }
+                } catch (e) {
+                  document.documentElement.classList.add('dark');
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="font-body antialiased selection:bg-primary/30 min-h-screen flex flex-col bg-background text-foreground">
         <AuthProvider>
           <InitialLoader />

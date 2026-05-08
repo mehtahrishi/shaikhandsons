@@ -22,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
+import { updateProfile } from '@/lib/auth/auth-client';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -63,21 +64,11 @@ export default function ProfilePage() {
     if (!user) return;
     setSaving(true);
     try {
-      const res = await fetch('/api/auth/update-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          phone: phone || null,
-          address: address || null,
-        }),
+      await updateProfile({
+        phone: phone || null,
+        address: address || null,
       });
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || 'Failed to update profile');
-      }
-
-      const data = await res.json();
       setIsEditing(false);
       await refresh(); // Refresh user data from context
 

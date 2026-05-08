@@ -132,7 +132,7 @@ export function Navbar() {
   useEffect(() => {
     setMounted(true);
     
-    const savedTheme = sessionStorage.getItem('shaikh_theme');
+    const savedTheme = localStorage.getItem('shaikh_theme');
     if (savedTheme) {
       const isCurrentlyDark = savedTheme === 'dark';
       setIsDark(isCurrentlyDark);
@@ -186,10 +186,10 @@ export function Navbar() {
     setIsDark(nextIsDark);
     if (nextIsDark) {
       document.documentElement.classList.add('dark');
-      sessionStorage.setItem('shaikh_theme', 'dark');
+      localStorage.setItem('shaikh_theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
-      sessionStorage.setItem('shaikh_theme', 'light');
+      localStorage.setItem('shaikh_theme', 'light');
     }
   };
 

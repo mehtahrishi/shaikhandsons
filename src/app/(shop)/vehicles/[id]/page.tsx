@@ -3,7 +3,7 @@
 
 import React, { use } from 'react';
 import Image from 'next/image';
-import { vehicles } from '@/lib/mock-data';
+import { vehicles } from '@/lib/db/mock-data';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';

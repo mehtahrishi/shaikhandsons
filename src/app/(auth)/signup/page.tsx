@@ -10,6 +10,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, User, Mail, Lock, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { signUp } from '@/lib/auth/auth-client';
+
 export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
@@ -23,17 +25,7 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/create-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, fullName: name }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Sign-up failed');
-      }
+      await signUp(email, password, name);
 
       toast({
         title: "Account Created",

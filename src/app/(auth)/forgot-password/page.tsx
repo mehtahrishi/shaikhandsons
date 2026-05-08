@@ -10,6 +10,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Mail, Lock, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { forgotPassword, resetPassword, verifyOTP } from '@/lib/auth/auth-client';
+
 export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -25,19 +27,9 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
+      const { token: newToken } = await forgotPassword(email);
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to send reset code.');
-      }
-
-      setToken(data.token);
+      setToken(newToken);
       setStep('otp');
       toast({
         title: "Code Sent",
@@ -70,16 +62,7 @@ export default function ForgotPasswordPage() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, otp: fullOtp }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Verification failed.');
-      }
+      await verifyOTP(token, fullOtp);
 
       sessionStorage.setItem('reset_email', email);
       sessionStorage.setItem('reset_token', token);
@@ -165,21 +148,12 @@ export default function ForgotPasswordPage() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          otp: otp.join(''),
-          newPassword: password,
-          token,
-        }),
+      await resetPassword({
+        email,
+        otp: otp.join(''),
+        newPassword: password,
+        token,
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Password reset failed.');
-      }
 
       sessionStorage.removeItem('reset_email');
       sessionStorage.removeItem('reset_token');
@@ -205,16 +179,9 @@ export default function ForgotPasswordPage() {
   const handleResend = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
+      const { token: newToken } = await forgotPassword(email);
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to resend code');
-
-      setToken(data.token);
+      setToken(newToken);
       toast({
         title: "Code Resent",
         description: `A new code was sent to ${email}.`,

@@ -1,15 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserById } from '@/lib/db/auth';
 import jwt from 'jsonwebtoken';
+import { JWTPayload } from '@/types/auth';
 
 export const runtime = 'nodejs';
-
-interface JWTPayload {
-  userId: number;
-  email: string;
-  iat: number;
-  exp: number;
-}
 
 export async function GET(req: NextRequest) {
   try {

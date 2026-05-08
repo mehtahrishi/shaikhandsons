@@ -1,21 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createUser, hashPassword, getUserByEmail } from '@/lib/db/auth';
+import { signUpSchema } from '@/lib/validations';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, fullName } = await req.json();
-
-    // Validation
-    if (!email || typeof email !== 'string' || !email.includes('@')) {
-      return NextResponse.json({ error: 'A valid email is required.' }, { status: 400 });
+    const body = await req.json();
+    
+    // Validation using Zod
+    const result = signUpSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ error: result.error.errors[0].message }, { status: 400 });
     }
 
-    if (!password || typeof password !== 'string' || password.length < 6) {
-      return NextResponse.json({ error: 'Password must be at least 6 characters.' }, { status: 400 });
-    }
-
+    const { email, password, fullName } = result.data;
     const trimmedEmail = email.toLowerCase().trim();
 
     // Check if user already exists

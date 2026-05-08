@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyOtpToken } from '@/lib/otp';
+import { verifyOtpToken } from '@/lib/auth/otp';
 
 export const runtime = 'nodejs';
 

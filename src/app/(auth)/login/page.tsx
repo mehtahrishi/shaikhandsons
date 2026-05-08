@@ -10,6 +10,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Mail, Lock, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { validateCredentials, sendOTP } from '@/lib/auth/auth-client';
+
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -38,31 +40,15 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const validateRes = await fetch('/api/auth/validate-credentials', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      // 1. Validate credentials
+      await validateCredentials(email, password);
 
-      if (!validateRes.ok) {
-        throw new Error('Invalid email or password');
-      }
-
-      const res = await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to send OTP email.');
-      }
+      // 2. Send OTP
+      const { token } = await sendOTP(email);
 
       sessionStorage.setItem('pending_email', email);
       sessionStorage.setItem('pending_password', password); 
-      sessionStorage.setItem('pending_otp_token', data.token);
+      sessionStorage.setItem('pending_otp_token', token);
 
       toast({
         title: "Security Verification",

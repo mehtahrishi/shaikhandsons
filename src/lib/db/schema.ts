@@ -25,6 +25,7 @@ export const brands = pgTable(
   {
     id: serial('id').primaryKey(),
     name: varchar('name', { length: 255 }).notNull().unique(),
+    imageUrl: varchar('image_url', { length: 500 }),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
   }

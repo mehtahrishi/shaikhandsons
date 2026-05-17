@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateAdminCredentials, createAdminToken } from '@/lib/db/admin-auth';
+import { validateAdminCredentials } from '@/lib/db/admin-auth';
 import { adminLoginSchema } from '@/lib/validations';
+import { getAdminSession } from '@/lib/auth/session';
 
 export const runtime = 'nodejs';
 
@@ -23,33 +24,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid credentials.' }, { status: 401 });
     }
 
-    // Check if JWT secret is configured
-    if (!process.env.OTP_JWT_SECRET) {
-      return NextResponse.json({ error: 'Server configuration error.' }, { status: 500 });
-    }
+    // Set admin session using iron-session
+    const session = await getAdminSession();
+    session.adminEmail = email.toLowerCase();
+    session.role = 'ADMIN';
+    await session.save();
 
-    // Create JWT token
-    const token = createAdminToken(email.toLowerCase());
-
-    // Set secure HTTP-only cookie
-    const response = NextResponse.json({
+    return NextResponse.json({
       success: true,
       user: {
         email: email.toLowerCase(),
         role: 'ADMIN',
       },
-      token,
     });
-
-    response.cookies.set('admin-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: '/',
-    });
-
-    return response;
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err);
     console.error('[admin-auth] Error:', errorMessage, err);

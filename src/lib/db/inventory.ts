@@ -21,12 +21,13 @@ export async function getBrandById(id: number) {
 /**
  * Create brand
  */
-export async function createBrand(name: string) {
+export async function createBrand(name: string, imageUrl?: string) {
   try {
     const result = await db
       .insert(brands)
       .values({
         name,
+        imageUrl,
       })
       .returning();
 
@@ -42,15 +43,20 @@ export async function createBrand(name: string) {
 /**
  * Update brand
  */
-export async function updateBrand(id: number, name: string) {
+export async function updateBrand(id: number, name: string, imageUrl?: string) {
   return await db.transaction(async (tx) => {
-    // 1. Update the brand name
+    // 1. Update the brand
+    const updates: any = {
+      name,
+      updatedAt: new Date(),
+    };
+    if (imageUrl !== undefined) {
+      updates.imageUrl = imageUrl;
+    }
+
     const result = await tx
       .update(brands)
-      .set({
-        name,
-        updatedAt: new Date(),
-      })
+      .set(updates)
       .where(eq(brands.id, id))
       .returning();
 

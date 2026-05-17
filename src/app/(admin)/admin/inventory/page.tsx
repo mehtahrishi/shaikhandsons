@@ -61,6 +61,7 @@ import {
   deleteBrand, 
   createVehicle, 
   uploadVehicleImages, 
+  uploadBrandImage,
   updateVehicleAPI, 
   deleteVehicleAPI,
   bulkUpdateVehicles,
@@ -87,7 +88,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { Mail, FileText } from 'lucide-react';
+import { Mail, FileText, Image as ImageIcon } from 'lucide-react';
+import Image from 'next/image';
+
+import { BrandManagement } from '@/components/admin/inventory/brand-management';
 
 type Vehicle = {
   id: string;
@@ -131,6 +135,7 @@ type Vehicle = {
 type BrandData = {
   id: number;
   name: string;
+  imageUrl?: string | null;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -255,9 +260,6 @@ export default function AdminInventoryPage() {
   // Brands State
   const [brands, setBrands] = React.useState<BrandData[]>([]);
   const [isBrandsLoading, setIsBrandsLoading] = React.useState(false);
-  const [newBrandName, setNewBrandName] = React.useState('');
-  const [editingBrand, setEditingBrand] = React.useState<BrandData | null>(null);
-  const [isBrandActionLoading, setIsBrandActionLoading] = React.useState(false);
 
   const fetchAllBrands = React.useCallback(async () => {
     try {
@@ -271,48 +273,7 @@ export default function AdminInventoryPage() {
     }
   }, []);
 
-  const handleAddBrand = async () => {
-    if (!newBrandName.trim()) return;
-    try {
-      setIsBrandActionLoading(true);
-      await createBrand(newBrandName);
-      setNewBrandName('');
-      fetchAllBrands();
-      toast({ title: "Success", description: "Brand added successfully." });
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setIsBrandActionLoading(false);
-    }
-  };
 
-  const handleUpdateBrand = async () => {
-    if (!editingBrand || !editingBrand.name.trim()) return;
-    try {
-      setIsBrandActionLoading(true);
-      await updateBrand(String(editingBrand.id), editingBrand.name);
-      setEditingBrand(null);
-      fetchAllBrands();
-      toast({ title: "Success", description: "Brand updated successfully." });
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setIsBrandActionLoading(false);
-    }
-  };
-
-  const handleDeleteBrand = async (id: number) => {
-    try {
-      setIsBrandActionLoading(true);
-      await deleteBrand(String(id));
-      fetchAllBrands();
-      toast({ title: "Success", description: "Brand deleted successfully." });
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setIsBrandActionLoading(false);
-    }
-  };
 
   const fetchVehicles = React.useCallback(async () => {
     try {
@@ -2074,83 +2035,11 @@ export default function AdminInventoryPage() {
         </TabsContent>
 
         <TabsContent value="brands">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card className="border-border/50 bg-card/40 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="font-headline text-xl font-bold">Add Brand</CardTitle>
-                <CardDescription className="text-[10px] uppercase tracking-widest">Create a new manufacturer brand.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest">Brand Name</Label>
-                  <Input 
-                    placeholder="Enter brand name..." 
-                    value={newBrandName}
-                    onChange={(e) => setNewBrandName(e.target.value)}
-                    className="bg-muted/20 h-10 text-xs"
-                  />
-                </div>
-                <Button 
-                  onClick={handleAddBrand}
-                  disabled={isBrandActionLoading || !newBrandName.trim()}
-                  className="w-full h-10 font-black uppercase tracking-widest text-[10px] rounded-lg"
-                >
-                  {isBrandActionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
-                  Add Brand
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border/50 bg-card/40 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="font-headline text-xl font-bold">Brand List</CardTitle>
-                <CardDescription className="text-[10px] uppercase tracking-widest">Manage existing brands.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {isBrandsLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                    </div>
-                  ) : brands.length === 0 ? (
-                    <p className="text-center text-muted-foreground text-[10px] font-bold uppercase py-8">No brands found.</p>
-                  ) : (
-                    brands.map((brand) => (
-                      <div key={brand.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/20 border border-border/50">
-                        {editingBrand?.id === brand.id ? (
-                          <div className="flex items-center gap-2 flex-1 mr-2">
-                            <Input 
-                              value={editingBrand.name}
-                              onChange={(e) => setEditingBrand({...editingBrand, name: e.target.value})}
-                              className="h-8 text-xs bg-background"
-                            />
-                            <Button size="icon" variant="ghost" className="h-8 w-8 text-green-500" onClick={handleUpdateBrand}>
-                              <Check className="h-4 w-4" />
-                            </Button>
-                            <Button size="icon" variant="ghost" className="h-8 w-8 text-red-500" onClick={() => setEditingBrand(null)}>
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <>
-                            <span className="text-xs font-bold uppercase tracking-widest">{brand.name}</span>
-                            <div className="flex items-center gap-1">
-                              <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-primary/10" onClick={() => setEditingBrand(brand)}>
-                                <Pencil className="h-3.5 w-3.5" />
-                              </Button>
-                              <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-red-500/10 hover:text-red-500" onClick={() => handleDeleteBrand(brand.id)}>
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <BrandManagement 
+            brands={brands}
+            isBrandsLoading={isBrandsLoading}
+            fetchAllBrands={fetchAllBrands}
+          />
         </TabsContent>
       </Tabs>
 

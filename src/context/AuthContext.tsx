@@ -1,7 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { getCurrentUser, signOut, type AuthUser } from '@/lib/auth/auth-client';
+import { getCurrentUser, signOut } from '@/lib/auth/auth-client';
+import type { AuthUser } from '@/types/auth';
 
 // ─── Context Shape ────────────────────────────────────────────────────────────
 

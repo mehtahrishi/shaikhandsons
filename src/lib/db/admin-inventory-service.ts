@@ -13,11 +13,11 @@ export async function fetchBrands() {
   return data.brands || [];
 }
 
-export async function createBrand(name: string) {
+export async function createBrand(name: string, imageUrl?: string) {
   const res = await fetch('/api/admin/brands', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name, imageUrl }),
   });
   if (!res.ok) {
     const error = await res.json();
@@ -111,7 +111,7 @@ export async function uploadVehicleImages(files: File[]) {
     formData.append('files', file);
   });
 
-  const res = await fetch('/api/admin/storage/upload', {
+  const res = await fetch('/api/admin/storage/upload?folder=vehicles', {
     method: 'POST',
     body: formData,
   });
@@ -122,7 +122,31 @@ export async function uploadVehicleImages(files: File[]) {
   }
 
   const data = await res.json();
+  if (data.files && Array.isArray(data.files)) {
+    return data.files.map((f: any) => f.url);
+  }
   return data.urls || [];
+}
+
+export async function uploadBrandImage(file: File) {
+  const formData = new FormData();
+  formData.append('files', file);
+
+  const res = await fetch('/api/admin/storage/upload?folder=brands', {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || 'Failed to upload brand image');
+  }
+
+  const data = await res.json();
+  if (data.files && Array.isArray(data.files) && data.files.length > 0) {
+    return data.files[0].url;
+  }
+  return null;
 }
 
 // Update Vehicle

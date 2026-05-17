@@ -115,6 +115,8 @@ Root/
 │   │
 │   ├── components/                    # 🧩 React UI Component Library
 │   │   ├── admin/                     # Admin-specific components
+│   │   │   ├── inventory/             # Admin inventory management components
+│   │   │   │   └── brand-management.tsx # Brand management component with modal add functionality
 │   │   │   ├── AdminFooter.tsx        # Footer UI for the admin dashboard
 │   │   │   ├── AdminHeader.tsx        # Admin top nav, logout dropdown, theme toggle
 │   │   │   ├── AdminNavbar.tsx        # Mobile-specific navigation for admin
@@ -154,7 +156,8 @@ Root/
 │   │   ├── auth/                      # Identity Logic
 │   │   │   ├── auth-client.ts         # Centralized client-side fetch wrappers for all Auth APIs
 │   │   │   ├── email-templates.ts     # HTML designs/templates for NodeMailer emails
-│   │   │   └── otp.ts                 # Server-side HMAC-SHA256 OTP generation and JWT signing
+│   │   │   ├── otp.ts                 # Server-side HMAC-SHA256 OTP generation and JWT signing
+│   │   │   └── session.ts             # Iron Session configuration and utility functions
 │   │   ├── db/                        # Database Services & Queries
 │   │   │   ├── admin-auth.ts          # Server-side validation for ENV admin credentials
 │   │   │   ├── admin-inventory-service.ts # Client-side fetch wrappers for Admin inventory APIs
@@ -166,6 +169,7 @@ Root/
 │   │   │   ├── migrate.ts             # CLI Utility script to run Drizzle schema migrations
 │   │   │   ├── mock-data.ts           # Fallback static vehicle data (when DB is empty)
 │   │   │   └── schema.ts              # Drizzle ORM schemas: `users`, `brands`, `vehicles` tables
+│   │   ├── storage-node.ts            # Node.js file system utilities (file deletion)
 │   │   ├── utils.ts                   # Global helpers (e.g. `cn` for merging Tailwind classes)
 │   │   └── validations.ts             # Zod schemas for API payload validation and type safety
 │   │

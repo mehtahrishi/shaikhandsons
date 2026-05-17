@@ -1,37 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { updateUserProfile, getUserById } from '@/lib/db/auth';
-import jwt from 'jsonwebtoken';
-import { JWTPayload } from '@/types/auth';
+import { getSession } from '@/lib/auth/session';
 import { updateProfileSchema } from '@/lib/validations';
 
 export async function POST(req: NextRequest) {
   try {
-    // Get token from cookie
-    let token = req.cookies.get('auth-token')?.value;
+    const session = await getSession();
 
-    if (!token) {
-      const authHeader = req.headers.get('Authorization');
-      if (authHeader?.startsWith('Bearer ')) {
-        token = authHeader.substring(7);
-      }
-    }
-
-    if (!token) {
+    if (!session.userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Verify and decode token
-    const secret = process.env.OTP_JWT_SECRET;
-    if (!secret) {
-      return NextResponse.json({ error: 'JWT secret not configured' }, { status: 500 });
-    }
-
-    const decoded = jwt.verify(token, secret) as JWTPayload;
-    const userId = decoded.userId;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-    }
+    const userId = session.userId;
 
     const body = await req.json();
 

@@ -1,36 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserById } from '@/lib/db/auth';
-import jwt from 'jsonwebtoken';
-import { JWTPayload } from '@/types/auth';
+import { getSession } from '@/lib/auth/session';
 
 export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
   try {
-    // Get token from cookie or Authorization header
-    let token = req.cookies.get('auth-token')?.value;
+    const session = await getSession();
 
-    if (!token) {
-      const authHeader = req.headers.get('Authorization');
-      if (authHeader?.startsWith('Bearer ')) {
-        token = authHeader.substring(7);
-      }
-    }
-
-    if (!token) {
+    if (!session.userId) {
       return NextResponse.json({ user: null }, { status: 200 });
     }
 
-    // Verify JWT
-    const secret = process.env.OTP_JWT_SECRET;
-    if (!secret) {
-      throw new Error('JWT secret not configured');
-    }
-
-    const decoded = jwt.verify(token, secret) as JWTPayload;
-
     // Get user from database
-    const user = await getUserById(decoded.userId);
+    const user = await getUserById(session.userId);
 
     if (!user) {
       return NextResponse.json({ user: null }, { status: 200 });

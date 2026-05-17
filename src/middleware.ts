@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    const adminToken = request.cookies.get('admin-token')?.value;
+    const adminToken = request.cookies.get('admin-session')?.value;
     if (!adminToken) {
       const url = new URL('/admin/login', request.url);
       return NextResponse.redirect(url);
@@ -20,7 +20,7 @@ export function middleware(request: NextRequest) {
 
   // 2. User Profile Protection
   if (pathname.startsWith('/profile')) {
-    const authToken = request.cookies.get('auth-token')?.value;
+    const authToken = request.cookies.get('auth-session')?.value;
     if (!authToken) {
       const url = new URL('/login', request.url);
       return NextResponse.redirect(url);
@@ -30,7 +30,7 @@ export function middleware(request: NextRequest) {
   // 3. Auth Redirects (Redirect logged-in users away from auth pages)
   const authPages = ['/login', '/signup', '/verify-otp', '/forgot-password'];
   if (authPages.includes(pathname)) {
-    const authToken = request.cookies.get('auth-token')?.value;
+    const authToken = request.cookies.get('auth-session')?.value;
     if (authToken) {
       const url = new URL('/', request.url);
       return NextResponse.redirect(url);

@@ -37,3 +37,21 @@ This document contains foundational mandates and strict engineering standards fo
 - **Validation:** Zod.
 - **Animations:** Framer Motion.
 - **Icons:** Lucide React.
+- **Storage:** Local VPS File System (using `fs` and `sharp`).
+
+## 📁 Local VPS Storage Mandates
+
+To ensure clean file management on the VPS, follow these protocols for all image/file operations:
+
+### 1. Storage Responsibility
+- **Saving (Upload):** `src/app/api/admin/storage/upload/route.ts`. Handles multipart form data, compresses to WebP using `sharp`, and saves to `public/uploads/`.
+- **Deleting:** `src/lib/storage-node.ts`. Provides the `deleteFile(fileUrl)` utility. Always use this utility to ensure safety checks and absolute path resolution.
+- **Viewing:** Handled natively by Next.js via the `public/` folder, or via the protected proxy route `src/app/api/admin/storage/view/[fileId]/route.ts`.
+
+### 2. Synchronization Rule
+When an entity (Brand, Vehicle, User) that has an associated image is **deleted** or its image is **updated**, you MUST manually trigger the deletion of the old file from the VPS using the `deleteFile` utility. Never leave "orphan" files on the VPS.
+
+### 3. Security
+- Files must be stored in `public/uploads/`.
+- File names must be randomized (UUID or Hash) to prevent collision and enumeration.
+- All storage-related API routes must verify `isAdminAuthenticated` or `getSession` as appropriate.

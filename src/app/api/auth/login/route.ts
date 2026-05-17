@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserByEmail, verifyUser } from '@/lib/db/auth';
-import crypto from 'crypto';
-import jwt from 'jsonwebtoken';
-import { JWTPayload } from '@/types/auth';
+import { getSession } from '@/lib/auth/session';
 
 export const runtime = 'nodejs';
 
@@ -34,22 +32,13 @@ export async function POST(req: NextRequest) {
       await verifyUser(user.id);
     }
 
-    // Create JWT token
-    const secret = process.env.OTP_JWT_SECRET;
-    if (!secret) {
-      throw new Error('JWT secret not configured');
-    }
+    // Create session using iron-session
+    const session = await getSession();
+    session.userId = user.id;
+    session.email = user.email;
+    session.fullName = user.fullName;
+    await session.save();
 
-    const jwtPayload: JWTPayload = {
-      userId: user.id,
-      email: user.email,
-      iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60, // 30 days
-    };
-
-    const sessionToken = jwt.sign(jwtPayload, secret);
-
-    // Set secure HTTP-only cookie
     const response = NextResponse.json({
       success: true,
       user: {
@@ -57,15 +46,6 @@ export async function POST(req: NextRequest) {
         email: user.email,
         fullName: user.fullName,
       },
-      token: sessionToken,
-    });
-
-    response.cookies.set('auth-token', sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 30 * 24 * 60 * 60, // 30 days
-      path: '/',
     });
 
     return response;

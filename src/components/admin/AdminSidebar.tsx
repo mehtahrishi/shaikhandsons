@@ -9,7 +9,8 @@ import {
   Package, 
   Users,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Award
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -19,6 +20,7 @@ const navItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Inventory", href: "/admin/inventory", icon: Package },
+  { name: "Brands", href: "/admin/brands", icon: Award },
   { name: "Customers", href: "/admin/users", icon: Users },
 ]
 

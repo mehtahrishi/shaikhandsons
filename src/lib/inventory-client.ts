@@ -26,11 +26,11 @@ export async function createBrand(name: string, imageUrl?: string) {
   return await res.json();
 }
 
-export async function updateBrand(id: string, name: string) {
+export async function updateBrand(id: string, name: string, imageUrl?: string) {
   const res = await fetch(`/api/admin/brands?id=${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name, imageUrl }),
   });
   if (!res.ok) {
     const error = await res.json();

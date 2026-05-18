@@ -82,16 +82,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import { Mail, FileText, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
-
-import { BrandManagement } from '@/components/admin/inventory/brand-management';
 
 type Vehicle = {
   id: string;
@@ -1878,13 +1870,7 @@ export default function AdminInventoryPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="inventory" className="w-full">
-        <TabsList className="bg-card/40 backdrop-blur-xl border border-border/50 p-1 mb-6">
-          <TabsTrigger value="inventory" className="text-[10px] font-black uppercase tracking-widest px-8">Fleet Inventory</TabsTrigger>
-          <TabsTrigger value="brands" className="text-[10px] font-black uppercase tracking-widest px-8">Brand Management</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="inventory" className="space-y-6">
+      <div className="w-full space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               { label: 'Total Assets', value: isLoading ? '...' : String(totalAssets), icon: Package, trend: 'In Fleet' },
@@ -2032,16 +2018,7 @@ export default function AdminInventoryPage() {
               </Table>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="brands">
-          <BrandManagement 
-            brands={brands}
-            isBrandsLoading={isBrandsLoading}
-            fetchAllBrands={fetchAllBrands}
-          />
-        </TabsContent>
-      </Tabs>
+      </div>
 
       <Dialog open={isEditModalOpen} onOpenChange={(open) => {
         setIsEditModalOpen(open);

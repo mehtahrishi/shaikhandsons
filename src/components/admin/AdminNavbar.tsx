@@ -7,7 +7,8 @@ import {
   LayoutDashboard, 
   ShoppingCart, 
   Package, 
-  Users
+  Users,
+  Award
 } from "lucide-react"
 import { cn } from '@/lib/utils';
 import { BrandIdentity } from '@/components/common/BrandIdentity';
@@ -16,6 +17,7 @@ const navItems = [
   { name: "Dash", href: "/admin", icon: LayoutDashboard },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Stock", href: "/admin/inventory", icon: Package },
+  { name: "Brands", href: "/admin/brands", icon: Award },
   { name: "Users", href: "/admin/users", icon: Users },
 ]
 

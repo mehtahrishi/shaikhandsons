@@ -55,7 +55,7 @@ type Vehicle = {
   updatedAt?: string;
 };
 
-export function VehicleShowroom() {
+export function VehicleShowroom({ activeCategory }: { activeCategory?: string }) {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,6 +80,28 @@ export function VehicleShowroom() {
 
     fetchVehicles();
   }, []);
+
+  const filteredVehicles = React.useMemo(() => {
+    if (!activeCategory || activeCategory === 'all') return vehicles;
+    return vehicles.filter(vehicle => {
+      const cat = vehicle.category?.toLowerCase() || '';
+      const filter = activeCategory.toLowerCase();
+      
+      if (filter === 'bikes') {
+        return cat.includes('bike') && !cat.includes('dirt');
+      }
+      if (filter === 'scooty') {
+        return cat.includes('scooty') || cat.includes('scooter') || cat.includes('scooters');
+      }
+      if (filter === 'dirt-bike') {
+        return cat.includes('dirt');
+      }
+      if (filter === 'electric-loader') {
+        return cat.includes('loader') || cat.includes('electric-loader') || cat.includes('auto-bicycle-bike');
+      }
+      return cat === filter;
+    });
+  }, [vehicles, activeCategory]);
 
   return (
     <section id="showroom" className="pt-5 pb-24 bg-background">
@@ -111,7 +133,7 @@ export function VehicleShowroom() {
               </motion.div>
             ))
           ) : (
-            vehicles.map((vehicle, index) => (
+            filteredVehicles.map((vehicle, index) => (
               <motion.div
                 key={vehicle.id}
                 initial={{ opacity: 0, y: 30 }}

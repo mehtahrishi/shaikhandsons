@@ -23,8 +23,10 @@ Root/
 │   │   │
 │   │   ├── (admin)/                   # 🛡️ Admin Restricted Route Group
 │   │   │   └── admin/                 # Base path: /admin
+│   │   │       ├── brands/            # Base path: /admin/brands
+│   │   │       │   └── page.tsx       # Corporate Manufacturer Directory & Assets
 │   │   │       ├── inventory/         # Base path: /admin/inventory
-│   │   │       │   └── page.tsx       # UI for managing vehicles and brands in the DB
+│   │   │       │   └── page.tsx       # Fleet catalog management and asset actions
 │   │   │       ├── login/             # Base path: /admin/login
 │   │   │       │   └── page.tsx       # Stateless admin secure login interface
 │   │   │       ├── orders/            # Base path: /admin/orders

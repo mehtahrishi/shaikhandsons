@@ -11,8 +11,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "db:migrate": "tsx src/lib/db/migrate.ts",
-    "db:push": "drizzle-kit push",
-    "postinstall": "if [ \"$(uname)\" = \"Linux\" ]; then npm_config_build_from_source=true npm install sharp; fi"
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "node-addon-api": "^8.3.0",

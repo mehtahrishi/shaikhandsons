@@ -75,3 +75,37 @@ export function verifyOtpToken(
 export function generateOtp(): string {
   return crypto.randomInt(100000, 1000000).toString();
 }
+
+/** 
+ * Sign a "Pre-Auth" token that proves the user has entered correct password.
+ * Valid for only 15 minutes.
+ */
+export function signPreAuthToken(email: string): string {
+  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'PREAUTH' })).toString('base64url');
+  const payload = {
+    email,
+    exp: Date.now() + 15 * 60 * 1000,
+  };
+  const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const sig = crypto
+    .createHmac('sha256', getSecret())
+    .update(`${header}.${body}`)
+    .digest('base64url');
+  return `${header}.${body}.${sig}`;
+}
+
+/** Verify Pre-Auth token and return email. */
+export function verifyPreAuthToken(token: string): { valid: boolean; email?: string } {
+  try {
+    const [header, body, sig] = token.split('.');
+    const expected = crypto.createHmac('sha256', getSecret()).update(`${header}.${body}`).digest('base64url');
+    if (expected !== sig) return { valid: false };
+    
+    const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
+    if (Date.now() > payload.exp) return { valid: false };
+    
+    return { valid: true, email: payload.email };
+  } catch {
+    return { valid: false };
+  }
+}

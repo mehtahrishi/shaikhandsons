@@ -26,28 +26,30 @@ export async function signUp(email: string, password: string, fullName: string =
 
 /**
  * Validate credentials with the database
+ * Returns a temporary Pre-Auth token on success
  */
-export async function validateCredentials(email: string, password: string): Promise<void> {
+export async function validateCredentials(email: string, password: string): Promise<{ preAuthToken: string }> {
   const res = await fetch('/api/auth/validate-credentials', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
 
+  const data = await res.json();
   if (!res.ok) {
-    const data = await res.json();
     throw new Error(data.error || 'Invalid credentials');
   }
+  return data;
 }
 
 /**
- * Create session after OTP verification
+ * Create session after OTP verification using Pre-Auth token
  */
-export async function createSessionFromOTP(email: string, password: string): Promise<void> {
+export async function createSessionFromOTP(email: string, preAuthToken: string): Promise<void> {
   const res = await fetch('/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, preAuthToken }),
   });
 
   if (!res.ok) {

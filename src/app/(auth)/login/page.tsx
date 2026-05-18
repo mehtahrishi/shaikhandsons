@@ -41,13 +41,13 @@ export default function LoginPage() {
 
     try {
       // 1. Validate credentials
-      await validateCredentials(email, password);
+      const { preAuthToken } = await validateCredentials(email, password);
 
       // 2. Send OTP
       const { token } = await sendOTP(email);
 
       sessionStorage.setItem('pending_email', email);
-      sessionStorage.setItem('pending_password', password); 
+      sessionStorage.setItem('pending_preauth_token', preAuthToken); 
       sessionStorage.setItem('pending_otp_token', token);
 
       toast({

@@ -28,7 +28,7 @@ export default function VerifyOTPPage() {
     const email = sessionStorage.getItem('pending_email') ?? '';
     setPendingEmail(email);
 
-    if (!sessionStorage.getItem('pending_otp_token') || !sessionStorage.getItem('pending_password')) {
+    if (!sessionStorage.getItem('pending_otp_token') || !sessionStorage.getItem('pending_preauth_token')) {
       router.push('/login');
     }
   }, [router]);
@@ -89,10 +89,10 @@ export default function VerifyOTPPage() {
     }
 
     const token = sessionStorage.getItem('pending_otp_token');
-    const password = sessionStorage.getItem('pending_password');
+    const preAuthToken = sessionStorage.getItem('pending_preauth_token');
     const email = sessionStorage.getItem('pending_email');
 
-    if (!token || !password || !email) {
+    if (!token || !preAuthToken || !email) {
       toast({ title: "Session Expired", description: "Please login again.", variant: "destructive" });
       router.push('/login');
       return;
@@ -103,11 +103,11 @@ export default function VerifyOTPPage() {
       // 1. Verify OTP
       await verifyOTP(token, fullOtp);
 
-      // 2. Create session
-      await createSessionFromOTP(email, password);
+      // 2. Create session using Pre-Auth token
+      await createSessionFromOTP(email, preAuthToken);
       
       sessionStorage.removeItem('pending_email');
-      sessionStorage.removeItem('pending_password');
+      sessionStorage.removeItem('pending_preauth_token');
       sessionStorage.removeItem('pending_otp_token');
 
       await refresh();
@@ -183,7 +183,7 @@ export default function VerifyOTPPage() {
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           
           <form onSubmit={handleVerify} className="space-y-8">
-            <div className="flex justify-between gap-2">
+            <div className="flex justify-center sm:justify-between gap-1.5 md:gap-2">
               {otp.map((digit, index) => (
                 <Input
                   key={index}
@@ -191,7 +191,7 @@ export default function VerifyOTPPage() {
                   type="text"
                   inputMode="numeric"
                   maxLength={OTP_LENGTH}
-                  className="w-12 h-16 text-center text-2xl font-black border-border bg-background/50 focus:border-primary focus:bg-background/80 transition-all rounded-xl text-foreground selection:bg-primary/30"
+                  className="w-10 sm:w-12 h-14 sm:h-16 text-center text-xl sm:text-2xl font-black border-border bg-background/50 focus:border-primary focus:bg-background/80 transition-all rounded-xl text-foreground selection:bg-primary/30 p-0"
                   value={digit}
                   onChange={(e) => handleChange(e.target.value, index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}

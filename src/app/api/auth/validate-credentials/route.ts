@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserByEmail, comparePassword } from '@/lib/db/auth';
 import { loginSchema } from '@/lib/validations';
+import { signPreAuthToken } from '@/lib/auth/otp';
 
 export const runtime = 'nodejs';
 
@@ -28,8 +29,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
     }
 
+    // NEW: Generate a Pre-Auth token instead of sending success only
+    const preAuthToken = signPreAuthToken(user.email);
+
     return NextResponse.json({
       success: true,
+      preAuthToken,
       user: {
         id: user.id,
         email: user.email,

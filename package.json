@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "db:migrate": "tsx src/lib/db/migrate.ts",
     "db:push": "drizzle-kit push",
-    "postinstall": "if [ \"$(uname)\" = \"Linux\" ]; then npm install --os=linux --cpu=x64 sharp; fi"
+    "postinstall": "if [ \"$(uname)\" = \"Linux\" ]; then npm install --os=linux --cpu=x64 --force --include=optional sharp; fi"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.28.0",

@@ -203,7 +203,7 @@ export function BrandManagement({ brands, isBrandsLoading, fetchAllBrands }: Bra
                       <div className="flex items-center gap-3">
                         {brand.imageUrl ? (
                           <div className="h-8 w-8 rounded-md overflow-hidden relative bg-muted flex-shrink-0">
-                            <Image src={brand.imageUrl} alt={brand.name} fill className="object-cover" sizes="32px" />
+                            <Image src={brand.imageUrl} alt={brand.name} fill className="object-cover" sizes="32px" unoptimized />
                           </div>
                         ) : (
                           <div className="h-8 w-8 rounded-md bg-muted/50 flex items-center justify-center flex-shrink-0">

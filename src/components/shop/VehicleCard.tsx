@@ -109,6 +109,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover"
               priority
+              unoptimized={primaryImage.startsWith('/uploads/')}
             />
           </motion.div>
           {/* Reflective Surface overlay for depth */}

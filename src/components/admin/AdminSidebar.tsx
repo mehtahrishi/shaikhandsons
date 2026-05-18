@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { BrandIdentity } from "./BrandIdentity"
+import { BrandIdentity } from "@/components/common/BrandIdentity"
 
 const navItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },

@@ -2,7 +2,7 @@
  * Centralized Client-side Authentication Helpers
  */
 
-import { AuthUser } from '@/types/auth';
+import { AuthUser, AdminUser } from '@/types/auth';
 
 /**
  * Create a new user account
@@ -174,5 +174,58 @@ export async function signOut(): Promise<void> {
     });
   } catch (err) {
     console.error('Failed to sign out:', err);
+  }
+}
+
+/**
+ * Validate admin credentials and login
+ */
+export async function adminLogin(email: string, password: string): Promise<AdminUser> {
+  const res = await fetch('/api/admin/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Authentication failed');
+  }
+  return data.user;
+}
+
+/**
+ * Fetch current admin user session
+ */
+export async function getCurrentAdmin(): Promise<AdminUser | null> {
+  try {
+    const res = await fetch('/api/admin/me', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!res.ok) {
+      return null;
+    }
+
+    const data = await res.json();
+    return data.user || null;
+  } catch (err) {
+    console.error('Failed to fetch admin session:', err);
+    return null;
+  }
+}
+
+/**
+ * Logout the current admin
+ */
+export async function adminLogout(): Promise<void> {
+  try {
+    await fetch('/api/admin/logout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (err) {
+    console.error('Failed to logout admin:', err);
   }
 }

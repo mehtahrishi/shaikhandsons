@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
 
-import { createBrand, updateBrand, deleteBrand, uploadBrandImage } from '@/lib/db/admin-inventory-service';
+import { createBrand, updateBrand, deleteBrand, uploadBrandImage } from '@/lib/inventory-client';
 
 export type BrandData = {
   id: number;

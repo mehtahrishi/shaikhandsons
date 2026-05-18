@@ -10,7 +10,7 @@ import {
   Users
 } from "lucide-react"
 import { cn } from '@/lib/utils';
-import { BrandIdentity } from './BrandIdentity';
+import { BrandIdentity } from '@/components/common/BrandIdentity';
 
 const navItems = [
   { name: "Dash", href: "/admin", icon: LayoutDashboard },

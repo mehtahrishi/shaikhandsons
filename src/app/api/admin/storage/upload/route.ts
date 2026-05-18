@@ -95,7 +95,8 @@ export async function POST(req: NextRequest) {
         })
         .toFile(filePath);
 
-      // Return file URL
+      // Return file URL - ALWAYS use /uploads/ for the frontend
+      // Nginx handles the mapping from /uploads/ to the physical public/uploads/ folder
       const fileUrl = folder ? `/uploads/${folder}/${uniqueName}` : `/uploads/${uniqueName}`;
       uploadedFiles.push({ id: uniqueName, url: fileUrl, name: file.name });
     }

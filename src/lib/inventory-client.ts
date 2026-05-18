@@ -1,5 +1,5 @@
 /**
- * Admin Inventory Service
+ * Client-side Inventory Service
  * Provides client-side functions to interact with admin inventory endpoints
  */
 

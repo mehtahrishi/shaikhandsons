@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdminUser } from '@/types/auth';
+import { adminLogin, getCurrentAdmin, adminLogout } from '@/lib/auth/auth-client';
 
 interface AdminAuthContextValue {
   user: AdminUser | null;
@@ -26,15 +27,9 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const fetchAdminSession = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/admin/me');
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user || null);
-      } else {
-        setUser(null);
-      }
+      const admin = await getCurrentAdmin();
+      setUser(admin);
     } catch (err) {
-      console.error('Failed to fetch admin session:', err);
       setUser(null);
     } finally {
       setLoading(false);
@@ -48,19 +43,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Authentication failed');
-      }
-
-      setUser(data.user);
+      const admin = await adminLogin(email, password);
+      setUser(admin);
     } finally {
       setLoading(false);
     }
@@ -68,11 +52,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
-      await fetch('/api/admin/logout', {
-        method: 'POST',
-      });
-    } catch (err) {
-      console.error('Failed to logout admin:', err);
+      await adminLogout();
     } finally {
       setUser(null);
       router.push('/admin/login');

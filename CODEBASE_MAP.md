@@ -117,13 +117,12 @@ Root/
 │   │   ├── admin/                     # Admin-specific components
 │   │   │   ├── inventory/             # Admin inventory management components
 │   │   │   │   └── brand-management.tsx # Brand management component with modal add functionality
-│   │   │   ├── AdminFooter.tsx        # Footer UI for the admin dashboard
 │   │   │   ├── AdminHeader.tsx        # Admin top nav, logout dropdown, theme toggle
 │   │   │   ├── AdminNavbar.tsx        # Mobile-specific navigation for admin
-│   │   │   ├── AdminSidebar.tsx       # Desktop side navigation menu for admin
-│   │   │   └── BrandIdentity.tsx      # Reusable Shaikh & Sons stylized logo component
+│   │   │   └── AdminSidebar.tsx       # Desktop side navigation menu for admin
 │   │   ├── common/                    # Globally shared components
 │   │   │   ├── AnnouncementBar.tsx    # Top marketing text banner (e.g. "Pre-orders open")
+│   │   │   ├── BrandIdentity.tsx      # Reusable Shaikh & Sons stylized logo component
 │   │   │   ├── CookieConsent.tsx      # GDPR compliant cookie tracking consent banner
 │   │   │   └── InitialLoader.tsx      # Cinematic electric startup animation that plays on first load
 │   │   ├── home/                      # Homepage specific sections
@@ -160,7 +159,6 @@ Root/
 │   │   │   └── session.ts             # Iron Session configuration and utility functions
 │   │   ├── db/                        # Database Services & Queries
 │   │   │   ├── admin-auth.ts          # Server-side validation for ENV admin credentials
-│   │   │   ├── admin-inventory-service.ts # Client-side fetch wrappers for Admin inventory APIs
 │   │   │   ├── auth.ts                # Server-side PostgreSQL queries (Drizzle) for users
 │   │   │   ├── check-db.ts            # CLI Utility script to verify Postgres connection
 │   │   │   ├── dashboard.ts           # Server-side queries to aggregate dashboard stats
@@ -169,6 +167,7 @@ Root/
 │   │   │   ├── migrate.ts             # CLI Utility script to run Drizzle schema migrations
 │   │   │   ├── mock-data.ts           # Fallback static vehicle data (when DB is empty)
 │   │   │   └── schema.ts              # Drizzle ORM schemas: `users`, `brands`, `vehicles` tables
+│   │   ├── inventory-client.ts        # Client-side fetch wrappers for Admin inventory APIs
 │   │   ├── storage-node.ts            # Node.js file system utilities (file deletion)
 │   │   ├── utils.ts                   # Global helpers (e.g. `cn` for merging Tailwind classes)
 │   │   └── validations.ts             # Zod schemas for API payload validation and type safety

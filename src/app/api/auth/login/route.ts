@@ -1,19 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserByEmail, verifyUser } from '@/lib/db/auth';
+import { getUserByEmail, verifyUser, comparePassword } from '@/lib/db/auth';
 import { getSession } from '@/lib/auth/session';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, token, otp } = await req.json();
-
-    // If token + otp provided, verify OTP first
-    if (token && otp) {
-      // OTP verification is handled by verify-otp route
-      // This route expects the OTP to be pre-verified
-      return NextResponse.json({ error: 'Use POST /api/auth/verify-otp first.' }, { status: 400 });
-    }
+    const { email, password } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
@@ -25,10 +18,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
     }
 
-    // For login after OTP verification, we just need to create the session
-    // The password validation was already done during initial login attempt
+    // CRITICAL: Re-verify password hash even after OTP
+    const isPasswordValid = await comparePassword(password, user.passwordHash);
+    if (!isPasswordValid) {
+      return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
+    }
+
     if (!user.isVerified) {
-      // Mark as verified if OTP was verified
+      // Mark as verified if they successfully passed OTP + Login
       await verifyUser(user.id);
     }
 

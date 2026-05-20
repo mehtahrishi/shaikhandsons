@@ -110,6 +110,21 @@ const LoaderScooterIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const SpeedometerIcon = ({ className }: { className?: string }) => (
+  <svg
+    viewBox="0 0 34 34"
+    className={className}
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M17,0C7.626,0,0,7.626,0,17s7.626,17,17,17s17-7.626,17-17S26.374,0,17,0z M18,17v-3.333c0-0.552-0.447-1-1-1
+      c-0.553,0-1,0.448-1,1V17H4c0-3.32,1.262-6.344,3.316-8.644l1.803,1.801c0.195,0.195,0.451,0.293,0.707,0.293
+      c0.256,0,0.512-0.098,0.707-0.293c0.391-0.391,0.391-1.024,0-1.414L8.75,6.96c2.004-1.649,4.511-2.701,7.25-2.911v2.7
+      c0,0.552,0.447,1,1,1c0.553,0,1-0.448,1-1v-2.7c2.738,0.21,5.246,1.261,7.25,2.911l-1.783,1.783c-0.391,0.39-0.391,1.023,0,1.414
+      c0.195,0.195,0.451,0.293,0.707,0.293s0.512-0.098,0.707-0.293l1.803-1.801C28.738,10.656,30,13.679,30,17H18z" />
+  </svg>
+);
+
 const categoryIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   bikes: BikeIcon,
   scooty: ScootyIcon,
@@ -127,8 +142,8 @@ export function Navbar() {
   const pathname = usePathname();
   const { toast } = useToast();
   const [showAuthPopover, setShowAuthPopover] = useState(false);
-  const [showVehiclesPopover, setShowVehiclesPopover] = useState(false);
   const [showProfileSheet, setShowProfileSheet] = useState(false);
+  const [showVehiclesSheet, setShowVehiclesSheet] = useState(false);
   const { user, logout } = useAuth();
 
   const isAuthenticated = !!user;
@@ -208,8 +223,9 @@ export function Navbar() {
 
   const mobileNavLinks = [
     { name: 'Home', href: '/', icon: Home },
-    { name: 'Vehicles', href: '/#showroom', icon: Bike },
+    { name: 'Vehicles', href: '/vehicles', icon: SpeedometerIcon },
   ];
+
 
   const userInitial = user?.fullName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "C";
 
@@ -247,6 +263,18 @@ export function Navbar() {
 
             {/* Right: Theme + Auth */}
             <div className="flex items-center gap-2 md:gap-3 ml-auto">
+              {/* Desktop Vehicles Link */}
+              {!isAdminRoute && (
+                <Link
+                  href="/vehicles"
+                  className="hidden md:flex text-[10px] font-body font-black tracking-widest text-foreground hover:text-primary transition-colors uppercase relative group items-center gap-2 mr-2"
+                >
+                  <SpeedometerIcon className="w-5 h-5" />
+                  Vehicles
+                  <span className="absolute bottom-[-4px] left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </Link>
+              )}
+
               <button
                 onClick={toggleTheme}
                 className="h-9 w-9 flex items-center justify-center text-foreground hover:text-primary transition-colors rounded-lg"
@@ -264,7 +292,6 @@ export function Navbar() {
                       <Button
                         variant="ghost"
                         onClick={() => {
-                          setShowVehiclesPopover(false);
                           setShowAuthPopover(false);
                           setShowProfileSheet(!showProfileSheet);
                         }}
@@ -357,59 +384,50 @@ export function Navbar() {
       {!isAdminRoute && (
         <nav className="fixed bottom-0 left-0 right-0 md:hidden z-40 bg-background/95 backdrop-blur-md border-t border-border/50 safe-area-inset-bottom">
           <div className="flex items-center justify-around px-2 py-1.5">
-            {mobileNavLinks.map((link) => (
-              link.name === 'Vehicles' ? (
-                <button
-                  key="vehicles"
-                  onClick={() => { setShowAuthPopover(false); setShowProfileSheet(false); setShowVehiclesPopover(!showVehiclesPopover); }}
-                  className={cn(
-                    "flex flex-col items-center gap-0.5 p-1.5 rounded-lg text-foreground hover:text-primary",
-                    showVehiclesPopover ? "text-primary" : "hover:bg-muted/50"
-                  )}
-                >
-                  <link.icon className="h-5 w-5" />
-                  <span className="text-[6px] font-body font-black uppercase tracking-widest">{link.name}</span>
-                </button>
-              ) : (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => { setShowVehiclesPopover(false); setShowAuthPopover(false); setShowProfileSheet(false); }}
-                  className={cn(
-                    "flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary",
-                    pathname === link.href ? "text-primary" : "hover:bg-muted/50"
-                  )}
-                >
-                  <link.icon className="h-5 w-5" />
-                  <span className="text-[6px] font-body font-black uppercase tracking-widest">{link.name}</span>
-                </Link>
-              )
-            ))}
+            <Link
+              href="/"
+              onClick={() => { setShowAuthPopover(false); setShowProfileSheet(false); setShowVehiclesSheet(false); }}
+              className={cn(
+                "flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary",
+                pathname === "/" ? "text-primary" : "hover:bg-muted/50"
+              )}
+            >
+              <Home className="h-5 w-5" />
+            </Link>
+
+            <button
+              onClick={() => { setShowAuthPopover(false); setShowProfileSheet(false); setShowVehiclesSheet(!showVehiclesSheet); }}
+              className={cn(
+                "flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary",
+                showVehiclesSheet ? "text-primary" : "hover:bg-muted/50"
+              )}
+            >
+              <SpeedometerIcon className="h-5 w-5" />
+            </button>
 
             {/* Auth/Profile Icon */}
+
             {!mounted ? (
               <div className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg" />
             ) : isAuthenticated ? (
               <button
-                onClick={() => { setShowVehiclesPopover(false); setShowAuthPopover(false); setShowProfileSheet(!showProfileSheet); }}
+                onClick={() => { setShowAuthPopover(false); setShowVehiclesSheet(false); setShowProfileSheet(!showProfileSheet); }}
                 className={cn(
                   "flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-foreground hover:text-primary",
                   showProfileSheet ? "text-primary" : "hover:bg-muted/50"
                 )}
               >
                 <User className="h-5 w-5" />
-                <span className="text-[6px] font-body font-black uppercase tracking-widest">Profile</span>
               </button>
             ) : (
               <button
-                onClick={() => { setShowVehiclesPopover(false); setShowProfileSheet(false); setShowAuthPopover(!showAuthPopover); }}
+                onClick={() => { setShowProfileSheet(false); setShowVehiclesSheet(false); setShowAuthPopover(!showAuthPopover); }}
                 className={cn(
                   "flex flex-col items-center gap-0.5 p-1.5 rounded-lg text-foreground hover:text-primary transition-all",
                   showAuthPopover ? "text-primary" : "hover:bg-muted/50"
                 )}
               >
                 <User className="h-5 w-5" />
-                <span className="text-[6px] font-body font-black uppercase tracking-widest">Sign In</span>
               </button>
             )}
           </div>
@@ -448,44 +466,8 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Vehicles Bottom Sheet - Expands Upward */}
-      <div className={cn(
-        "fixed left-0 right-0 bottom-[56px] md:hidden z-30 bg-background/95 backdrop-blur-xl border-t border-border/50 overflow-hidden transition-all duration-300 ease-in-out",
-        showVehiclesPopover ? "max-h-60" : "max-h-0"
-      )}>
-        <div className="px-4 py-6">
-          <div className="px-2 mb-4">
-            <h3 className="text-sm font-body font-black uppercase">Select Vehicle Type</h3>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {VEHICLE_CATEGORIES.map((category, index) => {
-              const Icon = categoryIcons[category.id];
-              const isPrimary = index === 0;
-
-              return (
-                <Link
-                  key={category.id}
-                  href={`/?type=${category.queryValue}`}
-                  onClick={() => setShowVehiclesPopover(false)}
-                  className="block"
-                >
-                  <button className={cn(
-                    "w-full text-[10px] font-body font-black uppercase tracking-widest h-12 rounded-xl flex flex-col items-center justify-center gap-1 px-1",
-                    isPrimary
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "bg-primary/20 text-primary hover:bg-primary/30"
-                  )}>
-                    <Icon className="w-5 h-5" />
-                    <span>{category.label}</span>
-                  </button>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
       {/* Profile Bottom Sheet - Expands Upward */}
+
       <div className={cn(
         "fixed left-0 right-0 bottom-[56px] md:hidden z-30 bg-background/95 backdrop-blur-xl border-t border-border/50 overflow-hidden transition-all duration-300 ease-in-out",
         showProfileSheet ? "max-h-80" : "max-h-0"
@@ -519,6 +501,43 @@ export function Navbar() {
               <LogOut className="h-4 w-4" />
               <span>Logout</span>
             </button>
+          </div>
+        </div></div>
+
+      {/* Vehicles Bottom Sheet - Expands Upward */}
+      <div className={cn(
+        "fixed left-0 right-0 bottom-[56px] md:hidden z-50 bg-background/95 backdrop-blur-xl border-t border-border/50 overflow-hidden transition-all duration-300 ease-in-out",
+        showVehiclesSheet ? "max-h-96" : "max-h-0"
+      )}>
+        <div className="px-4 py-6">
+          <div className="px-2 mb-4">
+            <h3 className="text-sm font-body font-black uppercase">Browse Vehicles</h3>
+          </div>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setShowVehiclesSheet(false)}
+                  className="block"
+                >
+                  <button className="w-full text-left text-[11px] font-body font-black uppercase tracking-widest h-12 px-3 bg-muted/20 text-foreground hover:bg-muted/40 rounded-lg flex items-center justify-center gap-2 flex-col">
+                    <link.icon className="h-5 w-5" />
+                    <span>{link.name}</span>
+                  </button>
+                </Link>
+              ))}
+            </div>
+            <Link
+              href="/vehicles"
+              onClick={() => setShowVehiclesSheet(false)}
+              className="block"
+            >
+              <button className="w-full text-center text-[11px] font-body font-black uppercase tracking-widest h-12 px-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg">
+                All Vehicles
+              </button>
+            </Link>
           </div>
         </div>
       </div>

@@ -57,6 +57,7 @@ export async function createVehicle(data: {
   year: number;
   trim?: string;
   price: number;
+  slug?: string;
   designPhilosophy: string;
   images: string[];
   brandId: number;
@@ -159,6 +160,7 @@ export async function updateVehicleAPI(
     year?: number;
     trim?: string;
     price?: number;
+    slug?: string;
     designPhilosophy?: string;
     imageUrls?: string[];
     

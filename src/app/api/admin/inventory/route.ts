@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllVehicles, createVehicle, updateVehicle, deleteVehicle } from '@/lib/db/inventory';
 import { isAdminAuthenticated } from '@/lib/db/admin-auth';
+import { generateVehicleSlug } from '@/lib/slug';
 
 export const runtime = 'nodejs';
 
@@ -33,6 +34,9 @@ export async function POST(req: NextRequest) {
        return NextResponse.json({ error: 'Missing required fields (brandId, make, model, price)' }, { status: 400 });
     }
 
+    // Generate slug if not provided
+    const slug = body.slug || generateVehicleSlug(body.make, body.model);
+
     const vehicle = await createVehicle({
       brandId: Number(body.brandId),
       make: String(body.make).trim(),
@@ -40,6 +44,7 @@ export async function POST(req: NextRequest) {
       year: Number(body.year) || new Date().getFullYear(),
       trim: body.trim ? String(body.trim).trim() : null,
       price: String(body.price),
+      slug: slug,
       
       modelCode: body.modelCode ? String(body.modelCode).trim() : null,
       category: body.category ? String(body.category).trim() : null,

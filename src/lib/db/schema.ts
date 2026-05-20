@@ -42,6 +42,7 @@ export const vehicles = pgTable(
     year: integer('year').notNull(),
     trim: varchar('trim', { length: 255 }),
     price: decimal('price', { precision: 12, scale: 2 }).notNull(),
+    slug: varchar('slug', { length: 255 }).unique(),
     
     // Basic Info
     modelCode: varchar('model_code', { length: 100 }),

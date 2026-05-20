@@ -97,6 +97,7 @@ type Vehicle = {
   year: number;
   trim: string;
   price: number;
+  slug?: string;
   images: string[];
   imageUrls?: string[];
   designPhilosophy: string;
@@ -151,6 +152,7 @@ type BulkVehicleForm = {
   year: number;
   trim: string;
   price: number;
+  slug?: string;
   designPhilosophy: string;
   selectedFiles: File[];
   isExpanded: boolean;
@@ -209,6 +211,7 @@ const createEmptyBulkVehicle = (): BulkVehicleForm => ({
   year: 2026,
   trim: '',
   price: 0,
+  slug: '',
   designPhilosophy: '',
   selectedFiles: [],
   isExpanded: true,
@@ -376,6 +379,7 @@ export default function AdminInventoryPage() {
     year: 2026,
     trim: '',
     price: 0,
+    slug: '',
     designPhilosophy: '',
     
     modelCode: '',
@@ -451,6 +455,7 @@ export default function AdminInventoryPage() {
         year: formData.year,
         trim: formData.trim,
         price: formData.price,
+        slug: formData.slug,
         designPhilosophy: formData.designPhilosophy,
         images: imageUrls,
         
@@ -494,6 +499,7 @@ export default function AdminInventoryPage() {
         year: 2026,
         trim: '',
         price: 0,
+        slug: '',
         designPhilosophy: '',
         modelCode: '',
         category: '',
@@ -552,6 +558,7 @@ export default function AdminInventoryPage() {
       year: vehicle.year || 2026,
       trim: vehicle.trim || '',
       price: vehicle.price || 0,
+      slug: vehicle.slug || '',
       designPhilosophy: vehicle.designPhilosophy || '',
       
       modelCode: vehicle.modelCode || '',
@@ -627,6 +634,43 @@ export default function AdminInventoryPage() {
     setSelectedFiles([]);
     revokeEditGalleryPreviews(editGalleryItems);
     setEditGalleryItems([]);
+    // Reset form data to prevent it from carrying over to add modal
+    setFormData({
+      brandId: 0,
+      make: '',
+      model: '',
+      year: 2026,
+      trim: '',
+      price: 0,
+      slug: '',
+      designPhilosophy: '',
+      modelCode: '',
+      category: '',
+      shortDescription: '',
+      topSpeed: '',
+      certifiedRange: '',
+      realWorldRange: '',
+      ridingModes: [],
+      climbingDegree: '',
+      loadCapacity: '',
+      batteryType: '',
+      batteryCapacity: '',
+      chargingTime: '',
+      fastCharging: false,
+      chargerIncluded: '',
+      batteryWarranty: '',
+      motorPower: '',
+      brakingSystem: '',
+      tyreType: '',
+      wheelType: '',
+      wheelSize: '',
+      groundClearance: '',
+      displayType: '',
+      colors: [],
+      keyFeatures: [],
+      bootSpace: '',
+    });
+    setColorsInput('');
   };
 
   const handleUpdateUnit = async () => {
@@ -665,6 +709,7 @@ export default function AdminInventoryPage() {
         year: formData.year,
         trim: formData.trim,
         price: formData.price,
+        slug: formData.slug,
         designPhilosophy: formData.designPhilosophy,
         imageUrls: imageUrls,
         
@@ -844,6 +889,7 @@ export default function AdminInventoryPage() {
             year: entry.year || 2026,
             trim: entry.trim || '',
             price: entry.price,
+            slug: entry.slug || '',
             designPhilosophy: entry.designPhilosophy || '',
             images: imageUrls,
             
@@ -1022,6 +1068,10 @@ export default function AdminInventoryPage() {
                                     ))}
                                   </SelectContent>
                                 </Select>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">URL Slug</Label>
+                                <Input placeholder="auto-generated" className="h-8 text-[9px] bg-muted/20" value={entry.slug} onChange={(e) => updateBulkVehicle(idx, 'slug', e.target.value)} />
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Price (₹)</Label>
@@ -1535,6 +1585,16 @@ export default function AdminInventoryPage() {
                           className={`bg-muted/20 h-10 text-xs border-border/50 ${formErrors.price ? 'border-red-500 border-2' : ''}`}
                         />
                         {formErrors.price && <p className="text-[9px] text-red-500 font-bold">{formErrors.price}</p>}
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">URL Slug (e.g., ather-450x)</Label>
+                        <Input
+                          value={formData.slug || ''}
+                          onChange={(e) => setFormData(prev => ({...prev, slug: e.target.value}))}
+                          placeholder="auto-generated from make + model" 
+                          className="bg-muted/20 h-10 text-xs border-border/50"
+                        />
+                        <p className="text-[8px] text-muted-foreground">Leave empty to auto-generate from brand + model</p>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Year</Label>
@@ -2301,6 +2361,16 @@ export default function AdminInventoryPage() {
                       onChange={(e) => setFormData(prev => ({...prev, price: parseInt(e.target.value) || 0}))}
                       placeholder="0" className="bg-muted/20 h-10 text-xs border-border/50"
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">URL Slug</Label>
+                    <Input 
+                      value={formData.slug}
+                      onChange={(e) => setFormData(prev => ({...prev, slug: e.target.value}))}
+                      placeholder="e.g., ather-450x" 
+                      className="bg-muted/20 h-10 text-xs border-border/50" 
+                    />
+                    <p className="text-[8px] text-muted-foreground">SEO-friendly URL (auto-generated from brand + model if empty)</p>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Year</Label>

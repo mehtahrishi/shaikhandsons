@@ -89,14 +89,15 @@ export function VehicleShowroom({ activeCategory }: { activeCategory?: string })
 
   return (
     <section id="showroom" className="pt-5 pb-24 bg-background">
-      <div className="container mx-auto px-6">
+      <div className="w-full">
         {error && <div className="text-center text-red-500 py-8">{error}</div>}
 
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-8">
+        <div className="flex md:grid snap-x snap-mandatory md:snap-none gap-4 overflow-x-auto md:overflow-visible pb-4 md:pb-0 px-4 md:px-6 md:container md:mx-auto md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-8">
           {isLoading ? (
             Array.from({ length: 4 }).map((_, index) => (
               <motion.div
                 key={`skeleton-${index}`}
+                className="w-[calc(100vw-2rem)] md:w-auto flex-none snap-start"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
@@ -120,6 +121,7 @@ export function VehicleShowroom({ activeCategory }: { activeCategory?: string })
             filteredVehicles.map((vehicle, index) => (
               <motion.div
                 key={vehicle.id}
+                className="w-[calc(100vw-2rem)] md:w-auto flex-none snap-start"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

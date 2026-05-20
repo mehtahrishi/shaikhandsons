@@ -99,6 +99,15 @@ export async function getVehicleById(id: number) {
 }
 
 /**
+ * Get vehicle by slug
+ */
+export async function getVehicleBySlug(slug: string) {
+  return db.query.vehicles.findFirst({
+    where: eq(vehicles.slug, slug),
+  });
+}
+
+/**
  * Get vehicles by brand
  */
 export async function getVehiclesByBrand(brandId: number) {
@@ -117,6 +126,7 @@ export async function createVehicle(data: {
   year: number;
   trim?: string | null;
   price: string;
+  slug?: string;
   
   modelCode?: string | null;
   category?: string | null;
@@ -163,6 +173,7 @@ export async function createVehicle(data: {
       year: data.year,
       trim: data.trim || null,
       price: data.price,
+      slug: data.slug || null,
       
       modelCode: data.modelCode || null,
       category: data.category || null,

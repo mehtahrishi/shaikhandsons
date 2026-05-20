@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getImageUrl } from '@/lib/utils';
-import { IndianRupee, Zap, Gauge, Battery, ChevronRight, Activity } from 'lucide-react';
+import { IndianRupee, Zap, Gauge, Battery, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Vehicle {
@@ -15,6 +15,7 @@ interface Vehicle {
   year?: number;
   trim?: string;
   price: number | string;
+  slug?: string;
   certifiedRange?: string;
   motorPower?: string;
   topSpeed?: string;
@@ -75,33 +76,23 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
   const speedLabel = liveData.topSpeed || (liveData.zeroToSixtySeconds ? `${formatCompact(typeof liveData.zeroToSixtySeconds === 'string' ? parseFloat(liveData.zeroToSixtySeconds) : liveData.zeroToSixtySeconds)}s` : null);
 
   return (
-    <Link href={`/vehicles/${liveData.id}`} className="block w-full h-full">
+    <Link href={`/vehicles/${liveData.slug || liveData.id}`} className="block w-full h-full">
       <motion.div 
-        className="group relative w-full h-[420px] sm:h-[520px] bg-card rounded-[1.5rem] sm:rounded-[2.5rem] border border-border/40 overflow-hidden transition-all duration-500 hover:border-primary/30"
+        className="group relative w-full h-[420px] sm:h-[520px] bg-card rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-lg"
         initial={{ opacity: 0, scale: 0.95 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
         whileHover={{ y: -5 }}
       >
-        {/* Stage Lighting / Ambient Glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(var(--primary-rgb),0.05),transparent_60%)] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-card via-card/80 to-transparent pointer-events-none z-10" />
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-card pointer-events-none z-10" />
 
-        {/* HUD Elements */}
-        <div className="absolute top-4 left-4 sm:top-8 sm:left-8 z-20 flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-primary animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/80">Active Showroom</span>
-          </div>
-          <div className="h-[1px] w-8 bg-primary/20" />
-        </div>
-
-        {/* Main Stage Image */}
-        <div className="relative h-[60%] sm:h-[65%] w-full overflow-hidden">
+        {/* Vehicle Image */}
+        <div className="relative h-[55%] sm:h-[60%] w-full overflow-hidden bg-muted">
           <motion.div 
             className="relative w-full h-full"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            whileHover={{ scale: 1.08 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
           >
             <Image
               src={getImageUrl(primaryImage)}
@@ -113,56 +104,50 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
               unoptimized={primaryImage.startsWith('/uploads/')}
             />
           </motion.div>
-          {/* Reflective Surface overlay for depth */}
-          <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent z-10" />
         </div>
 
-        {/* Info HUD Panel */}
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 z-20 flex flex-col gap-4 sm:gap-6">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-primary">{liveData.make}</span>
-              <Activity className="h-3 w-3 text-primary/60" />
-            </div>
-            <h3 className="text-2xl sm:text-4xl font-black text-foreground uppercase tracking-tighter leading-none">
+        {/* Info Section */}
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 z-20 flex flex-col gap-3 sm:gap-4">
+          {/* Brand and Model */}
+          <div>
+            <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">{liveData.make}</p>
+            <h3 className="text-2xl sm:text-4xl font-black text-foreground leading-tight">
               {liveData.model}
             </h3>
           </div>
 
-          {/* Precision Stats Strip */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 py-3 border-y border-border/40">
+          {/* Quick Features */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
             {[
-              { icon: Battery, label: 'Range', value: rangeLabel || '450 km' },
+              { icon: Battery, label: 'Distance', value: rangeLabel || '450 km' },
               { icon: Zap, label: 'Power', value: powerLabel || '150 kW' },
-              { icon: Gauge, label: 'Top', value: speedLabel || '180 km/h' }
+              { icon: Gauge, label: 'Speed', value: speedLabel || '180 km/h' }
             ].map((stat, i) => (
-              <div key={i} className="flex flex-col gap-1">
-                <div className="flex items-center gap-1.5">
-                  <stat.icon className="h-3 w-3 text-primary" />
-                  <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-tighter text-muted-foreground">{stat.label}</span>
+              <div key={i} className="flex flex-col gap-0.5">
+                <div className="flex items-center gap-1">
+                  <stat.icon className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-[7px] sm:text-[8px] font-semibold text-muted-foreground">{stat.label}</span>
                 </div>
-                <span className="text-[11px] sm:text-[14px] font-black text-foreground tabular-nums">{stat.value}</span>
+                <span className="text-xs sm:text-sm font-bold text-foreground">{stat.value}</span>
               </div>
             ))}
           </div>
 
-          <div className="flex items-center justify-between mt-2">
-            <div className="flex flex-col">
-              <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 mb-0.5">Asset Valuation</span>
-              <div className="flex items-baseline gap-1">
+          {/* Price and CTA */}
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <p className="text-[7px] sm:text-[8px] font-semibold text-muted-foreground mb-0.5">Starting From</p>
+              <div className="flex items-baseline gap-0.5">
                 <IndianRupee className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-                <span className="text-xl sm:text-3xl font-black text-foreground tracking-tighter tabular-nums">{inrPrice}</span>
+                <span className="text-lg sm:text-2xl font-bold text-foreground">{inrPrice}</span>
               </div>
             </div>
             
-            <div className="h-10 w-10 sm:h-14 sm:w-14 rounded-full bg-secondary border border-border flex items-center justify-center transition-all duration-300 group-hover:bg-primary group-hover:border-primary">
-              <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-foreground group-hover:text-primary-foreground transition-transform group-hover:translate-x-1" />
-            </div>
+            <button className="h-9 w-9 sm:h-12 sm:w-12 rounded-full bg-primary flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+              <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
+            </button>
           </div>
         </div>
-
-        {/* Scanline Effect Overlay */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%]" />
       </motion.div>
     </Link>
   );

@@ -380,10 +380,22 @@ export function Navbar() {
         </div>
       </header>
 
+      {/* Backdrop for mobile bottom sheets */}
+      {(showAuthPopover || showProfileSheet || showVehiclesSheet) && (
+        <div 
+          className="fixed inset-0 z-20 md:hidden"
+          onClick={() => {
+            setShowAuthPopover(false);
+            setShowProfileSheet(false);
+            setShowVehiclesSheet(false);
+          }}
+        />
+      )}
+
       {/* Mobile Bottom Dock - Hidden on Admin Login */}
       {!isAdminRoute && (
-        <nav className="fixed bottom-0 left-0 right-0 md:hidden z-40 bg-background/95 backdrop-blur-md border-t border-border/50 safe-area-inset-bottom">
-          <div className="flex items-center justify-around px-2 py-1.5">
+        <nav className="fixed bottom-0 left-0 right-0 md:hidden z-40 bg-background/95 backdrop-blur-md border-t border-border/50 h-[calc(56px+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)]">
+          <div className="flex items-center justify-around h-14 px-2">
             <Link
               href="/"
               onClick={() => { setShowAuthPopover(false); setShowProfileSheet(false); setShowVehiclesSheet(false); }}
@@ -436,7 +448,7 @@ export function Navbar() {
 
       {/* Auth Bottom Sheet - Expands Upward */}
       <div className={cn(
-        "fixed left-0 right-0 bottom-[56px] md:hidden z-30 bg-background/95 backdrop-blur-xl border-t border-border/50 overflow-hidden transition-all duration-300 ease-in-out",
+        "fixed left-0 right-0 bottom-[calc(56px+env(safe-area-inset-bottom,0px))] md:hidden z-30 bg-background/95 backdrop-blur-xl border-t border-border/50 overflow-hidden transition-all duration-300 ease-in-out",
         showAuthPopover ? "max-h-60" : "max-h-0"
       )}>
         <div className="px-4 py-6">
@@ -469,7 +481,7 @@ export function Navbar() {
       {/* Profile Bottom Sheet - Expands Upward */}
 
       <div className={cn(
-        "fixed left-0 right-0 bottom-[56px] md:hidden z-30 bg-background/95 backdrop-blur-xl border-t border-border/50 overflow-hidden transition-all duration-300 ease-in-out",
+        "fixed left-0 right-0 bottom-[calc(56px+env(safe-area-inset-bottom,0px))] md:hidden z-30 bg-background/95 backdrop-blur-xl border-t border-border/50 overflow-hidden transition-all duration-300 ease-in-out",
         showProfileSheet ? "max-h-80" : "max-h-0"
       )}>
         <div className="px-4 py-6">
@@ -506,7 +518,7 @@ export function Navbar() {
 
       {/* Vehicles Bottom Sheet - Expands Upward */}
       <div className={cn(
-        "fixed left-0 right-0 bottom-[56px] md:hidden z-50 bg-background/95 backdrop-blur-xl border-t border-border/50 overflow-hidden transition-all duration-300 ease-in-out",
+        "fixed left-0 right-0 bottom-[calc(56px+env(safe-area-inset-bottom,0px))] md:hidden z-30 bg-background/95 backdrop-blur-xl border-t border-border/50 overflow-hidden transition-all duration-300 ease-in-out",
         showVehiclesSheet ? "max-h-96" : "max-h-0"
       )}>
         <div className="px-4 py-6">

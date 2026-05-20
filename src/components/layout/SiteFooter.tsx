@@ -22,7 +22,7 @@ export function SiteFooter({ showOnAdmin = false }: { showOnAdmin?: boolean }) {
     <footer className="bg-background border-t border-muted">
       <div className="container mx-auto px-6">
         {/* Main Footer Content */}
-        <div className="py-20 flex flex-col items-center text-center">
+        <div className="py-12 flex flex-col items-center text-center">
           <div className="max-w-2xl">
             {/* Brand Section */}
             <div className="flex flex-col items-center">
@@ -37,25 +37,26 @@ export function SiteFooter({ showOnAdmin = false }: { showOnAdmin?: boolean }) {
         </div>
 
         {/* Inspiration & Signature Section */}
-        <div className="pb-16 border-t border-muted/10 pt-16 px-4 md:px-12">
+        <div className="pb-10 border-t border-muted/10 pt-10 px-6 md:px-12">
           <div className="max-w-4xl mx-auto">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center text-center md:text-left mb-12">
-              <div className="md:w-3/4">
-                <h3 className="text-xs uppercase tracking-[0.3em] font-bold text-primary/60 mb-6">Inspiration</h3>
-                <p className="text-2xl md:text-3xl font-headline italic text-foreground leading-relaxed max-w-3xl mx-auto md:mx-0">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-8 text-center md:text-left">
+              {/* Left: Inspiration Label & Quote */}
+              <div className="flex flex-col items-center md:items-start max-w-2xl">
+                <h3 className="text-xs uppercase tracking-[0.3em] font-bold text-primary/60 mb-4 md:mb-6">Inspiration</h3>
+                <p className="text-xl md:text-2xl lg:text-3xl font-headline italic text-foreground leading-relaxed">
                   "The present is theirs; the future, for which I have really worked, is mine."
                 </p>
               </div>
-              <div className="flex justify-center items-center gap-4 mt-8 md:mt-0 md:w-1/4">
-                <span className="text-foreground/40 text-2xl md:text-3xl font-serif">~</span>
+              
+              {/* Right: Tilde & Signature */}
+              <div className="flex justify-center md:justify-end items-center gap-4 md:gap-8 w-full md:w-auto">
+                <span className="text-foreground/40 text-2xl md:text-3xl lg:text-4xl font-serif">~</span>
                 <motion.svg
-                  width="200"
-                  height="38"
                   viewBox="0 0 267 49"
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  className="text-foreground"
+                  className="text-foreground w-[160px] h-[30px] sm:w-[180px] sm:h-[34px] md:w-[200px] md:h-[38px]"
                 >
                 <g transform="translate(-4.5220961,1.1305238)">
                   <motion.path
@@ -116,12 +117,13 @@ export function SiteFooter({ showOnAdmin = false }: { showOnAdmin?: boolean }) {
                   strokeWidth="0.5"
                 />
               </motion.svg>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Sub Footer */}
-        <div className="py-6 px-6 md:px-12 border-t border-muted/20 bg-primary/5 rounded-2xl mb-8">
+        <div className="py-6 px-6 md:px-12 border-t border-muted/20 bg-primary/5 rounded-2xl mb-2">
           {/* Mobile Layout */}
           <div className="md:hidden flex flex-col gap-6">
             {/* Contact Section */}
@@ -156,7 +158,7 @@ export function SiteFooter({ showOnAdmin = false }: { showOnAdmin?: boolean }) {
                 <a href="#" className="w-8 h-8 flex items-center justify-center rounded border border-primary/30 text-muted-foreground hover:text-primary hover:bg-primary/10 hover:border-primary transition-all duration-300 text-xs" title="Instagram">
                   <Instagram size={16} />
                 </a>
-                <a href="#" className="w-8 h-8 flex items-center justify-center rounded border border-primary/30 text-muted-foreground hover:text-primary hover:bg-primary/10 hover:border-primary transition-all duration-300 text-xs" title="Call">
+                <a href="#" className="w-8 h-8 flex items-center justify-center rounded border border-primary/30 text-muted-foreground hover:text-primary hover:bg-primary/10 hover:border-primary transition-all duration-300 text-xs" title="Phone">
                   <Phone size={16} />
                 </a>
               </div>
@@ -208,7 +210,7 @@ export function SiteFooter({ showOnAdmin = false }: { showOnAdmin?: boolean }) {
                   <a href="#" className="w-8 h-8 flex items-center justify-center rounded border border-primary/30 text-muted-foreground hover:text-primary hover:bg-primary/10 hover:border-primary transition-all duration-300 text-xs" title="Instagram">
                     <Instagram size={16} />
                   </a>
-                  <a href="#" className="w-8 h-8 flex items-center justify-center rounded border border-primary/30 text-muted-foreground hover:text-primary hover:bg-primary/10 hover:border-primary transition-all duration-300 text-xs" title="Call">
+                  <a href="#" className="w-8 h-8 flex items-center justify-center rounded border border-primary/30 text-muted-foreground hover:text-primary hover:bg-primary/10 hover:border-primary transition-all duration-300 text-xs" title="Phone">
                     <Phone size={16} />
                   </a>
                 </div>
@@ -256,7 +258,7 @@ export function SiteFooter({ showOnAdmin = false }: { showOnAdmin?: boolean }) {
         </div>
 
         {/* Global Bottom Section (Mobile Only Copyright / Developer Credit) */}
-        <div className="md:hidden pb-20 space-y-8 text-center">
+        <div className="md:hidden pb-[calc(80px+env(safe-area-inset-bottom,0px))] space-y-4 text-center">
           {/* Mobile-only Copyright/Policies */}
           <div className="space-y-4">
             <p className="text-muted-foreground text-[10px] uppercase tracking-[0.2em] font-medium">
@@ -289,8 +291,9 @@ export function SiteFooter({ showOnAdmin = false }: { showOnAdmin?: boolean }) {
           </div>
         </div>
       </div>
-      </div>
-      </footer>
+      
+      
+    </footer>
 
   );
 }

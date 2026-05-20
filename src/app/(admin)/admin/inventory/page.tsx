@@ -15,7 +15,9 @@ import {
   Check,
   X,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
@@ -260,6 +262,15 @@ const ensureArray = (value: any): string[] => {
     return value.split(',').map((item: string) => item.trim()).filter(Boolean);
   }
   return [];
+};
+
+const moveArrayItem = <T,>(items: T[], fromIndex: number, toIndex: number) => {
+  if (toIndex < 0 || toIndex >= items.length) return items;
+
+  const nextItems = [...items];
+  const [movedItem] = nextItems.splice(fromIndex, 1);
+  nextItems.splice(toIndex, 0, movedItem);
+  return nextItems;
 };
 
 export default function AdminInventoryPage() {
@@ -606,6 +617,10 @@ export default function AdminInventoryPage() {
     });
   };
 
+  const moveEditGalleryItem = (fromIndex: number, toIndex: number) => {
+    setEditGalleryItems((prev) => moveArrayItem(prev, fromIndex, toIndex));
+  };
+
   const closeEditModal = () => {
     setIsEditModalOpen(false);
     setEditingVehicle(null);
@@ -740,6 +755,26 @@ export default function AdminInventoryPage() {
     setBulkVehicles((prev) =>
       prev.map((entry, idx) => (idx === index ? { ...entry, [field]: value } : entry))
     );
+  };
+
+  const moveSelectedFile = (fromIndex: number, toIndex: number) => {
+    setSelectedFiles((prev) => moveArrayItem(prev, fromIndex, toIndex));
+  };
+
+  const moveBulkSelectedFile = (vehicleIndex: number, fromIndex: number, toIndex: number) => {
+    setBulkVehicles((prev) => prev.map((entry, idx) => (
+      idx === vehicleIndex
+        ? { ...entry, selectedFiles: moveArrayItem(entry.selectedFiles, fromIndex, toIndex) }
+        : entry
+    )));
+  };
+
+  const removeBulkSelectedFile = (vehicleIndex: number, fileIndex: number) => {
+    setBulkVehicles((prev) => prev.map((entry, idx) => (
+      idx === vehicleIndex
+        ? { ...entry, selectedFiles: entry.selectedFiles.filter((_, selectedIndex) => selectedIndex !== fileIndex) }
+        : entry
+    )));
   };
 
   const addBulkVehicleRow = () => {
@@ -1299,6 +1334,35 @@ export default function AdminInventoryPage() {
                                   }}
                                   className="h-9 text-xs bg-muted/20 border-dashed border-primary/20"
                                 />
+                                {entry.selectedFiles.length > 0 && (
+                                  <div className="space-y-1 rounded-lg border border-primary/10 bg-primary/5 p-2">
+                                    {entry.selectedFiles.map((file, fileIndex) => (
+                                      <div key={`${file.name}-${fileIndex}`} className="flex items-center gap-2 rounded border border-border/50 bg-background/50 px-2 py-1">
+                                        <Badge variant={fileIndex === 0 ? "default" : "secondary"} className="h-5 px-2 text-[8px] font-black uppercase tracking-widest">
+                                          {fileIndex === 0 ? 'Face' : `#${fileIndex + 1}`}
+                                        </Badge>
+                                        <span className="min-w-0 flex-1 truncate text-[9px] font-bold">{file.name}</span>
+                                        <Button type="button" variant="ghost" size="icon" disabled={fileIndex === 0} onClick={() => moveBulkSelectedFile(idx, fileIndex, fileIndex - 1)} className="h-6 w-6">
+                                          <ChevronLeft className="h-3 w-3" />
+                                        </Button>
+                                        <Button type="button" variant="ghost" size="icon" disabled={fileIndex === entry.selectedFiles.length - 1} onClick={() => moveBulkSelectedFile(idx, fileIndex, fileIndex + 1)} className="h-6 w-6">
+                                          <ChevronRight className="h-3 w-3" />
+                                        </Button>
+                                        <Button type="button" variant="ghost" onClick={() => moveBulkSelectedFile(idx, fileIndex, 0)} disabled={fileIndex === 0} className="h-6 px-2 text-[8px] font-black uppercase tracking-widest">
+                                          Face
+                                        </Button>
+                                        <button
+                                          type="button"
+                                          onClick={() => removeBulkSelectedFile(idx, fileIndex)}
+                                          className="flex h-6 w-6 items-center justify-center rounded-full text-red-500 hover:bg-red-500 hover:text-white"
+                                          aria-label="Remove image"
+                                        >
+                                          <X className="h-3.5 w-3.5" />
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -1921,14 +1985,27 @@ export default function AdminInventoryPage() {
                           className="bg-muted/20 h-10 text-xs py-2 px-3 border-dashed border-primary/20" 
                         />
                         {selectedFiles.length > 0 && (
-                          <div className="flex flex-wrap gap-2 p-3 bg-primary/5 rounded-lg border border-primary/10">
+                          <div className="flex flex-col gap-2 p-3 bg-primary/5 rounded-lg border border-primary/10">
                             {selectedFiles.map((file, i) => (
-                              <div key={i} className="flex items-center gap-2 bg-background/50 px-2 py-1 rounded border border-border/50">
-                                <span className="text-[9px] font-bold truncate max-w-[100px]">{file.name}</span>
+                              <div key={`${file.name}-${i}`} className="flex items-center gap-2 bg-background/50 px-2 py-1 rounded border border-border/50">
+                                <Badge variant={i === 0 ? "default" : "secondary"} className="h-5 px-2 text-[8px] font-black uppercase tracking-widest">
+                                  {i === 0 ? 'Face' : `#${i + 1}`}
+                                </Badge>
+                                <span className="min-w-0 flex-1 text-[9px] font-bold truncate">{file.name}</span>
+                                <Button type="button" variant="ghost" size="icon" disabled={i === 0} onClick={() => moveSelectedFile(i, i - 1)} className="h-6 w-6">
+                                  <ChevronLeft className="h-3 w-3" />
+                                </Button>
+                                <Button type="button" variant="ghost" size="icon" disabled={i === selectedFiles.length - 1} onClick={() => moveSelectedFile(i, i + 1)} className="h-6 w-6">
+                                  <ChevronRight className="h-3 w-3" />
+                                </Button>
+                                <Button type="button" variant="ghost" onClick={() => moveSelectedFile(i, 0)} disabled={i === 0} className="h-6 px-2 text-[8px] font-black uppercase tracking-widest">
+                                  Face
+                                </Button>
                                 <button 
                                   type="button"
                                   onClick={() => setSelectedFiles(prev => prev.filter((_, idx) => idx !== i))}
-                                  className="text-red-500 hover:text-red-700 font-black text-[10px]"
+                                  className="flex h-6 w-6 items-center justify-center rounded-full text-red-500 hover:bg-red-500 hover:text-white"
+                                  aria-label="Remove image"
                                 >
                                   ✕
                                 </button>
@@ -2685,14 +2762,20 @@ export default function AdminInventoryPage() {
                                 <X className="h-3.5 w-3.5" />
                               </button>
                             </div>
-                            <div className="flex items-center gap-2 p-2">
+                            <div className="grid grid-cols-[auto_auto_1fr_auto] items-center gap-1 p-2">
+                              <Button type="button" variant="ghost" size="icon" disabled={index === 0} onClick={() => moveEditGalleryItem(index, index - 1)} className="h-7 w-7">
+                                <ChevronLeft className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button type="button" variant="ghost" size="icon" disabled={index === editGalleryItems.length - 1} onClick={() => moveEditGalleryItem(index, index + 1)} className="h-7 w-7">
+                                <ChevronRight className="h-3.5 w-3.5" />
+                              </Button>
                               <Button
                                 type="button"
                                 variant={index === 0 ? "secondary" : "outline"}
                                 size="sm"
                                 onClick={() => makeEditGalleryFaceImage(item.id)}
                                 disabled={index === 0}
-                                className="h-7 flex-1 rounded-md px-2 text-[8px] font-black uppercase tracking-widest"
+                                className="h-7 rounded-md px-2 text-[8px] font-black uppercase tracking-widest"
                               >
                                 {index === 0 ? (
                                   <>

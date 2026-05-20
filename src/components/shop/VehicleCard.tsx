@@ -99,7 +99,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
               alt={`${liveData.make} ${liveData.model}`}
               fill
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover"
+              className="object-contain p-4"
               priority
               unoptimized={primaryImage.startsWith('/uploads/')}
             />

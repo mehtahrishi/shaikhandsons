@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllVehicles } from '@/lib/db/inventory';
+import { getAllVehicles, getVehicleById } from '@/lib/db/inventory';
 
 export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    if (id && !isNaN(Number(id))) {
+      const vehicle = await getVehicleById(Number(id));
+      return NextResponse.json({ total: vehicle ? 1 : 0, vehicles: vehicle ? [vehicle] : [] });
+    }
+
     const vehicles = await getAllVehicles();
     return NextResponse.json({ total: vehicles.length, vehicles });
   } catch (err) {

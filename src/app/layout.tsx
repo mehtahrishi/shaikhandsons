@@ -31,7 +31,7 @@ export default function RootLayout({
               (function() {
                 try {
                   const savedTheme = localStorage.getItem('shaikh_theme');
-                  const theme = savedTheme || 'dark';
+                  const theme = savedTheme || 'light';
                   if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
                     document.documentElement.style.colorScheme = 'dark';
@@ -40,7 +40,8 @@ export default function RootLayout({
                     document.documentElement.style.colorScheme = 'light';
                   }
                 } catch (e) {
-                  document.documentElement.classList.add('dark');
+                  document.documentElement.classList.remove('dark');
+                  document.documentElement.style.colorScheme = 'light';
                 }
               })();
             `,

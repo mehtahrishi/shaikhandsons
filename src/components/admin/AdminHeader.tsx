@@ -17,13 +17,13 @@ import { useAdminAuth } from '@/context/AdminAuthContext';
 
 export function AdminHeader() {
   const { user, logout } = useAdminAuth();
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     setMounted(true);
-    const savedTheme = localStorage.getItem('shaikh_theme') || 'dark';
+    const savedTheme = localStorage.getItem('shaikh_theme') || 'light';
     const isCurrentlyDark = savedTheme === 'dark';
     setIsDark(isCurrentlyDark);
     if (isCurrentlyDark) document.documentElement.classList.add('dark');

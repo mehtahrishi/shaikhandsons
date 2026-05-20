@@ -88,6 +88,7 @@ import { Mail, FileText, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { ADMIN_VEHICLE_CATEGORIES } from '@/lib/vehicle-categories';
 import { getImageUrl } from '@/lib/utils';
+import { generateVehicleSlug } from '@/lib/slug';
 
 type Vehicle = {
   id: string;
@@ -289,6 +290,7 @@ export default function AdminInventoryPage() {
   const [isUploading, setIsUploading] = React.useState(false);
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
   const [formErrors, setFormErrors] = React.useState<Record<string, string>>({});
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = React.useState(false);
   const [bulkVehicles, setBulkVehicles] = React.useState<BulkVehicleForm[]>([createEmptyBulkVehicle()]);
   const [editingVehicle, setEditingVehicle] = React.useState<Vehicle | null>(null);
   const [editGalleryItems, setEditGalleryItems] = React.useState<EditGalleryItem[]>([]);
@@ -324,6 +326,7 @@ export default function AdminInventoryPage() {
       }
       const normalizedVehicles = (data.vehicles || []).map((vehicle: Vehicle) => ({
         ...vehicle,
+        price: Number(vehicle.price) || 0,
         images: getVehicleImages(vehicle),
       }));
       setVehicles(normalizedVehicles);
@@ -362,8 +365,8 @@ export default function AdminInventoryPage() {
     return result;
   }, [search, vehicles, selectedBrandId]);
 
-  const totalAssets = vehicles.length;
-  const totalValue = vehicles.reduce((sum, v) => sum + v.price, 0);
+  const totalAssets = filteredVehicles.length;
+  const totalValue = filteredVehicles.reduce((sum, v) => sum + (Number(v.price) || 0), 0);
   const formattedTotalValue = new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
@@ -410,6 +413,16 @@ export default function AdminInventoryPage() {
   });
   const [colorsInput, setColorsInput] = React.useState('');
 
+  // Auto-generate slug for single form
+  React.useEffect(() => {
+    if (!isSlugManuallyEdited && formData.make && formData.model) {
+      const generatedSlug = generateVehicleSlug(formData.make, formData.model);
+      if (formData.slug !== generatedSlug) {
+        setFormData(prev => ({ ...prev, slug: generatedSlug }));
+      }
+    }
+  }, [formData.make, formData.model, isSlugManuallyEdited, formData.slug]);
+
   const handleRegisterUnit = async () => {
     const errors: Record<string, string> = {};
     
@@ -433,18 +446,10 @@ export default function AdminInventoryPage() {
     try {
       setIsUploading(true);
       
-      // 1. Upload Images to Storage or use placeholders
+      // 1. Upload Images to Storage
       let imageUrls: string[] = [];
       if (selectedFiles.length > 0) {
         imageUrls = await uploadVehicleImages(selectedFiles);
-      } else {
-        // Generate placeholder images
-        const placeholders = [
-          `https://picsum.photos/seed/${formData.make}-${formData.model}-1/400/300`,
-          `https://picsum.photos/seed/${formData.make}-${formData.model}-2/400/300`,
-          `https://picsum.photos/seed/${formData.make}-${formData.model}-3/400/300`,
-        ];
-        imageUrls = placeholders;
       }
       
       // 2. Save Data to Database
@@ -544,6 +549,7 @@ export default function AdminInventoryPage() {
 
   const handleEditClick = (vehicle: Vehicle) => {
     setEditingVehicle(vehicle);
+    setIsSlugManuallyEdited(true);
     revokeEditGalleryPreviews(editGalleryItems);
     setSelectedFiles([]);
     setEditGalleryItems(getVehicleImages(vehicle).map((url, index) => ({
@@ -798,7 +804,21 @@ export default function AdminInventoryPage() {
     value: BulkVehicleForm[K]
   ) => {
     setBulkVehicles((prev) =>
-      prev.map((entry, idx) => (idx === index ? { ...entry, [field]: value } : entry))
+      prev.map((entry, idx) => {
+        if (idx === index) {
+          const updatedEntry = { ...entry, [field]: value };
+          
+          // Auto-generate slug for bulk entries if make or model changes
+          if (field === 'make' || field === 'model') {
+            if (updatedEntry.make && updatedEntry.model) {
+              updatedEntry.slug = generateVehicleSlug(updatedEntry.make, updatedEntry.model);
+            }
+          }
+          
+          return updatedEntry;
+        }
+        return entry;
+      })
     );
   };
 
@@ -1478,6 +1498,7 @@ export default function AdminInventoryPage() {
 
             <Dialog open={isAddModalOpen} onOpenChange={(open) => {
             setIsAddModalOpen(open);
+            if (open) setIsSlugManuallyEdited(false);
             if (!open) setColorsInput('');
           }}>
             <DialogTrigger asChild>
@@ -1594,7 +1615,10 @@ export default function AdminInventoryPage() {
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">URL Slug (e.g., ather-450x)</Label>
                         <Input
                           value={formData.slug || ''}
-                          onChange={(e) => setFormData(prev => ({...prev, slug: e.target.value}))}
+                          onChange={(e) => {
+                            setFormData(prev => ({...prev, slug: e.target.value}));
+                            setIsSlugManuallyEdited(true);
+                          }}
                           placeholder="auto-generated from make + model" 
                           className="bg-muted/20 h-10 text-xs border-border/50"
                         />
@@ -2108,7 +2132,7 @@ export default function AdminInventoryPage() {
                   className="h-10 px-6 font-black uppercase tracking-widest text-[10px] rounded-lg min-w-[120px]"
                 >
                   {isUploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                  {isUploading ? 'Saving...' : (selectedFiles.length > 0 ? 'Upload & Register' : 'Register with Placeholders')}
+                  {isUploading ? 'Saving...' : (selectedFiles.length > 0 ? 'Upload & Register' : 'Register')}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -2370,7 +2394,10 @@ export default function AdminInventoryPage() {
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">URL Slug</Label>
                     <Input 
                       value={formData.slug}
-                      onChange={(e) => setFormData(prev => ({...prev, slug: e.target.value}))}
+                      onChange={(e) => {
+                        setFormData(prev => ({...prev, slug: e.target.value}));
+                        setIsSlugManuallyEdited(true);
+                      }}
                       placeholder="e.g., ather-450x" 
                       className="bg-muted/20 h-10 text-xs border-border/50" 
                     />

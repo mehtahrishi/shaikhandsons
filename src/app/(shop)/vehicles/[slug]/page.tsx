@@ -340,7 +340,7 @@ export default function VehicleDetailPage() {
                       <img
                         src={getImageUrl(img)}
                         alt={`${vehicle.make} ${vehicle.model} thumbnail ${idx + 1}`}
-                        className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+                        className="w-full h-full object-contain p-2 transition-all duration-500 group-hover:scale-110"
                       />
                     </button>
                   ))}
@@ -381,7 +381,7 @@ export default function VehicleDetailPage() {
                   transition={{ duration: 0.5 }}
                   src={getImageUrl(selectedImage)}
                   alt={`${vehicle.make} ${vehicle.model}`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
+                  className="w-full h-full object-contain p-4 group-hover:scale-105 transition-all duration-700"
                 />
               ) : (
                 <div className="text-muted-foreground flex flex-col items-center gap-2">

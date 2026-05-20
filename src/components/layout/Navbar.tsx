@@ -134,7 +134,7 @@ const categoryIcons: Record<string, React.ComponentType<{ className?: string }>>
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
   const scrollTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
@@ -162,7 +162,7 @@ export function Navbar() {
         document.documentElement.classList.remove('dark');
       }
     } else {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('dark');
     }
   }, []);
 

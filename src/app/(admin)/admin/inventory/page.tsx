@@ -85,6 +85,7 @@ import {
 import { Mail, FileText, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { ADMIN_VEHICLE_CATEGORIES } from '@/lib/vehicle-categories';
+import { getImageUrl } from '@/lib/utils';
 
 type Vehicle = {
   id: string;
@@ -124,6 +125,13 @@ type Vehicle = {
   colors?: string[];
   keyFeatures?: string[];
   bootSpace?: string;
+};
+
+type EditGalleryItem = {
+  id: string;
+  type: 'existing' | 'file';
+  previewUrl: string;
+  file?: File;
 };
 
 type BrandData = {
@@ -182,6 +190,14 @@ const getVehicleImages = (vehicle: Pick<Vehicle, 'images' | 'imageUrls'>) => {
   }
 
   return [];
+};
+
+const revokeEditGalleryPreviews = (items: EditGalleryItem[]) => {
+  items.forEach((item) => {
+    if (item.type === 'file') {
+      URL.revokeObjectURL(item.previewUrl);
+    }
+  });
 };
 
 const createEmptyBulkVehicle = (): BulkVehicleForm => ({
@@ -261,6 +277,7 @@ export default function AdminInventoryPage() {
   const [formErrors, setFormErrors] = React.useState<Record<string, string>>({});
   const [bulkVehicles, setBulkVehicles] = React.useState<BulkVehicleForm[]>([createEmptyBulkVehicle()]);
   const [editingVehicle, setEditingVehicle] = React.useState<Vehicle | null>(null);
+  const [editGalleryItems, setEditGalleryItems] = React.useState<EditGalleryItem[]>([]);
   const [vehicleToDelete, setVehicleToDelete] = React.useState<string | null>(null);
   const [selectedBrandId, setSelectedBrandId] = React.useState<string>('all');
 
@@ -510,6 +527,13 @@ export default function AdminInventoryPage() {
 
   const handleEditClick = (vehicle: Vehicle) => {
     setEditingVehicle(vehicle);
+    revokeEditGalleryPreviews(editGalleryItems);
+    setSelectedFiles([]);
+    setEditGalleryItems(getVehicleImages(vehicle).map((url, index) => ({
+      id: `existing-${index}-${url}`,
+      type: 'existing',
+      previewUrl: url,
+    })));
     setFormData({
       brandId: vehicle.brandId || 0,
       make: vehicle.make || '',
@@ -549,6 +573,47 @@ export default function AdminInventoryPage() {
     setIsEditModalOpen(true);
   };
 
+  const addEditGalleryFiles = (files: File[]) => {
+    if (files.length === 0) return;
+
+    const newItems = files.map((file, index) => ({
+      id: `file-${Date.now()}-${index}-${file.name}`,
+      type: 'file' as const,
+      previewUrl: URL.createObjectURL(file),
+      file,
+    }));
+
+    setEditGalleryItems((prev) => [...prev, ...newItems]);
+  };
+
+  const removeEditGalleryItem = (id: string) => {
+    setEditGalleryItems((prev) => {
+      const itemToRemove = prev.find((item) => item.id === id);
+      if (itemToRemove?.type === 'file') {
+        URL.revokeObjectURL(itemToRemove.previewUrl);
+      }
+
+      return prev.filter((item) => item.id !== id);
+    });
+  };
+
+  const makeEditGalleryFaceImage = (id: string) => {
+    setEditGalleryItems((prev) => {
+      const selected = prev.find((item) => item.id === id);
+      if (!selected) return prev;
+
+      return [selected, ...prev.filter((item) => item.id !== id)];
+    });
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingVehicle(null);
+    setSelectedFiles([]);
+    revokeEditGalleryPreviews(editGalleryItems);
+    setEditGalleryItems([]);
+  };
+
   const handleUpdateUnit = async () => {
     if (!editingVehicle) return;
 
@@ -564,11 +629,19 @@ export default function AdminInventoryPage() {
     try {
       setIsUploading(true);
       
-      let imageUrls = editingVehicle.images;
-      if (selectedFiles.length > 0) {
-        // Upload new images if selected
-        imageUrls = await uploadVehicleImages(selectedFiles);
-      }
+      const fileItems = editGalleryItems.filter((item) => item.type === 'file' && item.file);
+      const uploadedUrls = fileItems.length > 0
+        ? await uploadVehicleImages(fileItems.map((item) => item.file as File))
+        : [];
+      let uploadedIndex = 0;
+      const imageUrls = editGalleryItems
+        .map((item) => {
+          if (item.type === 'existing') return item.previewUrl;
+          const uploadedUrl = uploadedUrls[uploadedIndex];
+          uploadedIndex += 1;
+          return uploadedUrl;
+        })
+        .filter(Boolean);
       
       await updateVehicleAPI(editingVehicle.id, {
         brandId: formData.brandId,
@@ -614,6 +687,8 @@ export default function AdminInventoryPage() {
       setIsEditModalOpen(false);
       setEditingVehicle(null);
       setSelectedFiles([]);
+      revokeEditGalleryPreviews(editGalleryItems);
+      setEditGalleryItems([]);
       fetchVehicles();
     } catch (error: any) {
       toast({
@@ -2001,7 +2076,7 @@ export default function AdminInventoryPage() {
                             <div className="h-10 w-16 rounded-md bg-muted/20 overflow-hidden border border-border/50 shrink-0">
                               {getVehicleImages(item)[0] ? (
                                 <img 
-                                  src={getVehicleImages(item)[0]} 
+                                  src={getImageUrl(getVehicleImages(item)[0])} 
                                   alt={item.model} 
                                   className="h-full w-full object-cover"
                                 />
@@ -2066,8 +2141,12 @@ export default function AdminInventoryPage() {
       </div>
 
       <Dialog open={isEditModalOpen} onOpenChange={(open) => {
-        setIsEditModalOpen(open);
-        if (!open) setColorsInput('');
+        if (open) {
+          setIsEditModalOpen(true);
+        } else {
+          closeEditModal();
+          setColorsInput('');
+        }
       }}>
         <DialogContent className="bg-card/95 backdrop-blur-xl border-border/50 sm:max-w-[850px] p-0 overflow-hidden">
           <DialogHeader className="p-6 pb-0">
@@ -2571,15 +2650,65 @@ export default function AdminInventoryPage() {
                       multiple
                       onChange={(e) => {
                         if (e.target.files) {
-                          setSelectedFiles(Array.from(e.target.files));
+                          addEditGalleryFiles(Array.from(e.target.files));
+                          e.target.value = '';
                         }
                       }}
                       className="bg-muted/20 h-10 text-xs py-2 px-3 border-dashed border-primary/20" 
                     />
-                    {selectedFiles.length > 0 ? (
-                      <p className="text-[8px] text-primary uppercase font-bold">{selectedFiles.length} new files selected</p>
+                    {editGalleryItems.length > 0 ? (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {editGalleryItems.map((item, index) => (
+                          <div key={item.id} className="relative overflow-hidden rounded-lg border border-border/50 bg-muted/10">
+                            <div className="relative aspect-[4/3] bg-muted/20">
+                              <img
+                                src={getImageUrl(item.previewUrl)}
+                                alt={`${formData.model || 'Vehicle'} image ${index + 1}`}
+                                className="h-full w-full object-cover"
+                              />
+                              {index === 0 && (
+                                <Badge className="absolute left-2 top-2 h-5 px-2 text-[8px] font-black uppercase tracking-widest">
+                                  Face
+                                </Badge>
+                              )}
+                              {item.type === 'file' && (
+                                <Badge variant="secondary" className="absolute bottom-2 left-2 h-5 px-2 text-[8px] font-black uppercase tracking-widest">
+                                  New
+                                </Badge>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => removeEditGalleryItem(item.id)}
+                                className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-background/90 text-red-500 shadow-sm transition-colors hover:bg-red-500 hover:text-white"
+                                aria-label="Remove image"
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                            <div className="flex items-center gap-2 p-2">
+                              <Button
+                                type="button"
+                                variant={index === 0 ? "secondary" : "outline"}
+                                size="sm"
+                                onClick={() => makeEditGalleryFaceImage(item.id)}
+                                disabled={index === 0}
+                                className="h-7 flex-1 rounded-md px-2 text-[8px] font-black uppercase tracking-widest"
+                              >
+                                {index === 0 ? (
+                                  <>
+                                    <Check className="mr-1 h-3 w-3" /> Face
+                                  </>
+                                ) : (
+                                  'Make Face'
+                                )}
+                              </Button>
+                              <span className="text-[9px] font-black text-muted-foreground">#{index + 1}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     ) : (
-                      <p className="text-[8px] text-muted-foreground uppercase font-bold">Current images will be kept if none selected</p>
+                      <p className="text-[8px] text-muted-foreground uppercase font-bold">No images selected for this vehicle</p>
                     )}
                   </div>
                 </div>
@@ -2595,11 +2724,7 @@ export default function AdminInventoryPage() {
             </div>
           </ScrollArea>
           <DialogFooter className="p-6 border-t border-border/30 bg-background/40 backdrop-blur-md">
-            <Button variant="outline" onClick={() => {
-              setIsEditModalOpen(false);
-              setEditingVehicle(null);
-              setSelectedFiles([]);
-            }} className="h-10 px-6 font-black uppercase tracking-widest text-[10px] rounded-lg">Cancel</Button>
+            <Button variant="outline" onClick={closeEditModal} className="h-10 px-6 font-black uppercase tracking-widest text-[10px] rounded-lg">Cancel</Button>
             <Button 
               onClick={handleUpdateUnit} 
               disabled={isUploading}

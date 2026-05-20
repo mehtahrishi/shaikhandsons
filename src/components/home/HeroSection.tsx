@@ -1,34 +1,41 @@
 
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export function HeroSection() {
+  // Carousel slides using real images from public/carousel
   const slides = [
     {
-      id: 'aether',
-      title: 'AETHER',
-      subtitle: 'ADVANCED SEDAN',
-      image: 'https://picsum.photos/seed/ev2/1536/1024',
-      hint: 'luxury electric sedan teal',
+      id: 'atun',
+      title: 'ATUN',
+      subtitle: 'ADVANCED MOBILITY',
+      image: '/carousel/atun.png',
+      hint: 'atun vehicle',
     },
     {
-      id: 'lumina',
-      title: 'LUMINA',
-      subtitle: 'INFINITE SUV',
-      image: 'https://picsum.photos/seed/ev3/1536/1024',
-      hint: 'luxury electric suv white',
+      id: 'dynamo',
+      title: 'DYNAMO',
+      subtitle: 'DYNAMIC PERFORMANCE',
+      image: '/carousel/dynamo.png',
+      hint: 'dynamo vehicle',
     },
     {
-      id: 'spectre',
-      title: 'SPECTRE',
-      subtitle: 'MASTER THE DARK',
-      image: 'https://picsum.photos/seed/ev4/1536/1024',
-      hint: 'luxury electric sports car black',
+      id: 'evey',
+      title: 'EVEY',
+      subtitle: 'ELECTRIC EVOLUTION',
+      image: '/carousel/evey.png',
+      hint: 'evey vehicle',
+    },
+    {
+      id: 'worzo',
+      title: 'WORZO',
+      subtitle: 'FUTURE READY',
+      image: '/carousel/worzo.png',
+      hint: 'worzo vehicle',
     }
   ];
 
@@ -43,7 +50,14 @@ export function HeroSection() {
   };
 
   const nextSlide = () => setSlide(getSlideIndex(1));
-  const prevSlide = () => setSlide(getSlideIndex(-1));
+
+  // Auto-rotate carousel every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [slides.length]);
 
   return (
     <section className="relative w-full bg-black overflow-hidden pb-0">
@@ -107,11 +121,6 @@ export function HeroSection() {
                     <h2 className="font-headline text-2xl md:text-3xl font-black text-white tracking-tighter uppercase">
                       {slides[currentIndex].title}
                     </h2>
-                    <div className="mt-8">
-                      <button className="px-10 py-3 border border-white/20 bg-white/5 hover:bg-white/10 backdrop-blur-md text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-full group">
-                        Explore <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
-                      </button>
-                    </div>
                   </motion.div>
                 </div>
               </motion.div>
@@ -165,29 +174,12 @@ export function HeroSection() {
                   <p className="text-primary font-bold tracking-[0.3em] text-[8px] uppercase mb-1">
                     {slides[currentIndex].subtitle}
                   </p>
-                  <h2 className="font-headline text-2xl font-black text-white tracking-tighter uppercase mb-6">
+                  <h2 className="font-headline text-2xl font-black text-white tracking-tighter uppercase">
                     {slides[currentIndex].title}
                   </h2>
-                  <button className="px-8 py-3 bg-primary text-primary-foreground text-[8px] font-bold uppercase tracking-widest rounded-full">
-                    Configure
-                  </button>
                 </div>
               </motion.div>
             </AnimatePresence>
-
-            {/* Mobile Nav Arrows */}
-            <button 
-              onClick={prevSlide}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white z-20"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button 
-              onClick={nextSlide}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white z-20"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
 
             {/* Mobile Indicators (Dots) - Now INSIDE and ABSOLUTE */}
             <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3 z-30">

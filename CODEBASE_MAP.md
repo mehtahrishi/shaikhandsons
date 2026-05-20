@@ -167,7 +167,6 @@ Root/
 │   │   │   ├── index.ts               # Drizzle ORM initialization and Postgres connection pool
 │   │   │   ├── inventory.ts           # Server-side queries for managing vehicles/brands
 │   │   │   ├── migrate.ts             # CLI Utility script to run Drizzle schema migrations
-│   │   │   ├── mock-data.ts           # Fallback static vehicle data (when DB is empty)
 │   │   │   └── schema.ts              # Drizzle ORM schemas: `users`, `brands`, `vehicles` tables
 │   │   ├── inventory-client.ts        # Client-side fetch wrappers for Admin inventory APIs
 │   │   ├── storage-node.ts            # Node.js file system utilities (file deletion)

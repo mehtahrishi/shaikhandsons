@@ -14,7 +14,7 @@ export function AnnouncementBar() {
           transition={{ repeat: Infinity, duration: 2 }}
           className="flex items-center gap-2"
         >
-          <span>Exclusive Premier: The Veridian Spectre is now accepting reservations</span>
+          <span>Welcome to Shaikh & Sons - Explore our latest collection</span>
           <ArrowRight className="h-3 w-3" />
         </motion.div>
       </div>

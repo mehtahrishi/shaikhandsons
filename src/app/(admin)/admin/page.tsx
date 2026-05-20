@@ -46,13 +46,6 @@ const chartConfig = {
   },
 };
 
-const recentEnquiries = [
-  { id: "ENQ-101", user: "Alexander Vance", model: "Veridian Aether", region: "London", status: "New" },
-  { id: "ENQ-102", user: "Sarah Jenkins", model: "Noir Spectre", region: "Dubai", status: "In Progress" },
-  { id: "ENQ-103", user: "Michael Chen", model: "Veridian Lumina", region: "Singapore", status: "Pending" },
-  { id: "ENQ-104", user: "Elena Rodriguez", model: "Veridian Aether", region: "New York", status: "Contacted" },
-];
-
 type DashboardStats = {
   totalUsers: number;
   totalVehicles: number;
@@ -249,22 +242,11 @@ export default function AdminDashboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {recentEnquiries.map((enq) => (
-                    <TableRow key={enq.id} className="border-border/50 hover:bg-primary/5 transition-colors">
-                      <TableCell className="py-4">
-                        <p className="text-xs font-bold leading-none mb-1">{enq.user}</p>
-                        <p className="text-[8px] text-muted-foreground uppercase tracking-widest">{enq.region}</p>
-                      </TableCell>
-                      <TableCell className="py-4 text-[10px] font-medium italic opacity-70">
-                        {enq.model.split(' ')[1]}
-                      </TableCell>
-                      <TableCell className="py-4 text-right">
-                        <span className="text-[8px] font-black uppercase tracking-[0.2em] px-2 py-1 bg-primary/10 text-primary rounded-full">
-                          {enq.status}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  <TableRow>
+                    <TableCell colSpan={3} className="h-24 text-center text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
+                      No enquiries yet
+                    </TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
             </CardContent>

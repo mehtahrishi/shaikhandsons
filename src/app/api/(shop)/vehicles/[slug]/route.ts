@@ -5,10 +5,11 @@ export const runtime = 'nodejs';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const identifier = params.slug;
+    const resolvedParams = await params;
+    const identifier = resolvedParams.slug;
 
     if (!identifier) {
       return NextResponse.json(

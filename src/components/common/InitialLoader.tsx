@@ -17,8 +17,6 @@ export function InitialLoader() {
     return () => clearTimeout(timer);
   }, []);
 
-  if (!mounted) return null;
-
   return (
     <AnimatePresence>
       {!isComplete && (

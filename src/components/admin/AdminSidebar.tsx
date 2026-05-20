@@ -19,7 +19,7 @@ import { BrandIdentity } from "@/components/common/BrandIdentity"
 const navItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
-  { name: "Inventory", href: "/admin/inventory", icon: Package },
+  { name: "Fleet Catalogue", href: "/admin/inventory", icon: Package },
   { name: "Brands", href: "/admin/brands", icon: Award },
   { name: "Customers", href: "/admin/users", icon: Users },
 ]

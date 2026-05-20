@@ -38,10 +38,10 @@ export function SiteFooter({ showOnAdmin = false }: { showOnAdmin?: boolean }) {
 
         {/* Inspiration & Signature Section */}
         <div className="pb-10 border-t border-muted/10 pt-10 px-6 md:px-12">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-8 text-center md:text-left">
+          <div className="max-w-full mx-auto">
+            <div className="flex flex-col md:grid md:grid-cols-2 gap-8 md:gap-12 items-center">
               {/* Left: Inspiration Label & Quote */}
-              <div className="flex flex-col items-center md:items-start max-w-2xl">
+              <div className="flex flex-col items-center md:items-start text-center md:text-left">
                 <h3 className="text-xs uppercase tracking-[0.3em] font-bold text-primary/60 mb-4 md:mb-6">Inspiration</h3>
                 <p className="text-xl md:text-2xl lg:text-3xl font-headline italic text-foreground leading-relaxed">
                   "The present is theirs; the future, for which I have really worked, is mine."
@@ -49,7 +49,7 @@ export function SiteFooter({ showOnAdmin = false }: { showOnAdmin?: boolean }) {
               </div>
               
               {/* Right: Tilde & Signature */}
-              <div className="flex justify-center md:justify-end items-center gap-4 md:gap-8 w-full md:w-auto">
+              <div className="flex justify-center md:justify-end items-center gap-4 md:gap-8 w-full">
                 <span className="text-foreground/40 text-2xl md:text-3xl lg:text-4xl font-serif">~</span>
                 <motion.svg
                   viewBox="0 0 267 49"

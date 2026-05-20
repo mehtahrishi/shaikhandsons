@@ -955,7 +955,7 @@ export default function AdminInventoryPage() {
           animate={{ opacity: 1, x: 0 }}
         >
           <h1 className="font-headline text-4xl md:text-6xl font-black mb-2 text-primary">
-            Inventory
+            Fleet Catalogue
           </h1>
           <p className="text-muted-foreground text-sm max-w-xl uppercase tracking-widest font-bold">
             Hardware management and fleet distribution.
@@ -1051,6 +1051,10 @@ export default function AdminInventoryPage() {
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Model Name</Label>
                                 <Input placeholder="Model" className="h-8 text-[9px] bg-muted/20" value={entry.model} onChange={(e) => updateBulkVehicle(idx, 'model', e.target.value)} />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Trim/Variant</Label>
+                                <Input placeholder="Standard/Pro/Max" className="h-8 text-[9px] bg-muted/20" value={entry.trim} onChange={(e) => updateBulkVehicle(idx, 'trim', e.target.value)} />
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Model Code</Label>
@@ -2151,7 +2155,7 @@ export default function AdminInventoryPage() {
             <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <CardTitle className="font-headline text-xl font-bold">Fleet Catalogue</CardTitle>
-                <CardDescription className="text-[10px] uppercase tracking-widest">Manage specifications and stock.</CardDescription>
+                <CardDescription className="text-[10px] uppercase tracking-widest">Manage specifications and fleet units.</CardDescription>
               </div>
               <div className="flex items-center gap-3">
                 <Select value={selectedBrandId} onValueChange={setSelectedBrandId}>
@@ -2170,7 +2174,7 @@ export default function AdminInventoryPage() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
                   <Input 
-                    placeholder="Search inventory..." 
+                    placeholder="Search catalogue..." 
                     className="pl-9 h-9 text-xs w-64 bg-muted/20"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -2379,6 +2383,14 @@ export default function AdminInventoryPage() {
                       value={formData.year}
                       onChange={(e) => setFormData(prev => ({...prev, year: parseInt(e.target.value) || 2026}))}
                       className="bg-muted/20 h-10 text-xs border-border/50" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Variant/Trim</Label>
+                    <Input 
+                      value={formData.trim}
+                      onChange={(e) => setFormData(prev => ({...prev, trim: e.target.value}))}
+                      placeholder="e.g., Grand Touring, Standard" className="bg-muted/20 h-10 text-xs border-border/50" 
                     />
                   </div>
                   <div className="col-span-1 md:col-span-2 space-y-2">

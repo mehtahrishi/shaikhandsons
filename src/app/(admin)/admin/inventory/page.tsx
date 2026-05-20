@@ -84,6 +84,7 @@ import {
 } from "@/components/ui/select";
 import { Mail, FileText, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
+import { ADMIN_VEHICLE_CATEGORIES } from '@/lib/vehicle-categories';
 
 type Vehicle = {
   id: string;
@@ -94,6 +95,7 @@ type Vehicle = {
   trim: string;
   price: number;
   images: string[];
+  imageUrls?: string[];
   designPhilosophy: string;
   createdAt: string;
   
@@ -168,6 +170,18 @@ type BulkVehicleForm = {
   colors: string[];
   keyFeatures: string[];
   bootSpace: string;
+};
+
+const getVehicleImages = (vehicle: Pick<Vehicle, 'images' | 'imageUrls'>) => {
+  if (Array.isArray(vehicle.imageUrls) && vehicle.imageUrls.length > 0) {
+    return vehicle.imageUrls;
+  }
+
+  if (Array.isArray(vehicle.images) && vehicle.images.length > 0) {
+    return vehicle.images;
+  }
+
+  return [];
 };
 
 const createEmptyBulkVehicle = (): BulkVehicleForm => ({
@@ -248,6 +262,7 @@ export default function AdminInventoryPage() {
   const [bulkVehicles, setBulkVehicles] = React.useState<BulkVehicleForm[]>([createEmptyBulkVehicle()]);
   const [editingVehicle, setEditingVehicle] = React.useState<Vehicle | null>(null);
   const [vehicleToDelete, setVehicleToDelete] = React.useState<string | null>(null);
+  const [selectedBrandId, setSelectedBrandId] = React.useState<string>('all');
 
   // Brands State
   const [brands, setBrands] = React.useState<BrandData[]>([]);
@@ -276,7 +291,11 @@ export default function AdminInventoryPage() {
       if (!response.ok) {
         throw new Error(data.error || 'Failed to fetch vehicles.');
       }
-      setVehicles(data.vehicles || []);
+      const normalizedVehicles = (data.vehicles || []).map((vehicle: Vehicle) => ({
+        ...vehicle,
+        images: getVehicleImages(vehicle),
+      }));
+      setVehicles(normalizedVehicles);
     } catch (err: any) {
       setError(err.message);
       console.error(err);
@@ -291,15 +310,26 @@ export default function AdminInventoryPage() {
   }, [fetchVehicles, fetchAllBrands]);
 
   const filteredVehicles = React.useMemo(() => {
+    let result = vehicles;
+    
+    // Brand filter
+    if (selectedBrandId && selectedBrandId !== 'all') {
+      result = result.filter(v => String(v.brandId) === selectedBrandId);
+    }
+    
+    // Search filter
     const term = search.trim().toLowerCase();
-    if (!term) return vehicles;
-    return vehicles.filter(v => 
-      v.make.toLowerCase().includes(term) || 
-      v.model.toLowerCase().includes(term) ||
-      v.trim.toLowerCase().includes(term) ||
-      v.id.toLowerCase().includes(term)
-    );
-  }, [search, vehicles]);
+    if (term) {
+      result = result.filter(v => 
+        v.make.toLowerCase().includes(term) || 
+        v.model.toLowerCase().includes(term) ||
+        v.trim.toLowerCase().includes(term) ||
+        v.id.toLowerCase().includes(term)
+      );
+    }
+    
+    return result;
+  }, [search, vehicles, selectedBrandId]);
 
   const totalAssets = vehicles.length;
   const totalValue = vehicles.reduce((sum, v) => sum + v.price, 0);
@@ -877,9 +907,9 @@ export default function AdminInventoryPage() {
                                     <SelectValue placeholder="Category" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="Scooter">Scooter</SelectItem>
-                                    <SelectItem value="Bike">Bike</SelectItem>
-                                    <SelectItem value="Loader">Loader</SelectItem>
+                                    {ADMIN_VEHICLE_CATEGORIES.map((category) => (
+                                      <SelectItem key={category.value} value={category.value}>{category.label}</SelectItem>
+                                    ))}
                                   </SelectContent>
                                 </Select>
                               </div>
@@ -1344,9 +1374,9 @@ export default function AdminInventoryPage() {
                             <SelectValue placeholder="Select Category" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Scooter">Scooter</SelectItem>
-                            <SelectItem value="Bike">Bike</SelectItem>
-                            <SelectItem value="Loader">Loader</SelectItem>
+                            {ADMIN_VEHICLE_CATEGORIES.map((category) => (
+                              <SelectItem key={category.value} value={category.value}>{category.label}</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </div>
@@ -1911,14 +1941,29 @@ export default function AdminInventoryPage() {
                 <CardTitle className="font-headline text-xl font-bold">Fleet Catalogue</CardTitle>
                 <CardDescription className="text-[10px] uppercase tracking-widest">Manage specifications and stock.</CardDescription>
               </div>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
-                <Input 
-                  placeholder="Search inventory..." 
-                  className="pl-9 h-9 text-xs w-64 bg-muted/20"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
+              <div className="flex items-center gap-3">
+                <Select value={selectedBrandId} onValueChange={setSelectedBrandId}>
+                  <SelectTrigger className="h-9 text-[10px] font-black uppercase tracking-widest w-40 bg-muted/20 border-border/50">
+                    <SelectValue placeholder="Filter by Brand" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all" className="text-[10px] font-black uppercase tracking-widest">All Brands</SelectItem>
+                    {brands.map((brand) => (
+                      <SelectItem key={brand.id} value={String(brand.id)} className="text-[10px] font-black uppercase tracking-widest">
+                        {brand.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search inventory..." 
+                    className="pl-9 h-9 text-xs w-64 bg-muted/20"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -1954,9 +1999,9 @@ export default function AdminInventoryPage() {
                         <TableCell className="py-4">
                           <div className="flex items-center gap-3">
                             <div className="h-10 w-16 rounded-md bg-muted/20 overflow-hidden border border-border/50 shrink-0">
-                              {item.images && item.images[0] ? (
+                              {getVehicleImages(item)[0] ? (
                                 <img 
-                                  src={item.images[0]} 
+                                  src={getVehicleImages(item)[0]} 
                                   alt={item.model} 
                                   className="h-full w-full object-cover"
                                 />
@@ -2086,9 +2131,9 @@ export default function AdminInventoryPage() {
                         <SelectValue placeholder="Select Category" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Scooter">Scooter</SelectItem>
-                        <SelectItem value="Bike">Bike</SelectItem>
-                        <SelectItem value="Loader">Loader</SelectItem>
+                        {ADMIN_VEHICLE_CATEGORIES.map((category) => (
+                          <SelectItem key={category.value} value={category.value}>{category.label}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

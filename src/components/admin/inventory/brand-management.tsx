@@ -56,6 +56,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
+import { getImageUrl } from '@/lib/utils';
 
 import { createBrand, updateBrand, deleteBrand, uploadBrandImage } from '@/lib/inventory-client';
 
@@ -269,7 +270,7 @@ export function BrandManagement({ brands, isBrandsLoading, fetchAllBrands }: Bra
                     <TableCell className="py-4">
                       <div className="h-10 w-10 rounded-lg overflow-hidden relative bg-muted/20 border border-border/50">
                         {brand.imageUrl ? (
-                          <Image src={brand.imageUrl} alt={brand.name} fill className="object-cover" sizes="40px" unoptimized />
+                          <Image src={getImageUrl(brand.imageUrl)} alt={brand.name} fill className="object-cover" sizes="40px" unoptimized />
                         ) : (
                           <div className="h-full w-full flex items-center justify-center">
                             <ImageIcon className="h-4 w-4 text-muted-foreground/30" />
@@ -278,7 +279,7 @@ export function BrandManagement({ brands, isBrandsLoading, fetchAllBrands }: Bra
                       </div>
                     </TableCell>
                     <TableCell className="py-4">
-                      <span className="text-xs font-bold uppercase tracking-widest">{brand.name}</span>
+                      <span className="text-xs font-bold">{brand.name}</span>
                     </TableCell>
                     <TableCell className="py-4 font-black text-[10px] opacity-70">
                       {brand.createdAt ? new Date(brand.createdAt).toLocaleDateString() : '-'}
@@ -376,7 +377,7 @@ export function BrandManagement({ brands, isBrandsLoading, fetchAllBrands }: Bra
                 <div className="flex items-center gap-2 mt-2">
                   <span className="text-[8px] text-muted-foreground uppercase font-bold">Current logo:</span>
                   <div className="h-6 w-6 rounded overflow-hidden relative border border-border/50 bg-muted/20">
-                    <Image src={editingBrand.imageUrl} alt="Current logo" fill className="object-cover" sizes="24px" unoptimized />
+                    <Image src={getImageUrl(editingBrand.imageUrl)} alt="Current logo" fill className="object-cover" sizes="24px" unoptimized />
                   </div>
                 </div>
               )}

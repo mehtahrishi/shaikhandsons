@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { getImageUrl } from '@/lib/utils';
 import { IndianRupee, Zap, Gauge, Battery, ChevronRight, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -103,7 +104,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <Image
-              src={primaryImage}
+              src={getImageUrl(primaryImage)}
               alt={`${liveData.make} ${liveData.model}`}
               fill
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 50vw, 33vw"

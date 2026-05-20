@@ -17,6 +17,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { BrandIdentity } from '@/components/common/BrandIdentity';
+import { VEHICLE_CATEGORIES } from '@/lib/vehicle-categories';
 
 
 
@@ -109,6 +110,13 @@ const LoaderScooterIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const categoryIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+  bikes: BikeIcon,
+  scooty: ScootyIcon,
+  'dirt-bike': DirtBikeIcon,
+  'electric-loader': LoaderScooterIcon,
+};
+
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDark, setIsDark] = useState(true);
@@ -192,12 +200,11 @@ export function Navbar() {
 
   if (isAdminRoute && pathname !== '/admin/login') return null;
 
-  const navLinks = [
-    { name: 'Bikes', href: '/category/bikes', icon: BikeIcon },
-    { name: 'Scooty', href: '/category/scooty', icon: ScootyIcon },
-    { name: 'Dirt Bike', href: '/category/dirt-bike', icon: DirtBikeIcon },
-    { name: 'Loader Scooter', href: '/category/electric-loader', icon: LoaderScooterIcon },
-  ];
+  const navLinks = VEHICLE_CATEGORIES.map((category) => ({
+    name: category.label,
+    href: category.href,
+    icon: categoryIcons[category.id],
+  }));
 
   const mobileNavLinks = [
     { name: 'Home', href: '/', icon: Home },
@@ -451,46 +458,29 @@ export function Navbar() {
             <h3 className="text-sm font-body font-black uppercase">Select Vehicle Type</h3>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Link
-              href="/?type=bikes"
-              onClick={() => setShowVehiclesPopover(false)}
-              className="block"
-            >
-              <button className="w-full text-[10px] font-body font-black uppercase tracking-widest h-12 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl flex flex-col items-center justify-center gap-1 px-1">
-                <BikeIcon className="w-5 h-5" />
-                <span>Bikes</span>
-              </button>
-            </Link>
-            <Link
-              href="/?type=scooters"
-              onClick={() => setShowVehiclesPopover(false)}
-              className="block"
-            >
-              <button className="w-full text-[10px] font-body font-black uppercase tracking-widest h-12 bg-primary/20 text-primary hover:bg-primary/30 rounded-xl flex flex-col items-center justify-center gap-1 px-1">
-                <ScootyIcon className="w-5 h-5" />
-                <span>Scooty</span>
-              </button>
-            </Link>
-            <Link
-              href="/?type=dirt-bike"
-              onClick={() => setShowVehiclesPopover(false)}
-              className="block"
-            >
-              <button className="w-full text-[10px] font-body font-black uppercase tracking-widest h-12 bg-primary/20 text-primary hover:bg-primary/30 rounded-xl flex flex-col items-center justify-center gap-1 px-1">
-                <DirtBikeIcon className="w-5 h-5" />
-                <span>Dirt Bike</span>
-              </button>
-            </Link>
-            <Link
-              href="/?type=electric-loader"
-              onClick={() => setShowVehiclesPopover(false)}
-              className="block"
-            >
-              <button className="w-full text-[10px] font-body font-black uppercase tracking-widest h-12 bg-primary/20 text-primary hover:bg-primary/30 rounded-xl flex flex-col items-center justify-center gap-1 px-1">
-                <LoaderScooterIcon className="w-5 h-5" />
-                <span>Loader Scooter</span>
-              </button>
-            </Link>
+            {VEHICLE_CATEGORIES.map((category, index) => {
+              const Icon = categoryIcons[category.id];
+              const isPrimary = index === 0;
+
+              return (
+                <Link
+                  key={category.id}
+                  href={`/?type=${category.queryValue}`}
+                  onClick={() => setShowVehiclesPopover(false)}
+                  className="block"
+                >
+                  <button className={cn(
+                    "w-full text-[10px] font-body font-black uppercase tracking-widest h-12 rounded-xl flex flex-col items-center justify-center gap-1 px-1",
+                    isPrimary
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "bg-primary/20 text-primary hover:bg-primary/30"
+                  )}>
+                    <Icon className="w-5 h-5" />
+                    <span>{category.label}</span>
+                  </button>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>

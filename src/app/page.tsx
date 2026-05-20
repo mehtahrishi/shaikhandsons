@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { VEHICLE_CATEGORIES, normalizeVehicleCategoryParam } from '@/lib/vehicle-categories';
 
 const BikeIcon = ({ className }: { className?: string }) => (
   <svg 
@@ -98,6 +99,13 @@ const LoaderScooterIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const categoryIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+  bikes: BikeIcon,
+  scooty: ScootyIcon,
+  'dirt-bike': DirtBikeIcon,
+  'electric-loader': LoaderScooterIcon,
+};
+
 export default function Home() {
   const { user, loading } = useAuth();
   const { toast } = useToast();
@@ -109,21 +117,16 @@ export default function Home() {
       const params = new URLSearchParams(window.location.search);
       const typeParam = params.get('type');
       if (typeParam) {
-        if (typeParam === 'scooters') {
-          setSelectedCategory('scooty');
-        } else {
-          setSelectedCategory(typeParam);
-        }
+        setSelectedCategory(normalizeVehicleCategoryParam(typeParam));
       }
     }
   }, []);
 
-  const categoriesList = [
-    { id: 'bikes', name: 'Bikes', icon: BikeIcon },
-    { id: 'scooty', name: 'Scooty', icon: ScootyIcon },
-    { id: 'dirt-bike', name: 'Dirt Bike', icon: DirtBikeIcon },
-    { id: 'electric-loader', name: 'Loader Scooter', icon: LoaderScooterIcon },
-  ];
+  const categoriesList = VEHICLE_CATEGORIES.map((category) => ({
+    id: category.id,
+    name: category.label,
+    icon: categoryIcons[category.id],
+  }));
 
   useEffect(() => {
     if (!loading && user) {

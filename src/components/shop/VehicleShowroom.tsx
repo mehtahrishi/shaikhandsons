@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { VehicleCard } from './VehicleCard';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
+import { vehicleMatchesCategory } from '@/lib/vehicle-categories';
 
 type Vehicle = {
   id: number;
@@ -83,24 +84,7 @@ export function VehicleShowroom({ activeCategory }: { activeCategory?: string })
 
   const filteredVehicles = React.useMemo(() => {
     if (!activeCategory || activeCategory === 'all') return vehicles;
-    return vehicles.filter(vehicle => {
-      const cat = vehicle.category?.toLowerCase() || '';
-      const filter = activeCategory.toLowerCase();
-      
-      if (filter === 'bikes') {
-        return cat.includes('bike') && !cat.includes('dirt');
-      }
-      if (filter === 'scooty') {
-        return cat.includes('scooty') || cat.includes('scooter') || cat.includes('scooters');
-      }
-      if (filter === 'dirt-bike') {
-        return cat.includes('dirt');
-      }
-      if (filter === 'electric-loader') {
-        return cat.includes('loader') || cat.includes('electric-loader') || cat.includes('auto-bicycle-bike');
-      }
-      return cat === filter;
-    });
+    return vehicles.filter((vehicle) => vehicleMatchesCategory(vehicle.category, activeCategory));
   }, [vehicles, activeCategory]);
 
   return (

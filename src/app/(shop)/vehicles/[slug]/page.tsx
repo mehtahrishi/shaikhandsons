@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   BatteryFull,
@@ -111,6 +111,7 @@ const getFeatureIcon = (featureName: string) => {
 
 export default function VehicleDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const slug = params.slug as string;
   const [vehicle, setVehicle] = React.useState<Vehicle | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -280,15 +281,38 @@ export default function VehicleDetailPage() {
   }).format(priceNumber);
 
   return (
-    <main className="min-h-screen bg-background text-foreground pb-24 relative overflow-hidden">
+    <main className="min-h-screen bg-background text-foreground pb-24 relative [overflow-x:clip]">
       {/* Visual Background Gradients */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none -z-10" />
       <div className="absolute top-[40%] left-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none -z-10" />
 
-      <div className="w-full max-w-7xl mx-auto px-6 pt-8">
+      {/* 1. Sticky Sub-Navbar */}
+      <section className="sticky top-[92px] md:top-[100px] z-30 border-b border-border/50 bg-background/95 backdrop-blur-md shadow-sm overflow-hidden">
+        <div className="w-full px-4 py-2 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-3">
+            {/* Back: icon-only arrow button */}
+            <button
+              onClick={() => router.back()}
+              className="h-10 w-10 shrink-0 rounded-lg bg-muted/20 border border-border/50 flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary transition-all group"
+            >
+              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+            </button>
+
+            {/* Product name — right side, no border */}
+            <div className="min-w-0">
+              <h2 className="text-sm sm:text-base font-black uppercase tracking-tight text-foreground truncate text-right">
+                {vehicle.make} <span className="text-primary">{vehicle.model}</span>
+              </h2>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. Main Detail Content */}
+      <div className="w-full max-w-7xl mx-auto px-6 pt-4">
 
         {/* Hero Section: Media & Primary Details */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-16 pt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-16 pt-0">
 
           {/* Left Column: Image Gallery */}
           <div className="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4 items-start">
@@ -337,13 +361,6 @@ export default function VehicleDetailPage() {
               onClick={handleMainImageClick}
               className="relative aspect-[4/3] flex-1 w-full flex items-center justify-center group cursor-zoom-in"
             >
-              {/* Category Badge */}
-              {vehicle.category && (
-                <div className="absolute top-6 left-6 z-10 bg-black/60 backdrop-blur-md text-white text-[10px] uppercase font-black tracking-[0.2em] py-2 px-4 rounded-full border border-white/10 shadow-lg">
-                  {vehicle.category}
-                </div>
-              )}
-
               {/* Zoom overlay — badge anchored to bottom-right */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none">
                 <span className="absolute bottom-4 right-4 bg-black/70 text-white text-[10px] font-black uppercase tracking-widest py-1.5 px-3 rounded-full border border-white/10 backdrop-blur-md shadow-lg flex items-center gap-1.5">
@@ -382,17 +399,17 @@ export default function VehicleDetailPage() {
               <span className="text-xs uppercase tracking-[0.4em] font-black text-primary">
                 {vehicle.make}
               </span>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none text-foreground uppercase">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tight leading-none text-foreground uppercase">
                 {vehicle.model}
               </h1>
 
-              <div className="flex items-center gap-4 pt-2">
-                <div className="bg-primary/5 border border-primary/20 px-5 py-3 rounded-2xl flex flex-col justify-center">
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <div className="bg-primary/5 border border-primary/20 px-4 py-3 rounded-2xl flex flex-col justify-center flex-1 min-w-0">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-0.5">Starting Ex-Showroom</span>
-                  <span className="text-2xl font-black text-primary tracking-tight">{formattedPrice}</span>
+                  <span className="text-xl sm:text-2xl font-black text-primary tracking-tight truncate">{formattedPrice}</span>
                 </div>
                 {vehicle.trim && (
-                  <div className="bg-muted/40 border border-border/30 px-4 py-2.5 rounded-xl text-xs font-bold text-foreground/80">
+                  <div className="bg-muted/40 border border-border/30 px-3 py-2.5 rounded-xl text-xs font-bold text-foreground/80 shrink-0">
                     TRIM: {vehicle.trim}
                   </div>
                 )}
@@ -812,18 +829,10 @@ export default function VehicleDetailPage() {
               ×
             </button>
 
-            {/* Previous Button (<) */}
-            {images.length > 1 && (
-              <button
-                onClick={handlePrevImage}
-                className="absolute left-4 md:left-8 text-white/70 hover:text-white bg-white/5 hover:bg-white/10 w-12 h-12 md:w-16 md:h-16 rounded-full border border-white/10 flex items-center justify-center transition-all z-10"
-              >
-                <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" />
-              </button>
-            )}
+            {/* Previous Button (<) — removed from absolute sides */}
 
             {/* Active Image container */}
-            <div className="max-w-[90vw] max-h-[85vh] relative" onClick={(e) => e.stopPropagation()}>
+            <div className="max-w-[90vw] max-h-[80vh] relative flex flex-col items-center gap-4" onClick={(e) => e.stopPropagation()}>
               <motion.img
                 key={lightboxIndex}
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -832,24 +841,32 @@ export default function VehicleDetailPage() {
                 transition={{ duration: 0.3 }}
                 src={getImageUrl(images[lightboxIndex])}
                 alt={`${vehicle.make} ${vehicle.model} - Large View`}
-                className="max-w-full max-h-[85vh] object-contain rounded-2xl border border-white/5 shadow-2xl"
+                className="max-w-full max-h-[75vh] object-contain rounded-2xl border border-white/5 shadow-2xl"
               />
 
-              {/* Image index indicator */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 border border-white/10 backdrop-blur-md text-white/80 text-xs font-bold py-1.5 px-4 rounded-full">
-                {lightboxIndex + 1} / {images.length}
-              </div>
-            </div>
+              {/* Bottom centre: < index > controls */}
+              {images.length > 1 && (
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handlePrevImage}
+                    className="text-white/70 hover:text-white bg-white/10 hover:bg-white/20 w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transition-all"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
 
-            {/* Next Button (>) */}
-            {images.length > 1 && (
-              <button
-                onClick={handleNextImage}
-                className="absolute right-4 md:right-8 text-white/70 hover:text-white bg-white/5 hover:bg-white/10 w-12 h-12 md:w-16 md:h-16 rounded-full border border-white/10 flex items-center justify-center transition-all z-10"
-              >
-                <ChevronRight className="w-6 h-6 md:w-8 md:h-8" />
-              </button>
-            )}
+                  <span className="bg-black/60 border border-white/10 backdrop-blur-md text-white/80 text-xs font-bold py-1.5 px-4 rounded-full">
+                    {lightboxIndex + 1} / {images.length}
+                  </span>
+
+                  <button
+                    onClick={handleNextImage}
+                    className="text-white/70 hover:text-white bg-white/10 hover:bg-white/20 w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transition-all"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

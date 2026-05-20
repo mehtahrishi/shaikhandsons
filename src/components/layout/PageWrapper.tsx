@@ -16,7 +16,7 @@ export function PageWrapper({ children }: { children: React.ReactNode }) {
   return (
     <div className={cn(
       "flex-1 flex flex-col",
-      !isAdmin && "pt-14 md:pt-16 pb-16 md:pb-0"
+      !isAdmin && "pt-[92px] md:pt-[100px] pb-16 md:pb-0"
     )}>
       {children}
     </div>

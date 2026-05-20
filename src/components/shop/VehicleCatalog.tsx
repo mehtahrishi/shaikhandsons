@@ -118,7 +118,7 @@ export function VehicleCatalog() {
           Our Catalogue
         </h1>
       </div>
-      <section className="sticky top-[61px] md:top-[73px] z-30 border-b border-border/50 bg-background/95 backdrop-blur-md">
+      <section className="sticky top-[92px] md:top-[100px] z-30 border-b border-border/50 bg-background/95 backdrop-blur-md">
         <div className="w-full px-4 py-5 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 items-center gap-3 lg:grid-cols-[190px_190px_minmax(220px,1fr)_minmax(280px,420px)]">
             <Select value={category} onValueChange={setCategory}>

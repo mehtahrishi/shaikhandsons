@@ -7,6 +7,7 @@ import { InitialLoader } from '@/components/common/InitialLoader';
 import { CookieConsent } from '@/components/common/CookieConsent';
 import { AuthProvider } from '@/context/AuthContext';
 import { PageWrapper } from '@/components/layout/PageWrapper';
+import { ActionDock } from '@/components/layout/ActionDock';
 
 export const metadata: Metadata = {
   title: 'Shaikh & Sons | High-Performance Electronic Mobility',
@@ -60,6 +61,7 @@ export default function RootLayout({
           <SiteFooter />
           <CookieConsent />
           <Toaster />
+          <ActionDock />
         </AuthProvider>
       </body>
     </html>

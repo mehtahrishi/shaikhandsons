@@ -287,29 +287,8 @@ export default function VehicleDetailPage() {
 
       <div className="w-full max-w-7xl mx-auto px-6 pt-8">
 
-        {/* Breadcrumb Navigation / Back Button */}
-        <div className="mb-8 flex items-center justify-between">
-          <Link
-            href="/vehicles"
-            className="group flex items-center gap-2.5 text-sm font-bold text-muted-foreground hover:text-primary transition-all duration-300"
-          >
-            <div className="w-8 h-8 rounded-full border border-border/60 flex items-center justify-center group-hover:border-primary/50 group-hover:bg-primary/5 transition-all">
-              <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
-            </div>
-            Back to Inventory
-          </Link>
-
-          <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-widest bg-muted/30 py-1.5 px-3 rounded-full border border-border/20">
-            <span>Vehicles</span>
-            <ChevronRight className="h-3 w-3" />
-            <span>{vehicle.make}</span>
-            <ChevronRight className="h-3 w-3 text-primary/60" />
-            <span className="text-foreground">{vehicle.model}</span>
-          </div>
-        </div>
-
         {/* Hero Section: Media & Primary Details */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-16 pt-8">
 
           {/* Left Column: Image Gallery */}
           <div className="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4 items-start">
@@ -356,7 +335,7 @@ export default function VehicleDetailPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               onClick={handleMainImageClick}
-              className="relative rounded-[32px] overflow-hidden border border-border/40 bg-gradient-to-br from-card/30 to-card/5 backdrop-blur-md aspect-[4/3] flex-1 w-full flex items-center justify-center group shadow-2xl cursor-zoom-in"
+              className="relative aspect-[4/3] flex-1 w-full flex items-center justify-center group cursor-zoom-in"
             >
               {/* Category Badge */}
               {vehicle.category && (
@@ -381,7 +360,7 @@ export default function VehicleDetailPage() {
                   transition={{ duration: 0.5 }}
                   src={getImageUrl(selectedImage)}
                   alt={`${vehicle.make} ${vehicle.model}`}
-                  className="w-full h-full object-contain p-4 group-hover:scale-105 transition-all duration-700"
+                  className="w-full h-full object-contain group-hover:scale-105 transition-all duration-700"
                 />
               ) : (
                 <div className="text-muted-foreground flex flex-col items-center gap-2">

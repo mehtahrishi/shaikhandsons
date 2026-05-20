@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Bike, Sun, Moon, User, LogOut, Home, Mail } from 'lucide-react';
+import { Bike, Sun, Moon, User, LogOut, Home, Mail, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { BrandIdentity } from '@/components/common/BrandIdentity';
 import { VEHICLE_CATEGORIES } from '@/lib/vehicle-categories';
+import { AnnouncementBar } from './AnnouncementBar';
 
 
 
@@ -233,6 +234,7 @@ export function Navbar() {
     <>
       {/* Top Header */}
       <header className="fixed top-0 left-0 w-full z-50">
+        {!isAdminRoute && <AnnouncementBar />}
         <div className={cn(
           "transition-all duration-300 bg-background/95 backdrop-blur-md border-b border-border/50"
         )}>
@@ -416,6 +418,16 @@ export function Navbar() {
             >
               <SpeedometerIcon className="h-5 w-5" />
             </button>
+
+            {/* WhatsApp Contact */}
+            <a 
+              href={`https://wa.me/919321111322?text=${encodeURIComponent("Hello Shaikh & Sons, I'm interested in your electric vehicles.")}`}
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-[#25D366] hover:bg-[#25D366]/10"
+            >
+              <MessageCircle className="h-5 w-5" />
+            </a>
 
             {/* Auth/Profile Icon */}
 

@@ -63,9 +63,12 @@ Root/
 │   │   │       └── [id]/              # Base path: /vehicles/[id] (Dynamic)
 │   │   │           └── page.tsx       # Deep dive vehicle details, specs, and reservation UI
 │   │   │
-│   │   ├── (user)/                    # 👤 User Restricted Route Group
-│   │   │   └── profile/               # Base path: /profile
-│   │   │       └── page.tsx           # UI for users to update phone, address, and view details
+│   ├── (user)/                    # 👤 User Restricted Route Group
+│   │   ├── favorites/             # Base path: /favorites
+│   │   │   └── page.tsx           # User's curated 'My Favorites' vehicle collection
+│   │   └── profile/               # Base path: /profile
+│   │       └── page.tsx           # UI for users to update phone, address, and view details
+
 │   │   │
 │   │   ├── api/                       # ⚙️ Next.js Backend Endpoints
 │   │   │   ├── (info)/

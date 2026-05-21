@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Bike, Sun, Moon, User, LogOut, Home, Mail, MessageCircle } from 'lucide-react';
+import { Bike, Sun, Moon, User, LogOut, Home, Mail, MessageCircle, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -339,10 +339,16 @@ export function Navbar() {
                               </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator className="my-1 bg-border/50" />
-                            <DropdownMenuItem asChild className="cursor-pointer rounded-xl p-0 font-body hover:bg-red-500 focus:bg-red-500 group">
+                            <DropdownMenuItem asChild className="cursor-pointer rounded-xl p-0 font-body hover:bg-primary focus:bg-primary group">
                               <Link href="/profile" className="flex h-11 w-full items-center gap-3 px-3">
                                 <User className="h-4 w-4 text-primary group-hover:text-white" />
                                 <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-white">My Profile</span>
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild className="mt-1 cursor-pointer rounded-xl p-0 font-body hover:bg-primary focus:bg-primary group">
+                              <Link href="/favorites" className="flex h-11 w-full items-center gap-3 px-3">
+                                <Heart className="h-4 w-4 text-primary group-hover:text-white" />
+                                <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-white">My Favorites</span>
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={handleLogout} className="mt-1 h-11 cursor-pointer rounded-xl px-3 font-body text-destructive focus:bg-destructive/10 focus:text-destructive">
@@ -384,7 +390,7 @@ export function Navbar() {
 
       {/* Backdrop for mobile bottom sheets */}
       {(showAuthPopover || showProfileSheet || showVehiclesSheet) && (
-        <div 
+        <div
           className="fixed inset-0 z-20 md:hidden"
           onClick={() => {
             setShowAuthPopover(false);
@@ -420,9 +426,9 @@ export function Navbar() {
             </button>
 
             {/* WhatsApp Contact */}
-            <a 
+            <a
               href={`https://wa.me/919321111322?text=${encodeURIComponent("Hello Shaikh & Sons, I'm interested in your electric vehicles.")}`}
-              target="_blank" 
+              target="_blank"
               rel="noopener noreferrer"
               className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-all text-[#25D366] hover:bg-[#25D366]/10"
             >
@@ -513,14 +519,26 @@ export function Navbar() {
               onClick={() => setShowProfileSheet(false)}
               className="block"
             >
-              <button className="w-full text-[12px] font-body font-black uppercase tracking-widest h-12 bg-primary text-primary-foreground hover:bg-red-500 rounded-xl flex items-center justify-center gap-2">
+              <button className="w-full text-[10px] font-body font-black uppercase tracking-widest h-12 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl flex items-center justify-center gap-2">
                 <User className="h-4 w-4" />
                 <span>My Profile</span>
               </button>
             </Link>
+            <Link
+              href="/favorites"
+              onClick={() => setShowProfileSheet(false)}
+              className="block"
+            >
+              <button className="w-full text-[10px] font-body font-black uppercase tracking-widest h-12 bg-primary/20 text-primary hover:bg-primary/30 rounded-xl flex items-center justify-center gap-2 border border-primary/20">
+                <Heart className="h-4 w-4" />
+                <span>Favorites</span>
+              </button>
+            </Link>
+          </div>
+          <div className="mt-3">
             <button
               onClick={() => { handleLogout(); setShowProfileSheet(false); }}
-              className="w-full text-[12px] font-body font-black uppercase tracking-widest h-12 bg-destructive/10 text-destructive hover:bg-destructive/20 rounded-xl flex items-center justify-center gap-2 border border-destructive/20"
+              className="w-full text-[10px] font-body font-black uppercase tracking-widest h-12 bg-destructive/10 text-destructive hover:bg-destructive/20 rounded-xl flex items-center justify-center gap-2 border border-destructive/20"
             >
               <LogOut className="h-4 w-4" />
               <span>Logout</span>

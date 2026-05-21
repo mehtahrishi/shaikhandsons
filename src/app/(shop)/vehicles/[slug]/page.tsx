@@ -683,10 +683,10 @@ export default function VehicleDetailPage() {
                 <h3 className="font-headline font-black uppercase text-sm tracking-widest text-foreground px-1">Key Features</h3>
                 
                 <Carousel className="w-full">
-                  <CarouselContent className="-ml-2">
+                  <CarouselContent>
                     {vehicle.keyFeatures?.map((feature, idx) => (
-                      <CarouselItem key={idx} className="pl-2 basis-[85%]">
-                        <div className="flex flex-col gap-4 p-6 rounded-[2rem] border border-border/40 bg-card/40 backdrop-blur-xl h-full">
+                      <CarouselItem key={idx}>
+                        <div className="flex flex-col gap-4 p-6 rounded-2xl border border-border/40 bg-card h-full">
                           <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                             {getFeatureIcon(feature)}
                           </div>

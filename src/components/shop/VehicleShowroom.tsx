@@ -88,7 +88,7 @@ export function VehicleShowroom({ activeCategory }: { activeCategory?: string })
   }, [vehicles, activeCategory]);
 
   return (
-    <section id="showroom" className="pt-5 pb-24 bg-background">
+    <section id="showroom" className="pt-5 pb-8 bg-background">
       <div className="w-full">
         {error && <div className="text-center text-red-500 py-8">{error}</div>}
 

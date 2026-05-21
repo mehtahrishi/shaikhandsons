@@ -105,7 +105,11 @@ export function VehicleCatalog() {
         vehicle.shortDescription,
       ].some((value) => value?.toLowerCase().includes(term));
       const matchesCategory = category === 'all' || vehicleMatchesCategory(vehicle.category, category);
-      const matchesBrand = brand === 'all' || vehicle.make === brand;
+      
+      // Fix: Support both Brand Name (from dropdown) and Brand ID (from Home Page links)
+      const matchesBrand = brand === 'all' || 
+        vehicle.make === brand || 
+        vehicle.brandId === Number(brand);
 
       return matchesSearch && matchesCategory && matchesBrand;
     });
@@ -188,13 +192,13 @@ export function VehicleCatalog() {
         </p>
       </section>
 
-      <section className="w-full py-6 px-0 sm:px-6 lg:px-8">
+      <section className="w-full py-8 px-6 lg:px-8 overflow-hidden">
         {error && <div className="py-10 text-center text-sm font-bold text-red-500">{error}</div>}
 
-        <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 px-4 sm:px-0">
+        <div className="flex md:grid snap-x snap-mandatory md:snap-none gap-6 md:gap-8 overflow-x-auto md:overflow-visible pb-8 md:pb-0 -mx-6 px-6 md:mx-0 md:px-0 scrollbar-none md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {isLoading ? (
-            Array.from({ length: 8 }).map((_, index) => (
-              <div key={`vehicle-skeleton-${index}`} className="h-[420px] w-[calc(100vw-2rem)] flex-none snap-start space-y-6 rounded-[1.5rem] border border-border/40 bg-card p-6 sm:h-[520px] sm:w-96 sm:rounded-[2.5rem]">
+            Array.from({ length: 4 }).map((_, index) => (
+              <div key={`vehicle-skeleton-${index}`} className="w-[calc(100vw-3rem)] md:w-full flex-none snap-center space-y-6 rounded-[1.5rem] border border-border/40 bg-card p-6 h-[420px] sm:h-[520px] sm:rounded-[2.5rem]">
                 <Skeleton className="h-1/2 w-full rounded-3xl" />
                 <Skeleton className="h-8 w-3/4" />
                 <Skeleton className="h-12 w-full" />
@@ -203,7 +207,7 @@ export function VehicleCatalog() {
             ))
           ) : (
             filteredVehicles.map((vehicle) => (
-              <div key={vehicle.id} className="w-[calc(100vw-2rem)] flex-none snap-start sm:w-96">
+              <div key={vehicle.id} className="w-[calc(100vw-3rem)] md:w-full flex-none snap-center h-[450px] sm:h-[520px]">
                 <VehicleCard vehicle={vehicle} />
               </div>
             ))

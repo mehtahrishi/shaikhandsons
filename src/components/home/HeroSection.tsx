@@ -10,11 +10,11 @@ export function HeroSection() {
   // Carousel slides using real images from public/carousel
   const slides = [
     {
-      id: 'atun',
-      title: 'ATUN',
+      id: 'atum',
+      title: 'ATUM',
       subtitle: 'ADVANCED MOBILITY',
       image: '/carousel/atun.png',
-      hint: 'atun vehicle',
+      hint: 'atum vehicle',
     },
     {
       id: 'dynamo',
@@ -64,9 +64,9 @@ export function HeroSection() {
       <div className="w-full">
         {/* Desktop & Tablet View: Interactive Window Slide (50% center) */}
         <div className="hidden md:flex w-full items-stretch justify-center bg-black group/hero">
-          
+
           {/* Left Peek Strip (25%) */}
-          <div 
+          <div
             className="w-[25%] cursor-pointer overflow-hidden relative z-30 transition-all duration-300 hover:brightness-110"
             onMouseEnter={() => setSlide(getSlideIndex(-1))}
           >
@@ -103,10 +103,10 @@ export function HeroSection() {
                   priority
                   data-ai-hint={slides[currentIndex].hint}
                 />
-                
+
                 {/* Cinematic Overlays */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
-                
+
                 {/* Content Overlay */}
                 <div className="absolute inset-0 flex flex-col items-center justify-end pb-16 p-4 text-center z-20">
                   <motion.div
@@ -128,7 +128,7 @@ export function HeroSection() {
           </div>
 
           {/* Right Peek Strip (25%) */}
-          <div 
+          <div
             className="w-[25%] cursor-pointer overflow-hidden relative z-30 transition-all duration-300 hover:brightness-110"
             onMouseEnter={() => setSlide(getSlideIndex(1))}
           >
@@ -168,7 +168,7 @@ export function HeroSection() {
                   data-ai-hint={slides[currentIndex].hint}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-                
+
                 {/* Mobile Content */}
                 <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 p-6 text-center">
                   <p className="text-primary font-bold tracking-[0.3em] text-[8px] uppercase mb-1">

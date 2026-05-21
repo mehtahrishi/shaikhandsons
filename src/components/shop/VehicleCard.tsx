@@ -5,8 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getImageUrl } from '@/lib/utils';
-import { IndianRupee, Zap, Gauge, Battery, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { IndianRupee, Zap, Gauge, Battery, ChevronRight, Heart } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/context/AuthContext';
+import { fetchLikeStatus, toggleLikeAPI } from '@/lib/inventory-client';
+import { useToast } from '@/hooks/use-toast';
 
 interface Vehicle {
   id: number | string;
@@ -34,6 +37,9 @@ interface VehicleCardProps {
 
 export function VehicleCard({ vehicle }: VehicleCardProps) {
   const [liveData, setLiveData] = React.useState<Vehicle>(vehicle);
+  const [isLiked, setIsLiked] = React.useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   // Fetch real-time vehicle data
   React.useEffect(() => {
@@ -51,10 +57,56 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
       }
     };
 
+    const fetchLikes = async () => {
+      if (liveData.slug) {
+        try {
+          const data = await fetchLikeStatus(liveData.slug);
+          setIsLiked(data.isLiked);
+        } catch (error) {
+          console.error('Failed to fetch likes:', error);
+        }
+      }
+    };
+
     fetchVehicleData();
+    fetchLikes();
     const interval = setInterval(fetchVehicleData, 30000);
     return () => clearInterval(interval);
-  }, [vehicle.id, vehicle]);
+  }, [vehicle.id, vehicle, liveData.slug]);
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to like vehicles.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!liveData.slug) return;
+
+    // Optimistic Update
+    const previousIsLiked = isLiked;
+    
+    setIsLiked(!isLiked);
+
+    try {
+      const data = await toggleLikeAPI(liveData.slug);
+      setIsLiked(data.liked);
+    } catch (error) {
+      // Revert on error
+      setIsLiked(previousIsLiked);
+      toast({
+        title: "Error",
+        description: "Failed to update like status.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const images = liveData.imageUrls || liveData.images || [];
   const primaryImage = images.length > 0 ? images[0] : 'https://picsum.photos/seed/placeholder/1200/800';
@@ -89,6 +141,20 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
 
         {/* Vehicle Image */}
         <div className="relative h-[55%] sm:h-[60%] w-full overflow-hidden bg-muted">
+          {/* Like Button */}
+          <div className="absolute top-4 right-4 z-20">
+            <motion.button
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleLike}
+              className={`transition-all duration-300 ${
+                isLiked ? 'text-red-500' : 'text-white/70 hover:text-white'
+              }`}
+            >
+              <Heart className={`h-6 w-6 ${isLiked ? 'fill-current' : ''}`} />
+            </motion.button>
+          </div>
+
           <motion.div 
             className="relative w-full h-full"
             whileHover={{ scale: 1.08 }}

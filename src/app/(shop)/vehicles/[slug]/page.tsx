@@ -37,13 +37,17 @@ import {
   Usb,
   KeyRound,
   LampCeiling,
-  Sun
+  Sun,
+  Heart
 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getImageUrl } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { fetchLikeStatus, toggleLikeAPI } from '@/lib/inventory-client';
 
 type Vehicle = {
   id: number | string;
@@ -105,6 +109,9 @@ export default function VehicleDetailPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<string>('');
   const [activeTab, setActiveTab] = React.useState<'specs' | 'features'>('specs');
+  const [isLiked, setIsLiked] = React.useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   const images = vehicle ? (vehicle.imageUrls || vehicle.images || []) : [];
 
@@ -189,6 +196,14 @@ export default function VehicleDetailPage() {
         if (images.length > 0) {
           setSelectedImage(images[0]);
         }
+
+        // Fetch likes
+        try {
+          const likeData = await fetchLikeStatus(slug);
+          setIsLiked(likeData.isLiked);
+        } catch (lerr) {
+          console.error('Failed to fetch likes:', lerr);
+        }
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -200,6 +215,35 @@ export default function VehicleDetailPage() {
       fetchVehicle();
     }
   }, [slug]);
+
+  const handleLike = async () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to like vehicles.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Optimistic Update
+    const previousIsLiked = isLiked;
+    
+    setIsLiked(!isLiked);
+
+    try {
+      const data = await toggleLikeAPI(slug);
+      setIsLiked(data.liked);
+    } catch (error) {
+      // Revert on error
+      setIsLiked(previousIsLiked);
+      toast({
+        title: "Error",
+        description: "Failed to update like status.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -410,6 +454,19 @@ export default function VehicleDetailPage() {
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-0.5">Starting Ex-Showroom</span>
                   <span className="text-xl sm:text-2xl font-black text-primary tracking-tight truncate">{formattedPrice}</span>
                 </div>
+
+                {/* Like Button Detail Page */}
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleLike}
+                  className={`p-2 transition-all duration-300 ${
+                    isLiked ? 'text-red-500' : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  title={isLiked ? "Unlike" : "Like"}
+                >
+                  <Heart className={`h-8 w-8 ${isLiked ? 'fill-current' : ''}`} />
+                </motion.button>
               </div>
             </motion.div>
 

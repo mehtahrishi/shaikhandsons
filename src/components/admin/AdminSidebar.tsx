@@ -10,7 +10,8 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
-  Award
+  Award,
+  Heart
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -22,6 +23,7 @@ const navItems = [
   { name: "Fleet Catalogue", href: "/admin/inventory", icon: Package },
   { name: "Brands", href: "/admin/brands", icon: Award },
   { name: "Customers", href: "/admin/users", icon: Users },
+  { name: "Likes", href: "/admin/likes", icon: Heart },
 ]
 
 export function AdminSidebar() {

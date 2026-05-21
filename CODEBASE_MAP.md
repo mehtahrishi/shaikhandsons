@@ -27,6 +27,8 @@ Root/
 │   │   │       │   └── page.tsx       # Corporate Manufacturer Directory & Assets
 │   │   │       ├── inventory/         # Base path: /admin/inventory
 │   │   │       │   └── page.tsx       # Fleet catalog management and asset actions
+│   │   │       ├── likes/             # Base path: /admin/likes
+│   │   │       │   └── page.tsx       # Customer engagement analytics and like logs
 │   │   │       ├── login/             # Base path: /admin/login
 │   │   │       │   └── page.tsx       # Stateless admin secure login interface
 │   │   │       ├── orders/            # Base path: /admin/orders

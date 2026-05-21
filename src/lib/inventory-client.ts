@@ -242,6 +242,27 @@ export async function bulkUpdateVehicles(
   return await res.json();
 }
 
+// Likes
+export async function fetchLikeStatus(slug: string) {
+  const res = await fetch(`/api/vehicles/${slug}/like`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch like status');
+  }
+  return await res.json();
+}
+
+export async function toggleLikeAPI(slug: string) {
+  const res = await fetch(`/api/vehicles/${slug}/like`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || 'Failed to toggle like');
+  }
+  return await res.json();
+}
+
 // Get vehicle placeholder images
 export function generatePlaceholderImages(make: string, model: string): string[] {
   return [

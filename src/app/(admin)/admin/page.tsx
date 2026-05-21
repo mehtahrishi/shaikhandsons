@@ -12,7 +12,8 @@ import {
   ChartSpline,
   ShieldCheck,
   CircleDollarSign,
-  Loader2
+  Loader2,
+  Heart
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
@@ -46,11 +47,31 @@ const chartConfig = {
   },
 };
 
+type PopularVehicle = {
+  id: number;
+  make: string;
+  model: string;
+  slug: string;
+  likeCount: number;
+};
+
+type LikeDetail = {
+  id: number;
+  userName: string | null;
+  userEmail: string;
+  vehicleMake: string;
+  vehicleModel: string;
+  createdAt: string;
+};
+
 type DashboardStats = {
   totalUsers: number;
   totalVehicles: number;
   totalBrands: number;
+  totalLikes: number;
   totalAssetValue: number;
+  popularVehicles: PopularVehicle[];
+  allLikesDetail: LikeDetail[];
 };
 
 export default function AdminDashboardPage() {
@@ -93,10 +114,10 @@ export default function AdminDashboardPage() {
       trend: 'Registered' 
     },
     { 
-      label: 'Total Vehicles', 
-      value: statsData ? String(statsData.totalVehicles) : '...', 
-      icon: Car, 
-      trend: 'In Fleet' 
+      label: 'Engagement', 
+      value: statsData ? String(statsData.totalLikes) : '...', 
+      icon: Heart, 
+      trend: 'Likes' 
     },
     { 
       label: 'Brand Network', 
@@ -253,6 +274,123 @@ export default function AdminDashboardPage() {
           </Card>
         </motion.div>
       </div>
-    </div>
-  );
-}
+
+      {/* Popular Vehicles - Likes Analytics */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+      >
+        <Card className="border-border/50 bg-card/40 backdrop-blur-xl">
+          <CardHeader>
+            <CardTitle className="font-headline text-xl font-bold flex items-center gap-2">
+              <Heart className="h-5 w-5 text-primary" /> Popular Vehicles
+            </CardTitle>
+            <CardDescription className="text-[10px] uppercase tracking-widest">Most liked vehicles by customers.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow className="border-border/50 hover:bg-transparent">
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest">Model</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-right">Total Likes</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={2} className="h-24 text-center">
+                      <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" />
+                    </TableCell>
+                  </TableRow>
+                ) : statsData?.popularVehicles && statsData.popularVehicles.length > 0 ? (
+                  statsData.popularVehicles.map((v) => (
+                    <TableRow key={v.id} className="border-border/50 hover:bg-primary/5 transition-colors group">
+                      <TableCell className="font-headline font-bold">
+                        <span className="text-muted-foreground uppercase text-[10px] block mb-0.5">{v.make}</span>
+                        {v.model}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="text-lg font-black text-primary">{v.likeCount}</span>
+                          <Heart className="h-3 w-3 text-primary fill-current opacity-50 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={2} className="h-24 text-center text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
+                      No engagement data yet
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </motion.div>
+      {/* Who Liked What - Individual Records */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+      >
+        <Card className="border-border/50 bg-card/40 backdrop-blur-xl">
+          <CardHeader>
+            <CardTitle className="font-headline text-xl font-bold flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" /> User Engagement Details
+            </CardTitle>
+            <CardDescription className="text-[10px] uppercase tracking-widest">Individual customer favorites.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow className="border-border/50 hover:bg-transparent">
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest">User</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest">Liked Product</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-right">Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={3} className="h-24 text-center">
+                      <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" />
+                    </TableCell>
+                  </TableRow>
+                ) : statsData?.allLikesDetail && statsData.allLikesDetail.length > 0 ? (
+                  statsData.allLikesDetail.map((like) => (
+                    <TableRow key={like.id} className="border-border/50 hover:bg-primary/5 transition-colors">
+                      <TableCell className="font-headline">
+                        <div className="flex flex-col">
+                          <span className="font-bold">{like.userName || 'N/A'}</span>
+                          <span className="text-[9px] text-muted-foreground">{like.userEmail}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-body">
+                        <div className="flex flex-col">
+                          <span className="text-[9px] text-primary font-black uppercase tracking-tighter">{like.vehicleMake}</span>
+                          <span className="font-bold">{like.vehicleModel}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right text-[10px] font-bold text-muted-foreground">
+                        {new Date(like.createdAt).toLocaleDateString()}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={3} className="h-24 text-center text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
+                      No individual likes recorded
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </motion.div>
+      </div>
+      );
+      }

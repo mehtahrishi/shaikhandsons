@@ -48,6 +48,19 @@ import { getImageUrl } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { fetchLikeStatus, toggleLikeAPI } from '@/lib/inventory-client';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 type Vehicle = {
   id: number | string;
@@ -319,6 +332,27 @@ export default function VehicleDetailPage() {
     maximumFractionDigits: 0,
   }).format(priceNumber);
 
+  const specsList = [
+    { label: "Battery Capacity", value: vehicle.batteryCapacity, icon: <BatteryFull size={15} /> },
+    { label: "Battery Type", value: vehicle.batteryType, icon: <Package size={15} /> },
+    { label: "Charging Time", value: vehicle.chargingTime, icon: <Hourglass size={15} /> },
+    { label: "Fast Charging", value: vehicle.fastCharging !== undefined ? (vehicle.fastCharging ? "Yes" : "No") : null, icon: <BatteryCharging size={15} /> },
+    { label: "Real World Range", value: vehicle.realWorldRange, icon: <MapPinned size={15} /> },
+    { label: "Riding Modes", value: vehicle.ridingModes?.join(', '), icon: <SlidersVertical size={15} /> },
+    { label: "Motor Power", value: vehicle.motorPower, icon: <Zap size={15} /> },
+    { label: "Climbing Degree", value: vehicle.climbingDegree, icon: <TrendingUp size={15} /> },
+    { label: "Braking System", value: vehicle.brakingSystem, icon: <Gauge size={15} /> },
+    { label: "Tyre Type", value: vehicle.tyreType, icon: <CircleDashed size={15} /> },
+    { label: "Wheel Type", value: vehicle.wheelType, icon: <CircleDot size={15} /> },
+    { label: "Wheel Size", value: vehicle.wheelSize, icon: <Diameter size={15} /> },
+    { label: "Ground Clearance", value: vehicle.groundClearance, icon: <ArrowDownFromLine size={15} /> },
+    { label: "Load Capacity", value: vehicle.loadCapacity, icon: <Weight size={15} /> },
+    { label: "Display", value: vehicle.displayType, icon: <Smartphone size={15} /> },
+    { label: "Boot Space", value: vehicle.bootSpace, icon: <ShoppingBag size={15} /> },
+    { label: "Charger", value: vehicle.chargerIncluded, icon: <Plug size={15} /> },
+    { label: "Battery Warranty", value: vehicle.batteryWarranty, icon: <ShieldCheck size={15} /> }
+  ].filter(spec => spec.value);
+
   return (
     <main className="min-h-screen bg-background text-foreground pb-24 relative [overflow-x:clip]">
       {/* Visual Background Gradients */}
@@ -531,157 +565,147 @@ export default function VehicleDetailPage() {
           </div>
         </div>
 
-        {/* Section 2: Technical Specifications vs Key Features Tabs & Booking Card */}
+        {/* Section 2: Responsive Technical Details & Features */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
 
-          {/* Left Block: Interactive Tabs for Details */}
+          {/* Details Block */}
           <div className="lg:col-span-8 space-y-6">
+            
+            {/* ─── DESKTOP TABS ────────────────────────────────────────────────── */}
+            <div className="hidden md:block">
+              {/* Tabs Header */}
+              <div className="flex border-b border-border/30 relative">
+                <button
+                  onClick={() => setActiveTab('specs')}
+                  className={`py-4 px-6 text-sm font-black tracking-[0.2em] uppercase transition-colors relative z-10 flex items-center gap-2 ${activeTab === 'specs' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                >
+                  <FileText size={16} />
+                  Specifications
+                  {activeTab === 'specs' && (
+                    <motion.div
+                      layoutId="activeTabUnderline"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </button>
 
-            {/* Tabs Header */}
-            <div className="flex border-b border-border/30 relative">
-              <button
-                onClick={() => setActiveTab('specs')}
-                className={`py-4 px-6 text-sm font-black tracking-[0.2em] uppercase transition-colors relative z-10 flex items-center gap-2 ${activeTab === 'specs' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-                  }`}
-              >
-                <FileText size={16} />
-                Specifications
-                {activeTab === 'specs' && (
-                  <motion.div
-                    layoutId="activeTabUnderline"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-              </button>
+                <button
+                  onClick={() => setActiveTab('features')}
+                  className={`py-4 px-6 text-sm font-black tracking-[0.2em] uppercase transition-colors relative z-10 flex items-center gap-2 ${activeTab === 'features' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                >
+                  <Sparkles size={16} />
+                  Key Features
+                  {activeTab === 'features' && (
+                    <motion.div
+                      layoutId="activeTabUnderline"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </button>
+              </div>
 
-              <button
-                onClick={() => setActiveTab('features')}
-                className={`py-4 px-6 text-sm font-black tracking-[0.2em] uppercase transition-colors relative z-10 flex items-center gap-2 ${activeTab === 'features' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-                  }`}
-              >
-                <Sparkles size={16} />
-                Key Features
-                {activeTab === 'features' && (
-                  <motion.div
-                    layoutId="activeTabUnderline"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-              </button>
-            </div>
-
-            {/* Tabs Content */}
-            <div className="pt-2">
-              <AnimatePresence mode="wait">
-                {activeTab === 'specs' ? (
-                  <motion.div
-                    key="specs"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1"
-                  >
-                    {vehicle.batteryCapacity && (
-                      <SpecRowItem label="Battery Capacity" value={vehicle.batteryCapacity} icon={<BatteryFull size={15} />} />
-                    )}
-                    {vehicle.batteryType && (
-                      <SpecRowItem label="Battery Type" value={vehicle.batteryType} icon={<Package size={15} />} />
-                    )}
-                    {vehicle.chargingTime && (
-                      <SpecRowItem label="Charging Time" value={vehicle.chargingTime} icon={<Hourglass size={15} />} />
-                    )}
-                    {vehicle.fastCharging !== undefined && (
-                      <SpecRowItem label="Fast Charging" value={vehicle.fastCharging ? "Yes" : "No"} icon={<BatteryCharging size={15} />} />
-                    )}
-                    {vehicle.realWorldRange && (
-                      <SpecRowItem label="Real World Range" value={vehicle.realWorldRange} icon={<MapPinned size={15} />} />
-                    )}
-                    {vehicle.ridingModes && vehicle.ridingModes.length > 0 && (
-                      <SpecRowItem label="Riding Modes" value={vehicle.ridingModes.join(', ')} icon={<SlidersVertical size={15} />} />
-                    )}
-                    {vehicle.motorPower && (
-                      <SpecRowItem label="Motor Power" value={vehicle.motorPower} icon={<Zap size={15} />} />
-                    )}
-                    {vehicle.climbingDegree && (
-                      <SpecRowItem label="Climbing Degree" value={vehicle.climbingDegree} icon={<TrendingUp size={15} />} />
-                    )}
-                    {vehicle.brakingSystem && (
-                      <SpecRowItem label="Braking System" value={vehicle.brakingSystem} icon={<Gauge size={15} />} />
-                    )}
-                    {vehicle.tyreType && (
-                      <SpecRowItem label="Tyre Type" value={vehicle.tyreType} icon={<CircleDashed size={15} />} />
-                    )}
-                    {vehicle.wheelType && (
-                      <SpecRowItem label="Wheel Type" value={vehicle.wheelType} icon={<CircleDot size={15} />} />
-                    )}
-                    {vehicle.wheelSize && (
-                      <SpecRowItem label="Wheel Size" value={vehicle.wheelSize} icon={<Diameter size={15} />} />
-                    )}
-                    {vehicle.groundClearance && (
-                      <SpecRowItem label="Ground Clearance" value={vehicle.groundClearance} icon={<ArrowDownFromLine size={15} />} />
-                    )}
-                    {vehicle.loadCapacity && (
-                      <SpecRowItem label="Load Capacity" value={vehicle.loadCapacity} icon={<Weight size={15} />} />
-                    )}
-                    {vehicle.displayType && (
-                      <SpecRowItem label="Display" value={vehicle.displayType} icon={<Smartphone size={15} />} />
-                    )}
-                    {vehicle.bootSpace && (
-                      <SpecRowItem label="Boot Space" value={vehicle.bootSpace} icon={<ShoppingBag size={15} />} />
-                    )}
-                    {vehicle.chargerIncluded && (
-                      <SpecRowItem label="Charger" value={vehicle.chargerIncluded} icon={<Plug size={15} />} />
-                    )}
-                    {vehicle.batteryWarranty && (
-                      <SpecRowItem label="Battery Warranty" value={vehicle.batteryWarranty} icon={<ShieldCheck size={15} />} />
-                    )}
-                    {vehicle.designPhilosophy && (
-                      <div className="col-span-1 md:col-span-2 py-6 border-b border-border/20">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-2">Design Philosophy</p>
-                        <p className="text-sm text-muted-foreground leading-relaxed italic">{vehicle.designPhilosophy}</p>
-                      </div>
-                    )}
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="features"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                    className="grid grid-cols-1 sm:grid-cols-2 gap-4"
-                  >
-                    {vehicle.keyFeatures && vehicle.keyFeatures.length > 0 ? (
-                      vehicle.keyFeatures.map((feature, idx) => (
-                        <motion.div
-                          key={idx}
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: idx * 0.05 }}
-                          className="flex items-start gap-4 p-5 rounded-2xl border border-border/40 bg-card/20 backdrop-blur-sm hover:border-primary/20 hover:bg-card/40 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shrink-0">
+              {/* Tabs Content */}
+              <div className="pt-2">
+                <AnimatePresence mode="wait">
+                  {activeTab === 'specs' ? (
+                    <motion.div
+                      key="specs-desktop"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3 }}
+                      className="grid grid-cols-2 gap-x-8 gap-y-1"
+                    >
+                      {specsList.map((spec, idx) => (
+                        <SpecRowItem key={idx} label={spec.label} value={spec.value as string} icon={spec.icon} />
+                      ))}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="features-desktop"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3 }}
+                      className="grid grid-cols-2 gap-4"
+                    >
+                      {vehicle.keyFeatures?.map((feature, idx) => (
+                        <div key={idx} className="flex items-start gap-4 p-5 rounded-2xl border border-border/40 bg-card/20 backdrop-blur-sm group hover:border-primary/20 transition-all">
+                          <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shrink-0">
                             {getFeatureIcon(feature)}
                           </div>
                           <div className="space-y-1">
-                            <h4 className="font-bold text-sm text-foreground">{feature}</h4>
-                            <p className="text-xs text-muted-foreground leading-normal font-sans">
-                              Intelligent luxury technology integrated perfectly into the {vehicle.model} package.
+                            <h4 className="font-bold text-sm">{feature}</h4>
+                            <p className="text-xs text-muted-foreground leading-normal">Intelligent luxury technology integrated perfectly.</p>
+                          </div>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* ─── MOBILE ACCORDION + CAROUSEL ────────────────────────────────── */}
+            <div className="md:hidden space-y-10">
+              {/* Specifications Dropdown */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-primary">
+                  <FileText size={14} />
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">Technical Data</span>
+                </div>
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="specs" className="border-border/40">
+                    <AccordionTrigger className="font-headline font-black uppercase text-sm tracking-widest text-foreground hover:no-underline">
+                      Specifications
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-1 pt-2">
+                        {specsList.map((spec, idx) => (
+                          <SpecRowItem key={idx} label={spec.label} value={spec.value as string} icon={spec.icon} />
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+
+              {/* Key Features Carousel */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-primary">
+                  <Sparkles size={14} />
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">Signature Innovations</span>
+                </div>
+                <h3 className="font-headline font-black uppercase text-sm tracking-widest text-foreground px-1">Key Features</h3>
+                
+                <Carousel className="w-full">
+                  <CarouselContent className="-ml-2">
+                    {vehicle.keyFeatures?.map((feature, idx) => (
+                      <CarouselItem key={idx} className="pl-2 basis-[85%]">
+                        <div className="flex flex-col gap-4 p-6 rounded-[2rem] border border-border/40 bg-card/40 backdrop-blur-xl h-full">
+                          <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                            {getFeatureIcon(feature)}
+                          </div>
+                          <div className="space-y-2">
+                            <h4 className="font-headline font-black text-lg uppercase tracking-tight">{feature}</h4>
+                            <p className="text-[11px] text-muted-foreground leading-relaxed">
+                              Intelligent luxury technology integrated perfectly into the {vehicle.model} package for elite mobility.
                             </p>
                           </div>
-                        </motion.div>
-                      ))
-                    ) : (
-                      <div className="col-span-2 text-center py-12 border border-dashed border-border/40 rounded-2xl">
-                        <p className="text-sm text-muted-foreground">No features are registered for this vehicle model.</p>
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <div className="flex justify-end gap-2 mt-4 px-1">
+                    <CarouselPrevious className="relative static translate-y-0" />
+                    <CarouselNext className="relative static translate-y-0" />
+                  </div>
+                </Carousel>
+              </div>
             </div>
           </div>
 

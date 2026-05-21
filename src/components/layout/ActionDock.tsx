@@ -10,6 +10,7 @@ export function ActionDock() {
   const router = useRouter();
   const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -17,7 +18,23 @@ export function ActionDock() {
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 4500);
-    return () => clearTimeout(timer);
+
+    // Watch for lightbox attribute
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-lightbox-open') {
+          const isOpen = document.documentElement.getAttribute('data-lightbox-open') === 'true';
+          setIsLightboxOpen(isOpen);
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
   }, []);
 
   const isAdminPage = pathname?.startsWith('/admin');
@@ -31,7 +48,7 @@ export function ActionDock() {
 
   return (
     <AnimatePresence>
-      {isVisible && (
+      {isVisible && !isLightboxOpen && (
         <motion.div 
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}

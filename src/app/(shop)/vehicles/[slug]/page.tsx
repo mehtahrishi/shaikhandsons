@@ -84,19 +84,6 @@ type Vehicle = {
   images?: string[];
 };
 
-// Helper color hex map for vehicle color chips
-const getColorHex = (colorName: string): string => {
-  const name = colorName.toLowerCase().trim();
-  if (name.includes('white')) return '#ffffff';
-  if (name.includes('black') || name.includes('carbon') || name.includes('midnight')) return '#18181b';
-  if (name.includes('red') || name.includes('crimson') || name.includes('chilli')) return '#dc2626';
-  if (name.includes('blue') || name.includes('ocean') || name.includes('electric')) return '#2563eb';
-  if (name.includes('grey') || name.includes('gray') || name.includes('silver') || name.includes('slate')) return '#71717a';
-  if (name.includes('gold') || name.includes('yellow') || name.includes('orange')) return '#eab308';
-  if (name.includes('green') || name.includes('emerald') || name.includes('pine')) return '#16a34a';
-  return '#a1a1aa'; // fallback zinc
-};
-
 // Helper to get feature icons
 const getFeatureIcon = (featureName: string) => {
   const name = featureName.toLowerCase();
@@ -117,7 +104,6 @@ export default function VehicleDetailPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<string>('');
-  const [selectedColor, setSelectedColor] = React.useState<string>('');
   const [activeTab, setActiveTab] = React.useState<'specs' | 'features'>('specs');
 
   const images = vehicle ? (vehicle.imageUrls || vehicle.images || []) : [];
@@ -125,6 +111,18 @@ export default function VehicleDetailPage() {
   // Lightbox State
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
   const [lightboxIndex, setLightboxIndex] = React.useState(0);
+
+  // Sync lightbox state with document for global UI controls (like hiding ActionDock)
+  React.useEffect(() => {
+    if (lightboxOpen) {
+      document.documentElement.setAttribute('data-lightbox-open', 'true');
+    } else {
+      document.documentElement.removeAttribute('data-lightbox-open');
+    }
+    return () => {
+      document.documentElement.removeAttribute('data-lightbox-open');
+    };
+  }, [lightboxOpen]);
 
   const handleMainImageClick = () => {
     const idx = images.indexOf(selectedImage);
@@ -190,9 +188,6 @@ export default function VehicleDetailPage() {
         const images = data.vehicle.imageUrls || data.vehicle.images || [];
         if (images.length > 0) {
           setSelectedImage(images[0]);
-        }
-        if (data.vehicle.colors && data.vehicle.colors.length > 0) {
-          setSelectedColor(data.vehicle.colors[0]);
         }
       } catch (err: any) {
         setError(err.message);
@@ -293,15 +288,15 @@ export default function VehicleDetailPage() {
             {/* Back: icon-only arrow button */}
             <button
               onClick={() => router.back()}
-              className="h-10 w-10 shrink-0 rounded-lg bg-muted/20 border border-border/50 flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary transition-all group"
+              className="h-10 w-10 shrink-0 flex items-center justify-center transition-all group"
             >
-              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+              <ArrowLeft className="h-5 w-5 transition-all group-hover:text-primary group-active:text-primary group-hover:-translate-x-1" />
             </button>
 
             {/* Product name — right side, no border */}
             <div className="min-w-0">
               <h2 className="text-sm sm:text-base font-black uppercase tracking-tight text-foreground truncate text-right">
-                {vehicle.make} <span className="text-primary">{vehicle.model}</span>
+                {vehicle.make} <span className="text-primary">{vehicle.model}</span> {vehicle.trim && <span className="text-xs text-muted-foreground ml-1">({vehicle.trim})</span>}
               </h2>
             </div>
           </div>
@@ -326,7 +321,7 @@ export default function VehicleDetailPage() {
               >
                 {/* Scrollable strip */}
                 <div
-                  className="flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-y-auto md:max-h-[500px] pb-1 md:pb-2 pr-0.5
+                  className="flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-y-auto md:max-h-[430px] pb-1 md:pb-2 pr-0.5
                     [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:h-1
                     [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-muted/20
                     [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border/60"
@@ -388,7 +383,7 @@ export default function VehicleDetailPage() {
             </motion.div>
           </div>
 
-          {/* Right Column: Title, Specs & Color Selector */}
+          {/* Right Column: Title, Specs & Primary Details */}
           <div className="lg:col-span-5 space-y-8">
             <motion.div
               initial={{ opacity: 0, x: 20 }}
@@ -396,9 +391,16 @@ export default function VehicleDetailPage() {
               transition={{ duration: 0.6 }}
               className="space-y-4"
             >
-              <span className="text-xs uppercase tracking-[0.4em] font-black text-primary">
-                {vehicle.make}
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs uppercase tracking-[0.4em] font-black text-primary">
+                  {vehicle.make}
+                </span>
+                {vehicle.trim && (
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 border-l border-border/50 pl-3">
+                    {vehicle.trim}
+                  </span>
+                )}
+              </div>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tight leading-none text-foreground uppercase">
                 {vehicle.model}
               </h1>
@@ -408,53 +410,8 @@ export default function VehicleDetailPage() {
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-0.5">Starting Ex-Showroom</span>
                   <span className="text-xl sm:text-2xl font-black text-primary tracking-tight truncate">{formattedPrice}</span>
                 </div>
-                {vehicle.trim && (
-                  <div className="bg-muted/40 border border-border/30 px-3 py-2.5 rounded-xl text-xs font-bold text-foreground/80 shrink-0">
-                    TRIM: {vehicle.trim}
-                  </div>
-                )}
               </div>
             </motion.div>
-
-            {/* Color Configurator */}
-            {vehicle.colors && vehicle.colors.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.15 }}
-                className="p-6 rounded-[24px] border border-border/40 bg-card/10 backdrop-blur-md space-y-4"
-              >
-                <div className="flex justify-between items-center">
-                  <p className="text-xs uppercase tracking-[0.2em] font-black text-muted-foreground">Select Colorway</p>
-                  <span className="text-xs font-bold text-primary capitalize bg-primary/5 px-2.5 py-1 rounded-md border border-primary/10">
-                    {selectedColor}
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  {vehicle.colors.map((color, idx) => {
-                    const hex = getColorHex(color);
-                    const isSelected = selectedColor === color;
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => setSelectedColor(color)}
-                        title={color}
-                        className="relative p-0.5 rounded-full border transition-all duration-300"
-                        style={{
-                          borderColor: isSelected ? '#dc2626' : 'transparent',
-                          boxShadow: isSelected ? '0 0 14px rgba(220, 38, 38, 0.4)' : 'none'
-                        }}
-                      >
-                        <div
-                          className="w-8 h-8 rounded-full border border-border/20 transition-transform duration-300 hover:scale-110 shadow-inner"
-                          style={{ backgroundColor: hex }}
-                        />
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
 
             {/* Short Description */}
             {vehicle.shortDescription && (

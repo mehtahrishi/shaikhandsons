@@ -100,9 +100,35 @@ export const vehicles = pgTable(
   })
 );
 
+// Likes table
+export const likes = pgTable(
+  'likes',
+  {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id').notNull(),
+    vehicleId: integer('vehicle_id').notNull(),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => ({
+    userFk: foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+    }).onDelete('cascade'),
+    vehicleFk: foreignKey({
+      columns: [table.vehicleId],
+      foreignColumns: [vehicles.id],
+    }).onDelete('cascade'),
+    // Ensure a user can only like a vehicle once
+    userVehicleUnique: uniqueIndex('idx_likes_user_vehicle').on(table.userId, table.vehicleId),
+    vehicleIdx: index('idx_likes_vehicle').on(table.vehicleId),
+  })
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Brand = typeof brands.$inferSelect;
 export type NewBrand = typeof brands.$inferInsert;
 export type Vehicle = typeof vehicles.$inferSelect;
 export type NewVehicle = typeof vehicles.$inferInsert;
+export type Like = typeof likes.$inferSelect;
+export type NewLike = typeof likes.$inferInsert;

@@ -71,6 +71,8 @@ Root/
 │   │   │   │       └── route.ts       # Parses contact form and dispatches SMTP email
 │   │   │   ├── (shop)/
 │   │   │   │   └── vehicles/          # Endpoint: /api/vehicles
+│   │   │   │       ├── [slug]/
+│   │   │   │       │   └── like/route.ts # Endpoint: /api/vehicles/[slug]/like (GET/POST)
 │   │   │   │       └── route.ts       # Public endpoint to fetch vehicle catalog data
 │   │   │   ├── admin/                 # 🛡️ Protected Admin Endpoints
 │   │   │   │   ├── auth/              # Endpoint: /api/admin/auth
@@ -129,10 +131,12 @@ Root/
 │   │   │   └── InitialLoader.tsx      # Cinematic electric startup animation that plays on first load
 │   │   ├── home/                      # Homepage specific sections
 │   │   │   └── HeroSection.tsx        # Dynamic Framer Motion image slider for the landing page
-│   │   ├── layout/                    # Global layout structures
+├── layout/                    # Global layout structures
+│   │   │   ├── ActionDock.tsx         # Floating action menu (WhatsApp, Back) with lightbox awareness
 │   │   │   ├── Navbar.tsx             # Main user navigation, mobile dock, theme toggle, profile menu
 │   │   │   ├── PageWrapper.tsx        # Framer Motion wrapper for smooth page transitions
 │   │   │   └── SiteFooter.tsx         # Main user-facing footer with links and newsletter
+
 │   │   ├── shop/                      # Catalog and store components
 │   │   │   ├── VehicleCard.tsx        # Individual vehicle display card for grids
 │   │   │   └── VehicleShowroom.tsx    # Interactive vehicle catalog with category filters
@@ -166,6 +170,7 @@ Root/
 │   │   │   ├── dashboard.ts           # Server-side queries to aggregate dashboard stats
 │   │   │   ├── index.ts               # Drizzle ORM initialization and Postgres connection pool
 │   │   │   ├── inventory.ts           # Server-side queries for managing vehicles/brands
+│   │   │   ├── likes.ts               # Server-side queries for vehicle likes and user favoriting
 │   │   │   ├── migrate.ts             # CLI Utility script to run Drizzle schema migrations
 │   │   │   └── schema.ts              # Drizzle ORM schemas: `users`, `brands`, `vehicles` tables
 │   │   ├── inventory-client.ts        # Client-side fetch wrappers for Admin inventory APIs

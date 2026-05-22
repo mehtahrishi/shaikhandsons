@@ -140,7 +140,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-card pointer-events-none z-10" />
 
         {/* Vehicle Image */}
-        <div className="relative h-[55%] sm:h-[60%] w-full overflow-hidden bg-muted">
+        <div className="relative h-[55%] sm:h-[60%] w-full overflow-hidden">
           {/* Like Button */}
           <div className="absolute top-4 right-4 z-20">
             <motion.button
@@ -165,7 +165,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
               alt={`${liveData.make} ${liveData.model}`}
               fill
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-contain p-4"
+              className="object-cover"
               priority
               unoptimized={primaryImage.startsWith('/uploads/')}
             />

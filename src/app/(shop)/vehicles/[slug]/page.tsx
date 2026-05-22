@@ -38,9 +38,45 @@ import {
   KeyRound,
   LampCeiling,
   Sun,
-  Heart
+  Heart,
+  Check
 } from 'lucide-react';
 import Link from 'next/link';
+// ... (imports rest)
+
+const COLOR_MAP: Record<string, string> = {
+  'red': '#ef4444',
+  'blue': '#3b82f6',
+  'black': '#171717',
+  'white': '#fafafa',
+  'grey': '#737373',
+  'gray': '#737373',
+  'silver': '#a3a3a3',
+  'gold': '#fbbf24',
+  'yellow': '#eab308',
+  'green': '#22c55e',
+  'orange': '#f97316',
+  'purple': '#a855f7',
+  'pink': '#ec4899',
+  'brown': '#78350f',
+  'midnight black': '#0a0a0a',
+  'ocean blue': '#1e40af',
+  'pearl white': '#f8fafc',
+  'electric green': '#4ade80',
+  'crimson': '#991b1b',
+  'royal blue': '#1e3a8a',
+  'matte black': '#1a1a1a',
+  'glossy black': '#000000',
+  'candy red': '#dc2626',
+  'titanium grey': '#52525b',
+  'metallic silver': '#94a3b8',
+};
+
+const getColorHex = (colorName: string) => {
+  const name = colorName.toLowerCase().trim();
+  if (name.startsWith('#')) return name;
+  return COLOR_MAP[name] || name;
+};
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -121,6 +157,7 @@ export default function VehicleDetailPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<string>('');
+  const [selectedColor, setSelectedColor] = React.useState<string>('');
   const [activeTab, setActiveTab] = React.useState<'specs' | 'features'>('specs');
   const [isLiked, setIsLiked] = React.useState(false);
   const { user } = useAuth();
@@ -208,6 +245,10 @@ export default function VehicleDetailPage() {
         const images = data.vehicle.imageUrls || data.vehicle.images || [];
         if (images.length > 0) {
           setSelectedImage(images[0]);
+        }
+
+        if (data.vehicle.colors && data.vehicle.colors.length > 0) {
+          setSelectedColor(data.vehicle.colors[0]);
         }
 
         // Fetch likes
@@ -483,24 +524,55 @@ export default function VehicleDetailPage() {
                 {vehicle.model}
               </h1>
 
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <div className="bg-primary/5 border border-primary/20 px-4 py-3 rounded-2xl flex flex-col justify-center flex-1 min-w-0">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-0.5">Starting Ex-Showroom</span>
-                  <span className="text-xl sm:text-2xl font-black text-primary tracking-tight truncate">{formattedPrice}</span>
-                </div>
+              <div className="flex flex-col gap-3 pt-2">
+                <div className="relative group overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background p-6 shadow-sm hover:shadow-md transition-all duration-500">
+                  {/* Subtle Glow Effect */}
+                  <div className="absolute -top-12 -right-12 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all duration-500" />
+                  
+                  <div className="flex flex-col gap-1 relative z-10">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary text-[8px] font-black uppercase tracking-widest text-white">
+                        Special Offer
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <span className="text-4xl sm:text-5xl font-black text-primary tracking-tighter">
+                        {formattedPrice}
+                      </span>
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">
+                        Starts At
+                      </span>
+                    </div>
 
-                {/* Like Button Detail Page */}
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={handleLike}
-                  className={`p-2 transition-all duration-300 ${
-                    isLiked ? 'text-red-500' : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                  title={isLiked ? "Unlike" : "Like"}
-                >
-                  <Heart className={`h-8 w-8 ${isLiked ? 'fill-current' : ''}`} />
-                </motion.button>
+                    <div className="flex items-center gap-4 mt-4 pt-4 border-t border-border/10">
+                      <div className="flex flex-col">
+                        <span className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter">Booking Amount</span>
+                        <span className="text-base font-black text-foreground">₹ 5,999/-</span>
+                      </div>
+                      <div className="h-8 w-px bg-border/20" />
+                      <div className="flex flex-col flex-1">
+                        <span className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter">Est. Delivery</span>
+                        <span className="text-base font-black text-foreground">15 Days</span>
+                      </div>
+                      
+                      {/* Simplified Heart Button inside Price Card for cleaner look */}
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={handleLike}
+                        className={`p-3 rounded-2xl border transition-all duration-300 ${
+                          isLiked 
+                            ? 'bg-red-500/10 border-red-500/20 text-red-500' 
+                            : 'bg-background/50 border-border/50 text-muted-foreground hover:text-foreground hover:bg-background'
+                        }`}
+                        title={isLiked ? "Remove from Wishlist" : "Add to Wishlist"}
+                      >
+                        <Heart className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />
+                      </motion.button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </motion.div>
 
@@ -514,6 +586,47 @@ export default function VehicleDetailPage() {
               >
                 {vehicle.shortDescription}
               </motion.p>
+            )}
+
+            {/* Color Selection */}
+            {vehicle.colors && vehicle.colors.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="space-y-4 pt-2"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Available Finishes</span>
+                  <span className="text-[10px] font-bold text-primary uppercase tracking-widest">{selectedColor}</span>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  {vehicle.colors.map((color, idx) => {
+                    const isSelected = selectedColor === color;
+                    const hex = getColorHex(color);
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedColor(color)}
+                        className={`group relative w-10 h-10 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
+                          isSelected ? 'border-primary scale-110 shadow-lg shadow-primary/20' : 'border-border/40 hover:border-border'
+                        }`}
+                        title={color}
+                      >
+                        <div 
+                          className="w-7 h-7 rounded-full shadow-inner transition-transform duration-300 group-hover:scale-90"
+                          style={{ backgroundColor: hex }}
+                        />
+                        {isSelected && (
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <Check size={14} strokeWidth={4} className={hex.toLowerCase() === '#fafafa' || hex.toLowerCase() === '#ffffff' || hex.toLowerCase() === 'white' ? 'text-black' : 'text-white'} />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
             )}
 
             {/* Key Stats Cards Grid */}

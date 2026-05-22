@@ -11,16 +11,20 @@ import {
   ChevronLeft,
   ChevronRight,
   Award,
-  Heart
+  Heart,
+  Tag,
+  Sliders
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { BrandIdentity } from "@/components/common/BrandIdentity"
-
+ 
 const navItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
+  { name: "Coupons", href: "/admin/coupons", icon: Tag },
   { name: "Fleet Catalogue", href: "/admin/inventory", icon: Package },
+  { name: "Variants", href: "/admin/variants", icon: Sliders },
   { name: "Brands", href: "/admin/brands", icon: Award },
   { name: "Customers", href: "/admin/users", icon: Users },
   { name: "Likes", href: "/admin/likes", icon: Heart },

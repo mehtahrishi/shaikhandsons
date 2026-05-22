@@ -17,7 +17,8 @@ import {
   ChevronDown,
   ChevronUp,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Trash2
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
@@ -56,6 +57,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from 'next/navigation';
 import { 
   fetchBrands, 
   createBrand, 
@@ -67,7 +69,7 @@ import {
   updateVehicleAPI, 
   deleteVehicleAPI,
   bulkUpdateVehicles,
-  generatePlaceholderImages 
+  generatePlaceholderImages
 } from '@/lib/inventory-client';
 import { 
   DropdownMenu,
@@ -279,6 +281,7 @@ const moveArrayItem = <T,>(items: T[], fromIndex: number, toIndex: number) => {
 
 export default function AdminInventoryPage() {
   const { toast } = useToast();
+  const router = useRouter();
   const [vehicles, setVehicles] = React.useState<Vehicle[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -301,6 +304,9 @@ export default function AdminInventoryPage() {
   const [brands, setBrands] = React.useState<BrandData[]>([]);
   const [isBrandsLoading, setIsBrandsLoading] = React.useState(false);
 
+  const handleManageVariantsClick = (vehicle: Vehicle) => {
+    router.push(`/admin/variants?vehicleId=${vehicle.id}`);
+  };
   const fetchAllBrands = React.useCallback(async () => {
     try {
       setIsBrandsLoading(true);
@@ -2287,6 +2293,9 @@ export default function AdminInventoryPage() {
                             <DropdownMenuContent className="bg-card/95 backdrop-blur-xl border-border/50" align="end">
                               <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest">Management</DropdownMenuLabel>
                               <DropdownMenuSeparator className="bg-border/50" />
+                              <DropdownMenuItem onClick={() => handleManageVariantsClick(item)} className="text-[10px] font-black uppercase tracking-widest text-primary focus:bg-primary/10 focus:text-primary cursor-pointer font-bold">
+                                Manage Variants
+                              </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handleEditClick(item)} className="text-[10px] font-black uppercase tracking-widest focus:bg-primary/10 focus:text-primary cursor-pointer">
                                 Edit Asset
                               </DropdownMenuItem>
@@ -2928,6 +2937,8 @@ export default function AdminInventoryPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+
 
       {/* Delete Confirmation Modal */}
       <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>

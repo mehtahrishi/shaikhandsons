@@ -12,6 +12,8 @@ import {
   MapPinned,
   Calendar,
   User,
+  Lock,
+  UserCheck,
   Phone,
   Clock,
   Hourglass,
@@ -42,7 +44,26 @@ import {
   Check
 } from 'lucide-react';
 import Link from 'next/link';
-// ... (imports rest)
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { getImageUrl } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { fetchLikeStatus, toggleLikeAPI, submitOrderAPI, fetchPublicVariants } from '@/lib/inventory-client';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const COLOR_MAP: Record<string, string> = {
   'red': '#ef4444',
@@ -77,26 +98,8 @@ const getColorHex = (colorName: string) => {
   if (name.startsWith('#')) return name;
   return COLOR_MAP[name] || name;
 };
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { getImageUrl } from '@/lib/utils';
-import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { fetchLikeStatus, toggleLikeAPI } from '@/lib/inventory-client';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+
+
 
 type Vehicle = {
   id: number | string;
@@ -160,7 +163,10 @@ export default function VehicleDetailPage() {
   const [selectedColor, setSelectedColor] = React.useState<string>('');
   const [activeTab, setActiveTab] = React.useState<'specs' | 'features'>('specs');
   const [isLiked, setIsLiked] = React.useState(false);
-  const { user } = useAuth();
+  // Variants
+  const [variants, setVariants] = React.useState<any[]>([]);
+  const [selectedVariantId, setSelectedVariantId] = React.useState<number | null>(null);
+  const { user, loading: isAuthLoading } = useAuth();
   const { toast } = useToast();
 
   const images = vehicle ? (vehicle.imageUrls || vehicle.images || []) : [];
@@ -258,7 +264,22 @@ export default function VehicleDetailPage() {
         } catch (lerr) {
           console.error('Failed to fetch likes:', lerr);
         }
+
+        // Fetch variants (optional — no variants = single price)
+        try {
+          const variantList = await fetchPublicVariants(slug);
+          setVariants(variantList);
+          const defaultVar = variantList.find((v: any) => v.isDefault);
+          if (defaultVar) {
+            setSelectedVariantId(defaultVar.id);
+          } else {
+            setSelectedVariantId(null);
+          }
+        } catch {
+          // Variants optional — ignore silently
+        }
       } catch (err: any) {
+
         setError(err.message);
       } finally {
         setIsLoading(false);
@@ -304,10 +325,26 @@ export default function VehicleDetailPage() {
     if (!bookingForm.name || !bookingForm.phone) return;
 
     setIsBookingLoading(true);
-    // Simulate luxury booking reservation
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsBookingLoading(false);
-    setIsBooked(true);
+    try {
+      await submitOrderAPI(slug, {
+        variantId: selectedVariantId ?? null,
+        customerName: bookingForm.name,
+        customerPhone: bookingForm.phone,
+        customerEmail: bookingForm.email || undefined,
+        preferredShowroom: bookingForm.showroom,
+        preferredDate: bookingForm.date,
+        orderType: 'test_drive',
+      });
+      setIsBooked(true);
+    } catch (err: any) {
+      toast({
+        title: 'Booking Failed',
+        description: err.message || 'Could not submit booking. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsBookingLoading(false);
+    }
   };
 
   if (isLoading) {
@@ -393,6 +430,16 @@ export default function VehicleDetailPage() {
     { label: "Charger", value: vehicle.chargerIncluded, icon: <Plug size={15} /> },
     { label: "Battery Warranty", value: vehicle.batteryWarranty, icon: <ShieldCheck size={15} /> }
   ].filter(spec => spec.value);
+  
+  const selectedVariant = variants.find(v => v.id === selectedVariantId);
+  const addOnPrice = selectedVariant ? Number(selectedVariant.price) : 0;
+  const totalBookingPrice = priceNumber + addOnPrice;
+  const formattedTotalPrice = new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(totalBookingPrice);
 
   return (
     <main className="min-h-screen bg-background text-foreground pb-24 relative [overflow-x:clip]">
@@ -833,7 +880,41 @@ export default function VehicleDetailPage() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
 
               <AnimatePresence mode="wait">
-                {!isBooked ? (
+                {isAuthLoading ? (
+                  <div key="auth-loading" className="space-y-6 py-6">
+                    <Skeleton className="h-6 w-1/2 bg-muted/30" />
+                    <Skeleton className="h-4 w-full bg-muted/30" />
+                    <Skeleton className="h-12 w-full bg-muted/30 rounded-xl" />
+                    <Skeleton className="h-12 w-full bg-muted/30 rounded-xl" />
+                    <Skeleton className="h-12 w-full bg-muted/30 rounded-full" />
+                  </div>
+                ) : !user ? (
+                  <motion.div
+                    key="auth-required"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="space-y-6 text-center py-6"
+                  >
+                    <div className="w-16 h-16 bg-primary/10 border border-primary/20 text-primary rounded-full flex items-center justify-center mx-auto">
+                      <Lock size={32} />
+                    </div>
+
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-black uppercase tracking-tight">Authentication Required</h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed px-4">
+                        Please sign in or create an account to reserve a private viewing session, customize your specifications, or place an order with Shaikh & Sons.
+                      </p>
+                    </div>
+
+                    <Button
+                      onClick={() => router.push(`/login?redirect=/vehicles/${slug}`)}
+                      className="w-full bg-primary hover:bg-primary/95 text-white font-bold h-12 rounded-full shadow-lg shadow-primary/20 transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                      <UserCheck size={16} /> Sign In to Proceed
+                    </Button>
+                  </motion.div>
+                ) : !isBooked ? (
                   <motion.form
                     key="booking-form"
                     onSubmit={handleBookingSubmit}
@@ -850,7 +931,72 @@ export default function VehicleDetailPage() {
                       </p>
                     </div>
 
+                    {/* Dynamic Price Summary Box */}
+                    <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-between">
+                      <div className="flex flex-col">
+                        <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Total Price</span>
+                        <span className="text-xl font-black text-primary">{formattedTotalPrice}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest block">Chassis Base</span>
+                        <span className="text-xs font-bold text-foreground">{formattedPrice}</span>
+                      </div>
+                    </div>
+
                     <div className="space-y-4">
+                      {/* Variant Selector — shown only when variants exist */}
+                      {variants.length > 0 && (
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex justify-between">
+                            <span>Select Variant (Optional)</span>
+                            <span className="text-[9px] lowercase italic text-muted-foreground/60 font-semibold">click to select/deselect</span>
+                          </label>
+                          <div className="flex flex-col gap-2">
+                            {variants.map((v: any) => {
+                              const isSelected = selectedVariantId === v.id;
+                              const variantPriceAddon = Number(v.price) === 0 
+                                ? 'Included' 
+                                : `+ ₹${Number(v.price).toLocaleString('en-IN')}`;
+                              return (
+                                <button
+                                  key={v.id}
+                                  type="button"
+                                  onClick={() => setSelectedVariantId(selectedVariantId === v.id ? null : v.id)}
+                                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 text-left transition-all duration-200 ${
+                                    isSelected
+                                      ? 'border-primary bg-primary/10 text-foreground'
+                                      : 'border-border/40 bg-background/40 text-muted-foreground hover:border-border hover:bg-muted/20'
+                                  }`}
+                                >
+                                  <div className="flex flex-col">
+                                    <span className={`text-xs font-black uppercase tracking-wide ${
+                                      isSelected ? 'text-primary' : ''
+                                    }`}>{v.name}</span>
+                                    <span className="text-[9px] font-bold text-muted-foreground/85 uppercase tracking-wider mt-0.5">
+                                      {v.variantType === 'battery' || v.variantType === 'ev' 
+                                        ? '⚡ EV Variant' 
+                                        : v.variantType === 'engine' || v.variantType === 'petrol' 
+                                          ? '⚙️ Petrol Variant' 
+                                          : '💨 Gas Variant'}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    <span className={`text-sm font-black ${
+                                      isSelected ? 'text-primary' : 'text-foreground'
+                                    }`}>{variantPriceAddon}</span>
+                                    {isSelected && (
+                                      <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                                        <Check size={10} strokeWidth={3} className="text-white" />
+                                      </div>
+                                    )}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Name input */}
                       <div className="space-y-1.5 relative">
                         <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Full Name</label>

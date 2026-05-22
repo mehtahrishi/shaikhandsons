@@ -25,6 +25,8 @@ Root/
 │   │   │   └── admin/                 # Base path: /admin
 │   │   │       ├── brands/            # Base path: /admin/brands
 │   │   │       │   └── page.tsx       # Corporate Manufacturer Directory & Assets
+│   │   │       ├── coupons/           # Base path: /admin/coupons
+│   │   │       │   └── page.tsx       # CRUD UI for discount coupon codes
 │   │   │       ├── inventory/         # Base path: /admin/inventory
 │   │   │       │   └── page.tsx       # Fleet catalog management and asset actions
 │   │   │       ├── likes/             # Base path: /admin/likes
@@ -32,9 +34,11 @@ Root/
 │   │   │       ├── login/             # Base path: /admin/login
 │   │   │       │   └── page.tsx       # Stateless admin secure login interface
 │   │   │       ├── orders/            # Base path: /admin/orders
-│   │   │       │   └── page.tsx       # UI for tracking customer reservations (WIP)
+│   │   │       │   └── page.tsx       # Live booking/reservation management with status updates
 │   │   │       ├── users/             # Base path: /admin/users
 │   │   │       │   └── page.tsx       # UI for viewing the registered client list
+│   │   │       ├── variants/          # Base path: /admin/variants
+│   │   │       │   └── page.tsx       # UI for mapping variants and managing presets
 │   │   │       ├── layout.tsx         # Sidebar, Header, and Theme wrapper for all admin pages
 │   │   │       └── page.tsx           # The main admin dashboard analytics overview
 │   │   │
@@ -77,13 +81,19 @@ Root/
 │   │   │   ├── (shop)/
 │   │   │   │   └── vehicles/          # Endpoint: /api/vehicles
 │   │   │   │       ├── [slug]/
-│   │   │   │       │   └── like/route.ts # Endpoint: /api/vehicles/[slug]/like (GET/POST)
+│   │   │   │       │   ├── like/route.ts      # Endpoint: /api/vehicles/[slug]/like (GET/POST)
+│   │   │   │       │   ├── order/route.ts     # Endpoint: /api/vehicles/[slug]/order (POST) — creates booking
+│   │   │   │       │   └── variants/route.ts  # Endpoint: /api/vehicles/[slug]/variants (GET) — public
 │   │   │   │       └── route.ts       # Public endpoint to fetch vehicle catalog data
+│   │   │   ├── coupons/               # Endpoint: /api/coupons
+│   │   │   │   └── validate/route.ts  # POST — validates coupon code and returns discount amount
 │   │   │   ├── admin/                 # 🛡️ Protected Admin Endpoints
 │   │   │   │   ├── auth/              # Endpoint: /api/admin/auth
 │   │   │   │   │   └── route.ts       # Validates ENV credentials and sets admin-token cookie
 │   │   │   │   ├── brands/            # Endpoint: /api/admin/brands
 │   │   │   │   │   └── route.ts       # CRUD operations for vehicle brands in Postgres
+│   │   │   │   ├── coupons/           # Endpoint: /api/admin/coupons
+│   │   │   │   │   └── route.ts       # CRUD for discount coupon codes (GET/POST/PATCH/DELETE)
 │   │   │   │   ├── dashboard/         # Endpoint: /api/admin/dashboard/stats
 │   │   │   │   │   └── stats/route.ts # Aggregates analytics (total users, vehicles) for dashboard
 │   │   │   │   ├── inventory/         # Endpoint: /api/admin/inventory
@@ -91,11 +101,16 @@ Root/
 │   │   │   │   │   └── route.ts       # CRUD operations for specific vehicles
 │   │   │   │   ├── logout/            # Endpoint: /api/admin/logout
 │   │   │   │   │   └── route.ts       # Clears the HttpOnly admin session cookie
+│   │   │   │   ├── orders/            # Endpoint: /api/admin/orders
+│   │   │   │   │   └── route.ts       # GET (list with filter) + PATCH (update status)
 │   │   │   │   ├── storage/           # Endpoint: /api/admin/storage
 │   │   │   │   │   ├── upload/route.ts# Handles file uploads (images) to Vercel Blob
 │   │   │   │   │   └── view/[fileId]/route.ts # Retrieves uploaded files via ID
-│   │   │   │   └── users/             # Endpoint: /api/admin/users
-│   │   │   │       └── route.ts       # Fetches the list of all registered clients
+│   │   │   │   ├── users/             # Endpoint: /api/admin/users
+│   │   │   │   │   └── route.ts       # Fetches the list of all registered clients
+│   │   │   │   └── variants/          # Endpoint: /api/admin/variants
+│   │   │   │       ├── global/route.ts # CRUD for global variants preset (GET/POST/PATCH/DELETE)
+│   │   │   │       └── route.ts       # CRUD for vehicle_variants (GET/POST/PATCH/DELETE)
 │   │   │   └── auth/                  # 🔐 Public Authentication Endpoints
 │   │   │       ├── create-user/       # Endpoint: /api/auth/create-user
 │   │   │       │   └── route.ts       # Validates with Zod, hashes password, inserts into DB
@@ -172,12 +187,15 @@ Root/
 │   │   │   ├── admin-auth.ts          # Server-side validation for ENV admin credentials
 │   │   │   ├── auth.ts                # Server-side PostgreSQL queries (Drizzle) for users
 │   │   │   ├── check-db.ts            # CLI Utility script to verify Postgres connection
+│   │   │   ├── coupons.ts             # Drizzle queries for coupon CRUD, validation, discount calc
 │   │   │   ├── dashboard.ts           # Server-side queries to aggregate dashboard stats
 │   │   │   ├── index.ts               # Drizzle ORM initialization and Postgres connection pool
 │   │   │   ├── inventory.ts           # Server-side queries for managing vehicles/brands
 │   │   │   ├── likes.ts               # Server-side queries for vehicle likes and user favoriting
 │   │   │   ├── migrate.ts             # CLI Utility script to run Drizzle schema migrations
-│   │   │   └── schema.ts              # Drizzle ORM schemas: `users`, `brands`, `vehicles` tables
+│   │   │   ├── orders.ts              # Drizzle queries: createOrder, getAllOrders, updateStatus, stats
+│   │   │   ├── schema.ts              # Drizzle ORM schemas: users, brands, vehicles, variants, coupons, orders, likes
+│   │   │   └── variants.ts            # Drizzle queries for vehicle_variants CRUD
 │   │   ├── inventory-client.ts        # Client-side fetch wrappers for Admin inventory APIs
 │   │   ├── storage-node.ts            # Node.js file system utilities (file deletion)
 │   │   ├── utils.ts                   # Global helpers (e.g. `cn` for merging Tailwind classes)

@@ -447,6 +447,19 @@ export async function deleteVariantAPI(id: number) {
   return await res.json();
 }
 
+export async function bulkAssignVariantsAPI(vehicleId: number, globalVariantIds: number[]) {
+  const res = await fetch('/api/admin/variants/bulk-assign', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ vehicleId, globalVariantIds }),
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || 'Failed to bulk assign variants');
+  }
+  return await res.json();
+}
+
 // ─── Admin Orders ─────────────────────────────────────────────────────────────
 
 export async function fetchAdminOrders(status?: string) {

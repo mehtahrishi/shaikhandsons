@@ -272,6 +272,36 @@ export async function updateGlobalVariant(id: number, data: Partial<{
 }
 
 /**
+ * Bulk assign variants to a vehicle from global presets
+ */
+export async function bulkAssignVariants(vehicleId: number, globalVariantIds: number[]) {
+  // Filter out those already assigned
+  const existing = await db
+    .select({ globalVariantId: vehicleVariants.globalVariantId })
+    .from(vehicleVariants)
+    .where(eq(vehicleVariants.vehicleId, vehicleId));
+  
+  const existingIds = new Set(existing.map(e => e.globalVariantId));
+  const newIds = globalVariantIds.filter(id => !existingIds.has(id));
+  
+  if (newIds.length === 0) return [];
+  
+  const values = newIds.map(gid => ({
+    vehicleId,
+    globalVariantId: gid,
+    isDefault: false,
+    isAvailable: true,
+    sortOrder: 0
+  }));
+  
+  await db
+    .insert(vehicleVariants)
+    .values(values);
+    
+  return getAllVariantsByVehicleId(vehicleId);
+}
+
+/**
  * Delete a global variant preset
  */
 export async function deleteGlobalVariant(id: number) {

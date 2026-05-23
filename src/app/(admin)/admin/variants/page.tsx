@@ -49,7 +49,8 @@ import {
   deleteVariantAPI,
   createGlobalVariantAPI,
   updateGlobalVariantAPI,
-  deleteGlobalVariantAPI
+  deleteGlobalVariantAPI,
+  bulkAssignVariantsAPI
 } from '@/lib/inventory-client';
 
 interface Vehicle {
@@ -283,6 +284,41 @@ function VariantsPageContent() {
     }
   };
 
+  const handleAssignAll = async () => {
+    if (!selectedVehicle || globalPresets.length === 0) return;
+    
+    // Identify unassigned presets
+    const unassignedPresetIds = globalPresets
+      .filter(preset => !activeVariants.some(v => v.globalVariantId === preset.id))
+      .map(p => p.id);
+    
+    if (unassignedPresetIds.length === 0) {
+      toast({ title: 'Already assigned', description: 'All presets are already assigned to this vehicle.' });
+      return;
+    }
+
+    try {
+      setIsVariantsLoading(true);
+      await bulkAssignVariantsAPI(Number(selectedVehicle.id), unassignedPresetIds);
+      
+      toast({
+        title: 'Bulk assignment complete',
+        description: `Successfully assigned ${unassignedPresetIds.length} new variants.`,
+      });
+      
+      // Reload vehicle configurations
+      await loadVehicleVariants(Number(selectedVehicle.id));
+    } catch (err: any) {
+      toast({
+        title: 'Operation failed',
+        description: err.message || 'Failed to assign all variants.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsVariantsLoading(false);
+    }
+  };
+
   // ─── GLOBAL PRESET FORM HANDLERS ───────────────────────────────────────────
 
   const handleEditPreset = (preset: GlobalPreset) => {
@@ -467,13 +503,25 @@ function VariantsPageContent() {
           {/* Quick-Toggle Assignments View */}
           {selectedVehicle ? (
             <div className="space-y-6">
-              <div className="flex items-center justify-between border-b border-border/30 pb-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-border/30 pb-3 gap-3">
                 <h2 className="text-xl font-black uppercase tracking-wider text-foreground">
                   Variant Options for: <span className="text-primary">{selectedVehicle.make} {selectedVehicle.model}</span>
                 </h2>
-                <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest h-7 bg-primary/10 border-primary/20 text-primary">
-                  Base Price: ₹{Number(selectedVehicle.price).toLocaleString('en-IN')}
-                </Badge>
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAssignAll}
+                    disabled={isVariantsLoading || globalPresets.length === 0}
+                    className="h-8 px-4 text-[10px] font-black uppercase tracking-widest rounded-xl border-primary/30 hover:bg-primary/10 text-primary shadow-sm shadow-primary/10 transition-all active:scale-95 flex-1 sm:flex-none"
+                  >
+                    {isVariantsLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" /> : <Plus className="h-3.5 w-3.5 mr-2" />}
+                    Assign All
+                  </Button>
+                  <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest h-8 bg-primary/10 border-primary/20 text-primary px-3 rounded-lg flex-none">
+                    Base: ₹{Number(selectedVehicle.price).toLocaleString('en-IN')}
+                  </Badge>
+                </div>
               </div>
 
               {globalPresets.length === 0 ? (

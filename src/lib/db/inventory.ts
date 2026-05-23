@@ -86,7 +86,11 @@ export async function deleteBrand(id: number) {
  * Get all vehicles
  */
 export async function getAllVehicles() {
-  return db.query.vehicles.findMany();
+  return db.query.vehicles.findMany({
+    with: {
+      variants: true,
+    },
+  });
 }
 
 /**

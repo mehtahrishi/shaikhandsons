@@ -211,10 +211,10 @@ export default function AdminCouponsPage() {
               Click edit to modify any coupon
             </CardDescription>
           </div>
-          <div className="relative w-full sm:w-64">
+          <div className="relative w-full md:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
             <Input placeholder="Search code or description..." value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)} className="pl-9 h-9 text-xs bg-muted/20" />
+              onChange={e => setSearchQuery(e.target.value)} className="pl-9 h-9 text-xs w-full bg-muted/20" />
           </div>
         </CardHeader>
         <CardContent>

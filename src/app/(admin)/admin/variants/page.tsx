@@ -3,16 +3,16 @@
 import React, { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { 
-  Sliders, 
-  Plus, 
-  Search, 
-  Trash2, 
-  Pencil, 
-  Check, 
-  X, 
-  Loader2, 
-  Zap, 
+import {
+  Sliders,
+  Plus,
+  Search,
+  Trash2,
+  Pencil,
+  Check,
+  X,
+  Loader2,
+  Zap,
   ArrowLeft,
   AlertCircle,
   ToggleLeft,
@@ -20,27 +20,27 @@ import {
   Star
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Select, 
-  SelectTrigger, 
-  SelectValue, 
-  SelectContent, 
-  SelectItem 
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
 } from "@/components/ui/select";
-import { 
+import {
   fetchAdminVehicles,
   fetchVariants,
   fetchGlobalVariantsAPI,
@@ -102,7 +102,7 @@ function VariantsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  
+
   const vehicleIdParam = searchParams.get('vehicleId');
 
   // Active Tab
@@ -113,7 +113,7 @@ function VariantsPageContent() {
   const [globalPresets, setGlobalPresets] = React.useState<GlobalPreset[]>([]);
   const [selectedVehicle, setSelectedVehicle] = React.useState<Vehicle | null>(null);
   const [activeVariants, setActiveVariants] = React.useState<VariantMapping[]>([]);
-  
+
   // Loading states
   const [isVehiclesLoading, setIsVehiclesLoading] = React.useState(true);
   const [isPresetsLoading, setIsPresetsLoading] = React.useState(true);
@@ -140,12 +140,12 @@ function VariantsPageContent() {
     try {
       setIsVehiclesLoading(true);
       setIsPresetsLoading(true);
-      
+
       const [vehiclesList, presetsList] = await Promise.all([
         fetchAdminVehicles(),
         fetchGlobalVariantsAPI()
       ]);
-      
+
       setVehicles(vehiclesList);
       setGlobalPresets(presetsList);
 
@@ -214,12 +214,12 @@ function VariantsPageContent() {
 
   const handleToggleAssignment = async (preset: GlobalPreset) => {
     if (!selectedVehicle) return;
-    
+
     const activeMapping = activeVariants.find(v => v.globalVariantId === preset.id);
-    
+
     try {
       setTogglingPresetId(preset.id);
-      
+
       if (activeMapping) {
         // Unassign: delete the variant mapping
         await deleteVariantAPI(activeMapping.id);
@@ -244,7 +244,7 @@ function VariantsPageContent() {
           description: `"${preset.name}" is now active for this vehicle.`,
         });
       }
-      
+
       // Reload vehicle configurations
       await loadVehicleVariants(Number(selectedVehicle.id));
     } catch (err: any) {
@@ -327,7 +327,7 @@ function VariantsPageContent() {
       // Refresh presets list
       const presets = await fetchGlobalVariantsAPI();
       setGlobalPresets(presets);
-      
+
       // If we had a vehicle selected, refresh its options mapping
       if (selectedVehicle) {
         loadVehicleVariants(Number(selectedVehicle.id));
@@ -348,7 +348,7 @@ function VariantsPageContent() {
       setIsPresetsLoading(true);
       await deleteGlobalVariantAPI(presetId);
       toast({ title: 'Preset deleted', description: 'Successfully deleted from database.' });
-      
+
       const presets = await fetchGlobalVariantsAPI();
       setGlobalPresets(presets);
       if (selectedVehicle) {
@@ -366,14 +366,14 @@ function VariantsPageContent() {
   };
 
   // Filters and searches lists
-  const filteredVehicles = vehicles.filter(v => 
+  const filteredVehicles = vehicles.filter(v =>
     `${v.make} ${v.model}`.toLowerCase().includes(vehicleSearch.toLowerCase())
   );
 
   const filteredPresets = globalPresets.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(presetSearch.toLowerCase());
-    const matchesType = presetTypeFilter === 'all' || 
-                        sanitizeType(p.variantType) === sanitizeType(presetTypeFilter);
+    const matchesType = presetTypeFilter === 'all' ||
+      sanitizeType(p.variantType) === sanitizeType(presetTypeFilter);
     return matchesSearch && matchesType;
   });
 
@@ -394,15 +394,8 @@ function VariantsPageContent() {
             Create variants once as global presets and instantly assign them to any vehicle.
           </p>
         </div>
-        
+
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={() => router.push('/admin/inventory')}
-            className="h-10 px-4 font-black uppercase tracking-[0.16em] text-[10px] rounded-xl border-border/60 bg-background/60 hover:bg-primary/10 hover:border-primary/50 transition-all"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" /> Back to Fleet
-          </Button>
         </div>
       </div>
 
@@ -410,21 +403,19 @@ function VariantsPageContent() {
       <div className="flex border-b border-border/50">
         <button
           onClick={() => setActiveTab('assignments')}
-          className={`px-6 py-3 font-headline text-sm font-black uppercase tracking-widest border-b-2 transition-all ${
-            activeTab === 'assignments' 
-              ? 'border-primary text-primary' 
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-          }`}
+          className={`px-6 py-3 font-body text-sm font-black uppercase tracking-widest border-b-2 transition-all ${activeTab === 'assignments'
+            ? 'border-primary text-primary'
+            : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
         >
           Vehicle Assignments
         </button>
         <button
           onClick={() => setActiveTab('presets')}
-          className={`px-6 py-3 font-headline text-sm font-black uppercase tracking-widest border-b-2 transition-all ${
-            activeTab === 'presets' 
-              ? 'border-primary text-primary' 
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-          }`}
+          className={`px-6 py-3 font-body text-sm font-black uppercase tracking-widest border-b-2 transition-all ${activeTab === 'presets'
+            ? 'border-primary text-primary'
+            : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
         >
           Global Presets Directory
         </button>
@@ -450,7 +441,7 @@ function VariantsPageContent() {
                     className="bg-muted/10 pl-9 border-border/50 text-xs font-medium h-10 rounded-lg"
                   />
                 </div>
-                
+
                 <Select
                   value={selectedVehicle ? String(selectedVehicle.id) : undefined}
                   onValueChange={(val) => {
@@ -495,7 +486,7 @@ function VariantsPageContent() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  
+
                   {/* EV Batteries Column */}
                   <Card className="bg-card/30 border-border/40 overflow-hidden">
                     <CardHeader className="bg-muted/5 border-b border-border/20 py-3.5">
@@ -511,15 +502,14 @@ function VariantsPageContent() {
                           const mapping = activeVariants.find(v => v.globalVariantId === preset.id);
                           const isAssigned = !!mapping;
                           const isToggling = togglingPresetId === preset.id;
-                          
+
                           return (
-                            <div 
+                            <div
                               key={preset.id}
-                              className={`p-3 rounded-xl border transition-all duration-200 flex flex-col gap-2.5 ${
-                                isAssigned 
-                                  ? 'bg-primary/5 border-primary/40' 
-                                  : 'bg-background/20 border-border/30 opacity-70 hover:opacity-100'
-                              }`}
+                              className={`p-3 rounded-xl border transition-all duration-200 flex flex-col gap-2.5 ${isAssigned
+                                ? 'bg-primary/5 border-primary/40'
+                                : 'bg-background/20 border-border/30 opacity-70 hover:opacity-100'
+                                }`}
                             >
                               <div className="flex items-start justify-between gap-2">
                                 <div>
@@ -536,11 +526,10 @@ function VariantsPageContent() {
                                   size="sm"
                                   onClick={() => handleToggleAssignment(preset)}
                                   disabled={isToggling || isVariantsLoading}
-                                  className={`h-7 px-3 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all ${
-                                    isAssigned 
-                                      ? 'bg-primary/20 text-primary border border-primary/30 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30' 
-                                      : 'bg-muted/30 text-muted-foreground border border-border/50 hover:bg-primary hover:text-primary-foreground hover:border-primary'
-                                  }`}
+                                  className={`h-7 px-3 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all ${isAssigned
+                                    ? 'bg-primary/20 text-primary border border-primary/30 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30'
+                                    : 'bg-muted/30 text-muted-foreground border border-border/50 hover:bg-primary hover:text-primary-foreground hover:border-primary'
+                                    }`}
                                 >
                                   {isToggling ? <Loader2 className="h-3 w-3 animate-spin" /> : isAssigned ? 'Remove' : 'Assign'}
                                 </Button>
@@ -587,15 +576,14 @@ function VariantsPageContent() {
                           const mapping = activeVariants.find(v => v.globalVariantId === preset.id);
                           const isAssigned = !!mapping;
                           const isToggling = togglingPresetId === preset.id;
-                          
+
                           return (
-                            <div 
+                            <div
                               key={preset.id}
-                              className={`p-3 rounded-xl border transition-all duration-200 flex flex-col gap-2.5 ${
-                                isAssigned 
-                                  ? 'bg-primary/5 border-primary/40' 
-                                  : 'bg-background/20 border-border/30 opacity-70 hover:opacity-100'
-                              }`}
+                              className={`p-3 rounded-xl border transition-all duration-200 flex flex-col gap-2.5 ${isAssigned
+                                ? 'bg-primary/5 border-primary/40'
+                                : 'bg-background/20 border-border/30 opacity-70 hover:opacity-100'
+                                }`}
                             >
                               <div className="flex items-start justify-between gap-2">
                                 <div>
@@ -612,11 +600,10 @@ function VariantsPageContent() {
                                   size="sm"
                                   onClick={() => handleToggleAssignment(preset)}
                                   disabled={isToggling || isVariantsLoading}
-                                  className={`h-7 px-3 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all ${
-                                    isAssigned 
-                                      ? 'bg-primary/20 text-primary border border-primary/30 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30' 
-                                      : 'bg-muted/30 text-muted-foreground border border-border/50 hover:bg-primary hover:text-primary-foreground hover:border-primary'
-                                  }`}
+                                  className={`h-7 px-3 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all ${isAssigned
+                                    ? 'bg-primary/20 text-primary border border-primary/30 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30'
+                                    : 'bg-muted/30 text-muted-foreground border border-border/50 hover:bg-primary hover:text-primary-foreground hover:border-primary'
+                                    }`}
                                 >
                                   {isToggling ? <Loader2 className="h-3 w-3 animate-spin" /> : isAssigned ? 'Remove' : 'Assign'}
                                 </Button>
@@ -663,15 +650,14 @@ function VariantsPageContent() {
                           const mapping = activeVariants.find(v => v.globalVariantId === preset.id);
                           const isAssigned = !!mapping;
                           const isToggling = togglingPresetId === preset.id;
-                          
+
                           return (
-                            <div 
+                            <div
                               key={preset.id}
-                              className={`p-3 rounded-xl border transition-all duration-200 flex flex-col gap-2.5 ${
-                                isAssigned 
-                                  ? 'bg-primary/5 border-primary/40' 
-                                  : 'bg-background/20 border-border/30 opacity-70 hover:opacity-100'
-                              }`}
+                              className={`p-3 rounded-xl border transition-all duration-200 flex flex-col gap-2.5 ${isAssigned
+                                ? 'bg-primary/5 border-primary/40'
+                                : 'bg-background/20 border-border/30 opacity-70 hover:opacity-100'
+                                }`}
                             >
                               <div className="flex items-start justify-between gap-2">
                                 <div>
@@ -688,11 +674,10 @@ function VariantsPageContent() {
                                   size="sm"
                                   onClick={() => handleToggleAssignment(preset)}
                                   disabled={isToggling || isVariantsLoading}
-                                  className={`h-7 px-3 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all ${
-                                    isAssigned 
-                                      ? 'bg-primary/20 text-primary border border-primary/30 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30' 
-                                      : 'bg-muted/30 text-muted-foreground border border-border/50 hover:bg-primary hover:text-primary-foreground hover:border-primary'
-                                  }`}
+                                  className={`h-7 px-3 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all ${isAssigned
+                                    ? 'bg-primary/20 text-primary border border-primary/30 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30'
+                                    : 'bg-muted/30 text-muted-foreground border border-border/50 hover:bg-primary hover:text-primary-foreground hover:border-primary'
+                                    }`}
                                 >
                                   {isToggling ? <Loader2 className="h-3 w-3 animate-spin" /> : isAssigned ? 'Remove' : 'Assign'}
                                 </Button>
@@ -738,7 +723,7 @@ function VariantsPageContent() {
       {/* ─── TAB 2: GLOBAL PRESET DIRECTORY ────────────────────────────────────── */}
       {activeTab === 'presets' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
+
           {/* Left panel: List of all presets */}
           <div className="lg:col-span-8 space-y-6">
             <Card className="bg-card/40 border-border/50 backdrop-blur-xl">
@@ -750,7 +735,7 @@ function VariantsPageContent() {
                       Master central configurations easily applied across the entire catalog.
                     </CardDescription>
                   </div>
-                  
+
                   {/* Preset categories quick filters */}
                   <div className="flex gap-1.5 overflow-x-auto shrink-0 py-1">
                     {['all', 'ev', 'petrol', 'gas'].map((filterType) => (
@@ -759,11 +744,10 @@ function VariantsPageContent() {
                         variant="outline"
                         size="sm"
                         onClick={() => setPresetTypeFilter(filterType)}
-                        className={`h-7 px-3 text-[8px] font-black uppercase tracking-widest rounded-full transition-all border-border/50 ${
-                          presetTypeFilter === filterType 
-                            ? 'bg-primary text-primary-foreground border-primary hover:bg-primary/90' 
-                            : 'hover:bg-primary/10'
-                        }`}
+                        className={`h-7 px-3 text-[8px] font-black uppercase tracking-widest rounded-full transition-all border-border/50 ${presetTypeFilter === filterType
+                          ? 'bg-primary text-primary-foreground border-primary hover:bg-primary/90'
+                          : 'hover:bg-primary/10'
+                          }`}
                       >
                         {filterType === 'all' ? 'All' : filterType === 'ev' ? 'EV' : filterType === 'petrol' ? 'Petrol' : 'Gas'}
                       </Button>
@@ -772,7 +756,7 @@ function VariantsPageContent() {
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                
+
                 {/* Preset list search bar */}
                 <div className="p-4 border-b border-border/10 bg-muted/5">
                   <div className="relative">
@@ -869,7 +853,7 @@ function VariantsPageContent() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 pt-4">
-                
+
                 {/* 1. Name */}
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Preset Name *</Label>

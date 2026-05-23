@@ -1,6 +1,7 @@
 "use client"
 
 import React from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
   Package, 
@@ -18,7 +19,8 @@ import {
   ChevronUp,
   ChevronLeft,
   ChevronRight,
-  Trash2
+  Trash2,
+  ExternalLink
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
@@ -105,6 +107,7 @@ type Vehicle = {
   imageUrls?: string[];
   designPhilosophy: string;
   createdAt: string;
+  variants?: any[];
   
   modelCode?: string;
   category?: string;
@@ -299,6 +302,7 @@ export default function AdminInventoryPage() {
   const [editGalleryItems, setEditGalleryItems] = React.useState<EditGalleryItem[]>([]);
   const [vehicleToDelete, setVehicleToDelete] = React.useState<string | null>(null);
   const [selectedBrandId, setSelectedBrandId] = React.useState<string>('all');
+  const [variantFilter, setVariantFilter] = React.useState<string>('all'); // 'all', 'with', 'without'
 
   // Brands State
   const [brands, setBrands] = React.useState<BrandData[]>([]);
@@ -356,6 +360,13 @@ export default function AdminInventoryPage() {
     if (selectedBrandId && selectedBrandId !== 'all') {
       result = result.filter(v => String(v.brandId) === selectedBrandId);
     }
+
+    // Variant filter
+    if (variantFilter === 'with') {
+      result = result.filter(v => Array.isArray(v.variants) && v.variants.length > 0);
+    } else if (variantFilter === 'without') {
+      result = result.filter(v => !Array.isArray(v.variants) || v.variants.length === 0);
+    }
     
     // Search filter
     const term = search.trim().toLowerCase();
@@ -369,7 +380,7 @@ export default function AdminInventoryPage() {
     }
     
     return result;
-  }, [search, vehicles, selectedBrandId]);
+  }, [search, vehicles, selectedBrandId, variantFilter]);
 
   const totalAssets = filteredVehicles.length;
   const totalValue = filteredVehicles.reduce((sum, v) => sum + (Number(v.price) || 0), 0);
@@ -2187,25 +2198,39 @@ export default function AdminInventoryPage() {
                 <CardTitle className="font-headline text-xl font-bold">Fleet Catalogue</CardTitle>
                 <CardDescription className="text-[10px] uppercase tracking-widest">Manage specifications and fleet units.</CardDescription>
               </div>
-              <div className="flex items-center gap-3">
-                <Select value={selectedBrandId} onValueChange={setSelectedBrandId}>
-                  <SelectTrigger className="h-9 text-[10px] font-black uppercase tracking-widest w-40 bg-muted/20 border-border/50">
-                    <SelectValue placeholder="Filter by Brand" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all" className="text-[10px] font-black uppercase tracking-widest">All Brands</SelectItem>
-                    {brands.map((brand) => (
-                      <SelectItem key={brand.id} value={String(brand.id)} className="text-[10px] font-black uppercase tracking-widest">
-                        {brand.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <div className="relative">
+              <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                <div className="grid grid-cols-2 gap-2 w-full sm:w-auto">
+                  <Select value={selectedBrandId} onValueChange={setSelectedBrandId}>
+                    <SelectTrigger className="h-9 text-[10px] font-black uppercase tracking-widest w-full sm:w-32 lg:w-40 bg-muted/20 border-border/50">
+                      <SelectValue placeholder="Filter by Brand" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all" className="text-[10px] font-black uppercase tracking-widest">All Brands</SelectItem>
+                      {brands.map((brand) => (
+                        <SelectItem key={brand.id} value={String(brand.id)} className="text-[10px] font-black uppercase tracking-widest">
+                          {brand.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={variantFilter} onValueChange={setVariantFilter}>
+                    <SelectTrigger className="h-9 text-[10px] font-black uppercase tracking-widest w-full sm:w-32 lg:w-40 bg-muted/20 border-border/50">
+                      <SelectValue placeholder="Filter by Variants" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all" className="text-[10px] font-black uppercase tracking-widest">All Units</SelectItem>
+                      <SelectItem value="with" className="text-[10px] font-black uppercase tracking-widest">With Variants</SelectItem>
+                      <SelectItem value="without" className="text-[10px] font-black uppercase tracking-widest">No Variants</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="relative flex-1 md:flex-none w-full md:w-64">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
                   <Input 
                     placeholder="Search catalogue..." 
-                    className="pl-9 h-9 text-xs w-64 bg-muted/20"
+                    className="pl-9 h-9 text-xs w-full bg-muted/20"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
@@ -2221,6 +2246,7 @@ export default function AdminInventoryPage() {
                     <TableHead className="text-[9px] font-black uppercase tracking-widest">Performance</TableHead>
                     <TableHead className="text-[9px] font-black uppercase tracking-widest">Battery</TableHead>
                     <TableHead className="text-[9px] font-black uppercase tracking-widest">Price</TableHead>
+                    <TableHead className="text-[9px] font-black uppercase tracking-widest">View</TableHead>
                     <TableHead className="text-[9px] font-black uppercase tracking-widest text-right"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -2282,6 +2308,15 @@ export default function AdminInventoryPage() {
                         </TableCell>
                         <TableCell className="py-4 font-headline font-bold text-sm">
                           {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(item.price)}
+                        </TableCell>
+                        <TableCell className="py-4">
+                          <Link 
+                            href={`/vehicles/${item.slug}`} 
+                            target="_blank"
+                            className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-primary/10 text-primary transition-colors"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Link>
                         </TableCell>
                         <TableCell className="py-4 text-right">
                           <DropdownMenu modal={false}>

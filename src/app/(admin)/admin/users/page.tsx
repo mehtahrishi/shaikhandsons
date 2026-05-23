@@ -131,11 +131,11 @@ export default function AdminUsersPage() {
             <CardTitle className="font-headline text-xl font-bold">Users Directory</CardTitle>
             <CardDescription className="text-[10px] uppercase tracking-widest">All Users</CardDescription>
           </div>
-          <div className="relative">
+          <div className="relative w-full md:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
             <Input
               placeholder="Search by name..."
-              className="pl-9 h-9 text-xs w-64 bg-muted/20"
+              className="pl-9 h-9 text-xs w-full bg-muted/20"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />

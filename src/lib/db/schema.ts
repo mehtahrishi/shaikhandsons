@@ -306,3 +306,25 @@ export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
 export type Like = typeof likes.$inferSelect;
 export type NewLike = typeof likes.$inferInsert;
+
+// ─── Relations ────────────────────────────────────────────────────────────────
+import { relations } from 'drizzle-orm';
+
+export const vehiclesRelations = relations(vehicles, ({ many }) => ({
+  variants: many(vehicleVariants),
+}));
+
+export const vehicleVariantsRelations = relations(vehicleVariants, ({ one }) => ({
+  vehicle: one(vehicles, {
+    fields: [vehicleVariants.vehicleId],
+    references: [vehicles.id],
+  }),
+  globalVariant: one(globalVariants, {
+    fields: [vehicleVariants.globalVariantId],
+    references: [globalVariants.id],
+  }),
+}));
+
+export const globalVariantsRelations = relations(globalVariants, ({ many }) => ({
+  vehicleVariants: many(vehicleVariants),
+}));

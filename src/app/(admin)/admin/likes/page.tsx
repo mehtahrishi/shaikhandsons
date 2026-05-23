@@ -84,9 +84,6 @@ export default function AdminLikesPage() {
           animate={{ opacity: 1, x: 0 }}
         >
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-primary/10 rounded-xl">
-              <Heart className="h-6 w-6 text-primary" />
-            </div>
             <h1 className="font-headline text-4xl md:text-6xl font-black text-primary uppercase">
               Engagement
             </h1>

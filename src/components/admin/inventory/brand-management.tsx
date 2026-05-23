@@ -164,14 +164,14 @@ export function BrandManagement({ brands, isBrandsLoading, fetchAllBrands }: Bra
             <CardDescription className="text-[10px] uppercase tracking-widest">Manage your vehicle brands</CardDescription>
           </div>
           
-          <div className="flex items-center gap-3">
-            <div className="relative">
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <div className="relative flex-1 md:flex-none">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
               <Input 
                 placeholder="Search brands..." 
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 h-9 text-xs w-48 lg:w-64 bg-muted/20"
+                className="pl-9 h-9 text-xs w-full md:w-48 lg:w-64 bg-muted/20"
               />
             </div>
 
@@ -183,8 +183,9 @@ export function BrandManagement({ brands, isBrandsLoading, fetchAllBrands }: Bra
               }
             }}>
               <DialogTrigger asChild>
-                <Button size="sm" className="h-9 px-4 font-black uppercase tracking-widest text-[10px] rounded-lg shadow-sm">
-                  <Plus className="h-4 w-4 mr-2" /> Add Brand
+                <Button size="sm" className="h-9 px-3 sm:px-4 font-black uppercase tracking-widest text-[10px] rounded-lg shadow-sm shrink-0">
+                  <Plus className="h-4 w-4 sm:mr-2" /> 
+                  <span className="hidden sm:inline">Add Brand</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="bg-card/95 backdrop-blur-xl border-border/50 sm:max-w-[400px]">
@@ -218,21 +219,22 @@ export function BrandManagement({ brands, isBrandsLoading, fetchAllBrands }: Bra
                     />
                   </div>
                 </div>
-                <DialogFooter>
+                <DialogFooter className="flex flex-row items-center justify-center gap-4 pt-2">
                   <Button 
                     variant="outline" 
+                    size="icon"
                     onClick={() => setIsAddModalOpen(false)}
-                    className="h-10 px-4 font-black uppercase tracking-widest text-[10px] rounded-lg"
+                    className="h-12 w-12 rounded-full border-border/50 hover:bg-muted p-0 flex items-center justify-center transition-all hover:scale-105"
                   >
-                    Cancel
+                    <X className="h-5 w-5 text-muted-foreground" />
                   </Button>
                   <Button 
+                    size="icon"
                     onClick={handleAddBrand}
                     disabled={isBrandActionLoading || !newBrandName.trim()}
-                    className="h-10 px-4 font-black uppercase tracking-widest text-[10px] rounded-lg"
+                    className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground border-none p-0 flex items-center justify-center transition-all hover:scale-110 shadow-lg shadow-primary/20"
                   >
-                    {isBrandActionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Check className="h-4 w-4 mr-2" />}
-                    Save Brand
+                    {isBrandActionLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5" />}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -383,21 +385,22 @@ export function BrandManagement({ brands, isBrandsLoading, fetchAllBrands }: Bra
               )}
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex flex-row items-center justify-center gap-4 pt-2">
             <Button 
-              variant="ghost" 
+              variant="outline" 
+              size="icon"
               onClick={() => setEditingBrand(null)}
-              className="h-10 px-4 font-black uppercase tracking-widest text-[10px] rounded-lg"
+              className="h-12 w-12 rounded-full border-border/50 hover:bg-muted p-0 flex items-center justify-center transition-all hover:scale-105"
             >
-              Cancel
+              <X className="h-5 w-5 text-muted-foreground" />
             </Button>
             <Button 
+              size="icon"
               onClick={handleUpdateBrand}
               disabled={isBrandActionLoading}
-              className="h-10 px-6 font-black uppercase tracking-widest text-[10px] rounded-lg"
+              className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground border-none p-0 flex items-center justify-center transition-all hover:scale-110 shadow-lg shadow-primary/20"
             >
-              {isBrandActionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Check className="h-4 w-4 mr-2" />}
-              Save Changes
+              {isBrandActionLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5" />}
             </Button>
           </DialogFooter>
         </DialogContent>

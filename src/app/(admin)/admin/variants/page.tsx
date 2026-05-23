@@ -387,8 +387,8 @@ function VariantsPageContent() {
       {/* Header section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="font-headline text-4xl md:text-5xl font-black mb-2 text-primary flex items-center gap-3">
-            <Sliders className="h-8 w-8 md:h-10 md:w-10 text-primary" /> Variant Management
+          <h1 className="font-headline text-3xl md:text-5xl font-black mb-2 text-primary flex items-center gap-3">
+            Variant Management
           </h1>
           <p className="text-muted-foreground text-xs uppercase tracking-widest font-bold">
             Create variants once as global presets and instantly assign them to any vehicle.

@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Sun, Moon, LogOut, ShieldCheck } from 'lucide-react';
+import { Sun, Moon, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import { BrandIdentity } from "@/components/common/BrandIdentity";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,12 +44,11 @@ export function AdminHeader() {
   if (!mounted) return <div className="h-20 border-b bg-background" />;
 
   return (
-    <header className="h-20 border-b bg-background/95 backdrop-blur-md fixed md:sticky top-12 md:top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10">
+    <header className="h-20 border-b bg-background/95 backdrop-blur-md fixed md:sticky top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10">
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
-          <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-primary">Operational Authority</span>
-        </div>
+        <Link href="/" className="md:hidden hover:opacity-80 transition-opacity">
+          <BrandIdentity />
+        </Link>
       </div>
 
       <div className="flex items-center gap-6">
@@ -56,7 +57,7 @@ export function AdminHeader() {
           className="text-foreground hover:bg-transparent transition-none"
           aria-label="Toggle Theme"
         >
-          {isDark ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
+          {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </button>
 
         <div className="h-8 w-px bg-border/50 hidden md:block" />
@@ -64,11 +65,11 @@ export function AdminHeader() {
         {user && (
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-12 w-12 p-0 overflow-visible hover:bg-transparent focus-visible:ring-0 group">
-                <span className="text-5xl font-headline font-black text-foreground hover:text-primary transition-colors select-none leading-none">
+              <Button variant="ghost" className="relative h-11 w-11 p-0 overflow-visible hover:bg-transparent focus-visible:ring-0 group">
+                <span className="text-4xl font-headline font-black text-foreground hover:text-primary transition-colors select-none leading-none pt-1">
                   {user.email.charAt(0).toUpperCase()}
                 </span>
-                <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-background rounded-full" />
+                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-background rounded-full" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-64 mt-2 bg-background/95 backdrop-blur-xl border-border/50 p-2 rounded-2xl" align="end">

@@ -3,10 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from "next/navigation"
-import { 
-  LayoutDashboard, 
-  ShoppingCart, 
-  Package, 
+import {
+  LayoutDashboard,
+  ShoppingCart,
+  Package,
   Users,
   Award,
   Tag,
@@ -15,12 +15,12 @@ import {
 } from "lucide-react"
 import { cn } from '@/lib/utils';
 import { BrandIdentity } from '@/components/common/BrandIdentity';
- 
+
 const navItems = [
   { name: "Dash", href: "/admin", icon: LayoutDashboard },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Coupons", href: "/admin/coupons", icon: Tag },
-  { name: "Stock", href: "/admin/inventory", icon: Package },
+  { name: "Fleet", href: "/admin/inventory", icon: Package },
   { name: "Variants", href: "/admin/variants", icon: Sliders },
   { name: "Brands", href: "/admin/brands", icon: Award },
   { name: "Users", href: "/admin/users", icon: Users },

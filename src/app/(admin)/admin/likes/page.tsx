@@ -2,22 +2,22 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Heart, 
-  Users, 
+import {
+  Heart,
+  Users,
   Loader2,
   TrendingUp,
   Search,
   Filter
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 
@@ -69,7 +69,7 @@ export default function AdminLikesPage() {
 
   const filteredLikes = React.useMemo(() => {
     if (!statsData?.allLikesDetail) return [];
-    return statsData.allLikesDetail.filter(like => 
+    return statsData.allLikesDetail.filter(like =>
       like.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       like.userEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
       like.vehicleModel.toLowerCase().includes(searchTerm.toLowerCase())
@@ -84,7 +84,7 @@ export default function AdminLikesPage() {
           animate={{ opacity: 1, x: 0 }}
         >
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="font-headline text-4xl md:text-6xl font-black text-primary uppercase">
+            <h1 className="font-headline text-4xl md:text-6xl font-black text-primary">
               Engagement
             </h1>
           </div>
@@ -176,8 +176,8 @@ export default function AdminLikesPage() {
                 </div>
                 <div className="relative w-full md:w-64">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                  <Input 
-                    placeholder="Search users or models..." 
+                  <Input
+                    placeholder="Search users or models..."
                     className="pl-9 bg-background/50 border-border/50 rounded-xl h-9 text-xs"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}

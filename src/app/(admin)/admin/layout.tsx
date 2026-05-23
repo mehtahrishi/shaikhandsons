@@ -37,18 +37,11 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         <AdminNavbar />
 
         <div className="flex-1 flex flex-col min-w-0">
-          {/* 3. Mobile Top Brand Bar */}
-          <div className="md:hidden fixed top-0 left-0 right-0 h-12 bg-background/95 backdrop-blur-md border-b flex items-center justify-center z-50">
-            <Link href="/" className="hover:opacity-80 transition-opacity">
-              <BrandIdentity className="scale-75" />
-            </Link>
-          </div>
-
-          {/* 4. Command Header */}
+          {/* 3. Command Header */}
           <AdminHeader />
 
-          {/* 3. Operational Content Area */}
-          <div className="flex-1 p-6 pt-32 md:pt-12 md:p-12 lg:p-16 flex flex-col gap-10 bg-background relative z-0">
+          {/* 4. Operational Content Area */}
+          <div className="flex-1 p-6 pt-24 md:pt-12 md:p-12 lg:p-16 flex flex-col gap-10 bg-background relative z-0">
             {loading && !user ? (
               <div className="flex-1 flex flex-col items-center justify-center gap-4">
                 <Loader2 className="h-10 w-10 text-primary animate-spin" />

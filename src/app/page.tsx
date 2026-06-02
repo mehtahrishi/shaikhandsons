@@ -255,7 +255,7 @@ export default function Home() {
             </div>
           </div>
 
-          <nav className="bg-background border-y border-border/50 z-40 relative">
+          <nav className="bg-background border-y border-border/50 z-20 relative">
             <div className="container mx-auto">
               <div className="flex items-center overflow-x-auto scrollbar-none justify-start md:justify-center">
                 {brandGroups.map((group) => {

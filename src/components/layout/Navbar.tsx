@@ -402,7 +402,7 @@ export function Navbar() {
 
       {/* Mobile Bottom Dock - Hidden on Admin Login */}
       {!isAdminRoute && (
-        <nav className="fixed bottom-0 left-0 right-0 md:hidden z-40 bg-background/95 backdrop-blur-md border-t border-border/50 h-[calc(56px+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)]">
+        <nav className="fixed bottom-0 left-0 right-0 md:hidden z-50 bg-background/95 backdrop-blur-md border-t border-border/50 h-[calc(56px+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)]">
           <div className="flex items-center justify-around h-14 px-2">
             <Link
               href="/"

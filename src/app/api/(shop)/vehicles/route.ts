@@ -13,7 +13,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ total: vehicle ? 1 : 0, vehicles: vehicle ? [vehicle] : [] });
     }
 
-    const vehicles = await getAllVehicles();
+    const allVehicles = await getAllVehicles();
+    const vehicles = allVehicles.filter(v => v.parentId === null);
     return NextResponse.json({ total: vehicles.length, vehicles });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to fetch vehicles.';

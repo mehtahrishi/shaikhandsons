@@ -33,6 +33,17 @@ export async function GET(
       );
     }
 
+    // If it is a child vehicle, return the parent vehicle with information about this child preselected
+    if (vehicle.parentId) {
+      const parentVehicle = await getVehicleById(vehicle.parentId);
+      if (parentVehicle) {
+        return NextResponse.json({
+          vehicle: parentVehicle,
+          initialColorVariantId: vehicle.id
+        });
+      }
+    }
+
     return NextResponse.json({ vehicle });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to fetch vehicle.';

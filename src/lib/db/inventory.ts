@@ -89,6 +89,8 @@ export async function getAllVehicles() {
   return db.query.vehicles.findMany({
     with: {
       variants: true,
+      colorVariants: true,
+      parent: true,
     },
   });
 }
@@ -99,6 +101,11 @@ export async function getAllVehicles() {
 export async function getVehicleById(id: number) {
   return db.query.vehicles.findFirst({
     where: eq(vehicles.id, id),
+    with: {
+      colorVariants: true,
+      variants: true,
+      parent: true,
+    },
   });
 }
 
@@ -108,6 +115,11 @@ export async function getVehicleById(id: number) {
 export async function getVehicleBySlug(slug: string) {
   return db.query.vehicles.findFirst({
     where: eq(vehicles.slug, slug),
+    with: {
+      colorVariants: true,
+      variants: true,
+      parent: true,
+    },
   });
 }
 
@@ -167,11 +179,13 @@ export async function createVehicle(data: {
   zeroToSixtySeconds?: string | null;
   designPhilosophy?: string | null;
   imageUrls?: string[];
+  parentId?: number | null;
 }) {
   const result = await db
     .insert(vehicles)
     .values({
       brandId: data.brandId,
+      parentId: data.parentId || null,
       make: data.make,
       model: data.model,
       year: data.year,

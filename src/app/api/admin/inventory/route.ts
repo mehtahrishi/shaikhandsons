@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllVehicles, createVehicle, updateVehicle, deleteVehicle } from '@/lib/db/inventory';
+import { getAllVehicles, getVehicleById, createVehicle, updateVehicle, deleteVehicle } from '@/lib/db/inventory';
 import { isAdminAuthenticated } from '@/lib/db/admin-auth';
 import { generateVehicleSlug } from '@/lib/slug';
+import { deleteFile } from '@/lib/storage-node';
 
 export const runtime = 'nodejs';
 
@@ -78,6 +79,7 @@ export async function POST(req: NextRequest) {
 
       designPhilosophy: body.designPhilosophy ? String(body.designPhilosophy).trim() : null,
       imageUrls: Array.isArray(body.imageUrls) ? body.imageUrls.filter(Boolean) : [],
+      parentId: body.parentId ? Number(body.parentId) : null,
     });
 
     return NextResponse.json({ success: true, vehicle });
@@ -122,6 +124,17 @@ export async function PATCH(req: NextRequest) {
     // Remove id from body to avoid passing it to the database
     const { id: _, ...updateData } = body;
 
+    // Fetch old vehicle to detect deleted images
+    const oldVehicle = await getVehicleById(Number(id));
+    if (oldVehicle && updateData.imageUrls) {
+      const oldImages = oldVehicle.imageUrls || [];
+      const newImages = updateData.imageUrls || [];
+      const removedImages = oldImages.filter(img => !newImages.includes(img));
+      for (const img of removedImages) {
+        await deleteFile(img);
+      }
+    }
+
     const vehicle = await updateVehicle(Number(id), updateData);
 
     if (!vehicle) {
@@ -148,6 +161,16 @@ export async function DELETE(req: NextRequest) {
     
     if (!id || isNaN(Number(id))) {
       return NextResponse.json({ error: 'Missing or invalid vehicle ID' }, { status: 400 });
+    }
+
+    const vehicle = await getVehicleById(Number(id));
+    if (vehicle) {
+      // Delete associated image files from VPS
+      if (Array.isArray(vehicle.imageUrls)) {
+        for (const url of vehicle.imageUrls) {
+          await deleteFile(url);
+        }
+      }
     }
 
     await deleteVehicle(Number(id));

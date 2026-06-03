@@ -37,6 +37,7 @@ export const vehicles = pgTable(
   {
     id: serial('id').primaryKey(),
     brandId: integer('brand_id').notNull(),
+    parentId: integer('parent_id'), // Self-reference for colored child variants
     make: varchar('make', { length: 255 }).notNull(),
     model: varchar('model', { length: 255 }).notNull(),
     year: integer('year').notNull(),
@@ -94,7 +95,12 @@ export const vehicles = pgTable(
       columns: [table.brandId],
       foreignColumns: [brands.id],
     }).onDelete('cascade'),
+    parentFk: foreignKey({
+      columns: [table.parentId],
+      foreignColumns: [table.id],
+    }).onDelete('cascade'),
     brandIdx: index('idx_vehicles_brand').on(table.brandId),
+    parentIdx: index('idx_vehicles_parent').on(table.parentId),
     yearIdx: index('idx_vehicles_year').on(table.year),
     categoryIdx: index('idx_vehicles_category').on(table.category),
   })
@@ -310,8 +316,16 @@ export type NewLike = typeof likes.$inferInsert;
 // ─── Relations ────────────────────────────────────────────────────────────────
 import { relations } from 'drizzle-orm';
 
-export const vehiclesRelations = relations(vehicles, ({ many }) => ({
+export const vehiclesRelations = relations(vehicles, ({ one, many }) => ({
   variants: many(vehicleVariants),
+  parent: one(vehicles, {
+    fields: [vehicles.parentId],
+    references: [vehicles.id],
+    relationName: 'colorVariants',
+  }),
+  colorVariants: many(vehicles, {
+    relationName: 'colorVariants',
+  }),
 }));
 
 export const vehicleVariantsRelations = relations(vehicleVariants, ({ one }) => ({

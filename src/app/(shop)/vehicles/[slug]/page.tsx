@@ -138,6 +138,8 @@ type Vehicle = {
   designPhilosophy?: string;
   imageUrls?: string[];
   images?: string[];
+  colorVariants?: Vehicle[];
+  parentId?: number | null;
 };
 
 // Helper to get feature icons
@@ -160,6 +162,7 @@ export default function VehicleDetailPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<string>('');
+  const [selectedColorVariant, setSelectedColorVariant] = React.useState<Vehicle | null>(null);
   const [selectedColor, setSelectedColor] = React.useState<string>('');
   const [activeTab, setActiveTab] = React.useState<'specs' | 'features'>('specs');
   const [isLiked, setIsLiked] = React.useState(false);
@@ -169,7 +172,9 @@ export default function VehicleDetailPage() {
   const { user, loading: isAuthLoading } = useAuth();
   const { toast } = useToast();
 
-  const images = vehicle ? (vehicle.imageUrls || vehicle.images || []) : [];
+  const images = selectedColorVariant?.imageUrls?.length 
+    ? selectedColorVariant.imageUrls 
+    : (vehicle ? (vehicle.imageUrls || vehicle.images || []) : []);
 
   // Lightbox State
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
@@ -186,6 +191,41 @@ export default function VehicleDetailPage() {
       document.documentElement.removeAttribute('data-lightbox-open');
     };
   }, [lightboxOpen]);
+
+  // Build a unified list of colors, placing parent-level colors first, then child-only colors
+  const colorItems = React.useMemo(() => {
+    if (!vehicle) return [];
+    
+    const items: { colorName: string; variant: Vehicle | null }[] = [];
+    const seenColors = new Set<string>();
+    const cvs = vehicle.colorVariants || [];
+    const pcs = vehicle.colors || [];
+
+    // 1. First, process all parent-level colors, linking them to matching child variants if they exist
+    pcs.forEach((cName: string) => {
+      const lowerName = cName.toLowerCase().trim();
+      if (!seenColors.has(lowerName)) {
+        seenColors.add(lowerName);
+        // Find if there is a child variant matching this color
+        const matchingCv = cvs.find((cv: any) => cv.colors?.[0]?.toLowerCase().trim() === lowerName);
+        items.push({ colorName: cName, variant: matchingCv || null });
+      }
+    });
+
+    // 2. Then, append any remaining child variants whose colors are not in the parent list
+    cvs.forEach((cv: any) => {
+      const cName = cv.colors?.[0];
+      if (cName) {
+        const lowerName = cName.toLowerCase().trim();
+        if (!seenColors.has(lowerName)) {
+          seenColors.add(lowerName);
+          items.push({ colorName: cName, variant: cv });
+        }
+      }
+    });
+
+    return items;
+  }, [vehicle]);
 
   const handleMainImageClick = () => {
     const idx = images.indexOf(selectedImage);
@@ -248,13 +288,59 @@ export default function VehicleDetailPage() {
         }
 
         setVehicle(data.vehicle);
-        const images = data.vehicle.imageUrls || data.vehicle.images || [];
-        if (images.length > 0) {
-          setSelectedImage(images[0]);
-        }
+        
+        // Build a unified list of colors to find the best default selection (parent colors first, then child-only colors)
+        const cvs = data.vehicle.colorVariants || [];
+        const pcs = data.vehicle.colors || [];
+        const items: { colorName: string; variant: any }[] = [];
+        const seen = new Set<string>();
+        
+        pcs.forEach((cn: string) => {
+          const low = cn.toLowerCase().trim();
+          if (!seen.has(low)) {
+            seen.add(low);
+            const matchingCv = cvs.find((cv: any) => cv.colors?.[0]?.toLowerCase().trim() === low);
+            items.push({ colorName: cn, variant: matchingCv || null });
+          }
+        });
+        
+        cvs.forEach((cv: any) => {
+          const cn = cv.colors?.[0];
+          if (cn) {
+            const low = cn.toLowerCase().trim();
+            if (!seen.has(low)) {
+              seen.add(low);
+              items.push({ colorName: cn, variant: cv });
+            }
+          }
+        });
 
-        if (data.vehicle.colors && data.vehicle.colors.length > 0) {
-          setSelectedColor(data.vehicle.colors[0]);
+        if (items.length > 0) {
+          const initialId = data.initialColorVariantId;
+          const matchedItem = initialId 
+            ? items.find(item => item.variant && String(item.variant.id) === String(initialId))
+            : null;
+          
+          // Default selection: matchedItem (if deep linked), or the first parent-level color (variant is null), or the first item
+          const defaultItem = matchedItem || items.find(item => item.variant === null) || items[0];
+          
+          if (defaultItem) {
+            setSelectedColorVariant(defaultItem.variant);
+            setSelectedColor(defaultItem.colorName);
+            const targetImages = defaultItem.variant 
+              ? (defaultItem.variant.imageUrls || []) 
+              : (data.vehicle.imageUrls || data.vehicle.images || []);
+            if (targetImages.length > 0) {
+              setSelectedImage(targetImages[0]);
+            }
+          }
+        } else {
+          setSelectedColorVariant(null);
+          const images = data.vehicle.imageUrls || data.vehicle.images || [];
+          if (images.length > 0) {
+            setSelectedImage(images[0]);
+          }
+          setSelectedColor('');
         }
 
         // Fetch likes
@@ -325,8 +411,9 @@ export default function VehicleDetailPage() {
     if (!bookingForm.name || !bookingForm.phone) return;
 
     setIsBookingLoading(true);
+    const targetSlug = selectedColorVariant?.slug || slug;
     try {
-      await submitOrderAPI(slug, {
+      await submitOrderAPI(targetSlug, {
         variantId: selectedVariantId ?? null,
         customerName: bookingForm.name,
         customerPhone: bookingForm.phone,
@@ -402,7 +489,10 @@ export default function VehicleDetailPage() {
     );
   }
 
-  const priceNumber = typeof vehicle.price === 'string' ? parseFloat(vehicle.price) : vehicle.price;
+  const activePriceStr = (selectedColorVariant && selectedColorVariant.price !== undefined && selectedColorVariant.price !== null)
+    ? selectedColorVariant.price 
+    : vehicle.price;
+  const priceNumber = typeof activePriceStr === 'string' ? parseFloat(activePriceStr) : activePriceStr;
   const formattedPrice = new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
@@ -629,14 +719,14 @@ export default function VehicleDetailPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="text-sm leading-relaxed text-muted-foreground font-light font-sans"
+                className="text-sm leading-relaxed text-muted-foreground font-light"
               >
                 {vehicle.shortDescription}
               </motion.p>
             )}
 
             {/* Color Selection */}
-            {vehicle.colors && vehicle.colors.length > 0 && (
+            {((vehicle.colorVariants && vehicle.colorVariants.length > 0) || (vehicle.colors && vehicle.colors.length > 0)) && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -648,20 +738,39 @@ export default function VehicleDetailPage() {
                   <span className="text-[10px] font-bold text-primary uppercase tracking-widest">{selectedColor}</span>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                  {vehicle.colors.map((color, idx) => {
-                    const isSelected = selectedColor === color;
-                    const hex = getColorHex(color);
+                  {colorItems.map((item, idx) => {
+                    const isSelected = selectedColor === item.colorName;
+                    const hex = getColorHex(item.colorName);
                     return (
                       <button
                         key={idx}
-                        onClick={() => setSelectedColor(color)}
-                        className={`group relative w-10 h-10 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
-                          isSelected ? 'border-primary scale-110 shadow-lg shadow-primary/20' : 'border-border/40 hover:border-border'
+                        onClick={() => {
+                          setSelectedColor(item.colorName);
+                          setSelectedColorVariant(item.variant);
+                          if (item.variant) {
+                            const varImages = item.variant.imageUrls || [];
+                            if (varImages.length > 0) {
+                              setSelectedImage(varImages[0]);
+                            }
+                          } else {
+                            const parentImages = vehicle.imageUrls || vehicle.images || [];
+                            if (parentImages.length > 0) {
+                              setSelectedImage(parentImages[0]);
+                            }
+                          }
+                          // Dynamically update URL slug in browser address bar without reload
+                          const targetSlug = item.variant?.slug || vehicle.slug;
+                          if (targetSlug && typeof window !== 'undefined') {
+                            window.history.replaceState(null, '', `/vehicles/${targetSlug}`);
+                          }
+                        }}
+                        className={`group relative w-10 h-10 rounded-full border-0 transition-all duration-300 flex items-center justify-center ${
+                          isSelected ? 'scale-110 shadow-lg shadow-primary/20' : 'hover:scale-105'
                         }`}
-                        title={color}
+                        title={item.colorName}
                       >
-                        <div 
-                          className="w-7 h-7 rounded-full shadow-inner transition-transform duration-300 group-hover:scale-90"
+                        <div
+                          className="w-10 h-10 rounded-full shadow-inner transition-transform duration-300 group-hover:scale-90"
                           style={{ backgroundColor: hex }}
                         />
                         {isSelected && (
@@ -724,6 +833,27 @@ export default function VehicleDetailPage() {
             </motion.div>
           </div>
         </div>
+
+        {/* Section: Overview (Long Description) */}
+        {vehicle.designPhilosophy && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-16 space-y-4"
+          >
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-border/40" />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Overview</span>
+              <div className="h-px flex-1 bg-border/40" />
+            </div>
+            <div className="max-w-4xl mx-auto">
+              <p className="text-base sm:text-lg leading-relaxed text-muted-foreground font-light text-center whitespace-pre-line">
+                {vehicle.designPhilosophy}
+              </p>
+            </div>
+          </motion.section>
+        )}
 
         {/* Section 2: Responsive Technical Details & Features */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
@@ -810,62 +940,149 @@ export default function VehicleDetailPage() {
               </div>
             </div>
 
-            {/* ─── MOBILE ACCORDION + CAROUSEL ────────────────────────────────── */}
+            {/* ─── MOBILE: ADMIN-STYLE GROUPED SECTIONS WITH SWIPABLE STRIPS ─── */}
             <div className="md:hidden space-y-10">
-              {/* Specifications Dropdown */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-primary">
-                  <FileText size={14} />
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">Technical Data</span>
-                </div>
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="specs" className="border-border/40">
-                    <AccordionTrigger className="font-headline font-black uppercase text-sm tracking-widest text-foreground hover:no-underline">
-                      Specifications
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-1 pt-2">
-                        {specsList.map((spec, idx) => (
-                          <SpecRowItem key={idx} label={spec.label} value={spec.value as string} icon={spec.icon} />
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </div>
-
-              {/* Key Features Carousel */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-primary">
-                  <Sparkles size={14} />
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">Signature Innovations</span>
-                </div>
-                <h3 className="font-headline font-black uppercase text-sm tracking-widest text-foreground px-1">Key Features</h3>
-                
-                <Carousel className="w-full">
-                  <CarouselContent>
-                    {vehicle.keyFeatures?.map((feature, idx) => (
-                      <CarouselItem key={idx}>
-                        <div className="flex flex-col gap-4 p-6 rounded-2xl border border-border/40 bg-card h-full">
-                          <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                            {getFeatureIcon(feature)}
-                          </div>
-                          <div className="space-y-2">
-                            <h4 className="font-headline font-black text-lg uppercase tracking-tight">{feature}</h4>
-                            <p className="text-[11px] text-muted-foreground leading-relaxed">
-                              Intelligent luxury technology integrated perfectly into the {vehicle.model} package for elite mobility.
-                            </p>
+              {/* Section 1: Technical Specifications */}
+              {(() => {
+                const items = [
+                  vehicle.topSpeed && { label: 'Top Speed', value: vehicle.topSpeed, icon: <Gauge size={18} /> },
+                  vehicle.certifiedRange && { label: 'Certified Range (ARAI)', value: vehicle.certifiedRange, icon: <BatteryFull size={18} /> },
+                  vehicle.realWorldRange && { label: 'Real-World Range', value: vehicle.realWorldRange, icon: <MapPinned size={18} /> },
+                  vehicle.climbingDegree && { label: 'Climbing Degree', value: vehicle.climbingDegree, icon: <TrendingUp size={18} /> },
+                  vehicle.loadCapacity && { label: 'Load Capacity', value: vehicle.loadCapacity, icon: <Weight size={18} /> },
+                  vehicle.ridingModes && vehicle.ridingModes.length > 0 && { label: 'Riding Modes', value: vehicle.ridingModes.join(', '), icon: <SlidersVertical size={18} /> },
+                ].filter(Boolean) as { label: string; value: string; icon: React.ReactNode }[];
+                if (items.length === 0) return null;
+                return (
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                      <div className="h-1 w-4 bg-primary rounded-full" /> 1. Technical Specifications
+                    </h3>
+                    <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-1 px-1 [&::-webkit-scrollbar]:hidden">
+                      {items.map((it, i) => (
+                        <div key={i} className="snap-start shrink-0 w-48 p-4 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm flex flex-col gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">{it.icon}</div>
+                          <div>
+                            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">{it.label}</p>
+                            <p className="text-sm font-black text-foreground mt-1 leading-tight">{it.value}</p>
                           </div>
                         </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <div className="flex justify-end gap-2 mt-4 px-1">
-                    <CarouselPrevious className="relative static translate-y-0" />
-                    <CarouselNext className="relative static translate-y-0" />
+                      ))}
+                    </div>
                   </div>
-                </Carousel>
-              </div>
+                );
+              })()}
+
+              {/* Section 2: Battery & Charging */}
+              {(() => {
+                const items = [
+                  vehicle.batteryType && { label: 'Battery Type', value: vehicle.batteryType, icon: <Package size={18} /> },
+                  vehicle.batteryCapacity && { label: 'Battery Capacity', value: vehicle.batteryCapacity, icon: <Zap size={18} /> },
+                  vehicle.chargingTime && { label: 'Charging Time (0-100%)', value: vehicle.chargingTime, icon: <Hourglass size={18} /> },
+                  vehicle.batteryWarranty && { label: 'Battery Warranty', value: vehicle.batteryWarranty, icon: <ShieldCheck size={18} /> },
+                  vehicle.chargerIncluded && { label: 'Charger Details', value: vehicle.chargerIncluded, icon: <Plug size={18} /> },
+                  vehicle.fastCharging !== undefined && { label: 'Fast Charging Support', value: vehicle.fastCharging ? 'Yes' : 'No', icon: <BatteryCharging size={18} /> },
+                ].filter(Boolean) as { label: string; value: string; icon: React.ReactNode }[];
+                if (items.length === 0) return null;
+                return (
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                      <div className="h-1 w-4 bg-primary rounded-full" /> 2. Battery & Charging
+                    </h3>
+                    <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-1 px-1 [&::-webkit-scrollbar]:hidden">
+                      {items.map((it, i) => (
+                        <div key={i} className="snap-start shrink-0 w-48 p-4 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm flex flex-col gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">{it.icon}</div>
+                          <div>
+                            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">{it.label}</p>
+                            <p className="text-sm font-black text-foreground mt-1 leading-tight">{it.value}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Section 3: Hardware & Mechanicals */}
+              {(() => {
+                const items = [
+                  vehicle.motorPower && { label: 'Motor Power', value: vehicle.motorPower, icon: <Zap size={18} /> },
+                  vehicle.brakingSystem && { label: 'Braking System', value: vehicle.brakingSystem, icon: <Gauge size={18} /> },
+                  vehicle.tyreType && { label: 'Tyre Type', value: vehicle.tyreType, icon: <CircleDashed size={18} /> },
+                  vehicle.wheelType && { label: 'Wheel Type', value: vehicle.wheelType, icon: <CircleDot size={18} /> },
+                  vehicle.wheelSize && { label: 'Wheel Size', value: vehicle.wheelSize, icon: <Diameter size={18} /> },
+                  vehicle.groundClearance && { label: 'Ground Clearance', value: vehicle.groundClearance, icon: <ArrowDownFromLine size={18} /> },
+                ].filter(Boolean) as { label: string; value: string; icon: React.ReactNode }[];
+                if (items.length === 0) return null;
+                return (
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                      <div className="h-1 w-4 bg-primary rounded-full" /> 3. Hardware & Mechanicals
+                    </h3>
+                    <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-1 px-1 [&::-webkit-scrollbar]:hidden">
+                      {items.map((it, i) => (
+                        <div key={i} className="snap-start shrink-0 w-48 p-4 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm flex flex-col gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">{it.icon}</div>
+                          <div>
+                            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">{it.label}</p>
+                            <p className="text-sm font-black text-foreground mt-1 leading-tight">{it.value}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Section 4: Smart Features & Aesthetics */}
+              {(() => {
+                const items = [
+                  vehicle.displayType && { label: 'Display Type', value: vehicle.displayType, icon: <Smartphone size={18} /> },
+                  vehicle.bootSpace && { label: 'Boot Space', value: vehicle.bootSpace, icon: <ShoppingBag size={18} /> },
+                ].filter(Boolean) as { label: string; value: string; icon: React.ReactNode }[];
+                if (items.length === 0) return null;
+                return (
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                      <div className="h-1 w-4 bg-primary rounded-full" /> 4. Smart Features & Aesthetics
+                    </h3>
+                    <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-1 px-1 [&::-webkit-scrollbar]:hidden">
+                      {items.map((it, i) => (
+                        <div key={i} className="snap-start shrink-0 w-48 p-4 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm flex flex-col gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">{it.icon}</div>
+                          <div>
+                            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">{it.label}</p>
+                            <p className="text-sm font-black text-foreground mt-1 leading-tight">{it.value}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Section 5: Signature Innovations (Key Features) */}
+              {vehicle.keyFeatures && vehicle.keyFeatures.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                    <div className="h-1 w-4 bg-primary rounded-full" /> 5. Signature Innovations
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {vehicle.keyFeatures.map((feature, idx) => (
+                      <div key={idx} className="flex items-start gap-4 p-4 rounded-2xl border border-border/40 bg-card/20 backdrop-blur-sm">
+                        <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                          {getFeatureIcon(feature)}
+                        </div>
+                        <div className="space-y-1">
+                          <h4 className="font-bold text-sm">{feature}</h4>
+                          <p className="text-xs text-muted-foreground leading-normal">Intelligent luxury technology integrated perfectly.</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

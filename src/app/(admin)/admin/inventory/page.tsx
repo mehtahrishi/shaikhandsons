@@ -108,6 +108,8 @@ type Vehicle = {
   designPhilosophy: string;
   createdAt: string;
   variants?: any[];
+  parentId?: number | null;
+  colorVariants?: any[];
   
   modelCode?: string;
   category?: string;
@@ -282,6 +284,20 @@ const moveArrayItem = <T,>(items: T[], fromIndex: number, toIndex: number) => {
   return nextItems;
 };
 
+const extractNumber = (val: string | number | undefined | null): string => {
+  if (val === undefined || val === null) return '';
+  const str = String(val).trim();
+  if (!str) return '';
+  const match = str.match(/^[-+]?[0-9]*\.?[0-9]+/);
+  return match ? match[0] : '';
+};
+
+const isPredefinedDisplay = (type: string | undefined | null): boolean => {
+  if (!type) return true;
+  return ["LED Digital", "TFT", "Touchscreen", ""].includes(type);
+};
+
+
 export default function AdminInventoryPage() {
   const { toast } = useToast();
   const router = useRouter();
@@ -311,6 +327,187 @@ export default function AdminInventoryPage() {
   const handleManageVariantsClick = (vehicle: Vehicle) => {
     router.push(`/admin/variants?vehicleId=${vehicle.id}`);
   };
+
+  // Manage Colors (Parent-Child) State
+  const [isColorsModalOpen, setIsColorsModalOpen] = React.useState(false);
+  const [selectedParentForColors, setSelectedParentForColors] = React.useState<Vehicle | null>(null);
+  const [colorVariantForm, setColorVariantForm] = React.useState({
+    colorName: '',
+    price: '',
+    slug: '',
+  });
+  const [colorVariantFiles, setColorVariantFiles] = React.useState<File[]>([]);
+  const [isAddingColorVariant, setIsAddingColorVariant] = React.useState(false);
+  const [expandedParentIds, setExpandedParentIds] = React.useState<Record<string, boolean>>({});
+
+  const handleManageColorsClick = (vehicle: Vehicle) => {
+    setSelectedParentForColors(vehicle);
+    setColorVariantForm({
+      colorName: '',
+      price: String(vehicle.price || ''),
+      slug: `${vehicle.slug || generateVehicleSlug(vehicle.make, vehicle.model)}-`,
+    });
+    setColorVariantFiles([]);
+    setIsColorsModalOpen(true);
+  };
+
+  const handleAddColorVariant = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedParentForColors) return;
+    if (!colorVariantForm.colorName.trim()) {
+      toast({
+        title: "Missing Color Name",
+        description: "Please specify the color name for this variant.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsAddingColorVariant(true);
+
+      // 1. Upload images
+      let imageUrls: string[] = [];
+      if (colorVariantFiles.length > 0) {
+        imageUrls = await uploadVehicleImages(colorVariantFiles);
+      }
+
+      // 2. Create vehicle child record
+      const parent = selectedParentForColors;
+      const cleanColor = colorVariantForm.colorName.trim();
+      const fallbackSlug = `${parent.slug}-${cleanColor.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+      const targetSlug = colorVariantForm.slug.trim() || fallbackSlug;
+
+      await createVehicle({
+        parentId: Number(parent.id),
+        brandId: parent.brandId,
+        make: parent.make,
+        model: parent.model,
+        year: parent.year,
+        trim: parent.trim || '',
+        price: Number(colorVariantForm.price) || Number(parent.price),
+        slug: targetSlug,
+        designPhilosophy: parent.designPhilosophy || '',
+        images: imageUrls,
+        
+        modelCode: parent.modelCode || '',
+        category: parent.category || '',
+        shortDescription: parent.shortDescription || '',
+        topSpeed: parent.topSpeed || '',
+        certifiedRange: parent.certifiedRange || '',
+        realWorldRange: parent.realWorldRange || '',
+        ridingModes: ensureArray(parent.ridingModes),
+        climbingDegree: parent.climbingDegree || '',
+        loadCapacity: parent.loadCapacity || '',
+        batteryType: parent.batteryType || '',
+        batteryCapacity: parent.batteryCapacity || '',
+        chargingTime: parent.chargingTime || '',
+        fastCharging: !!parent.fastCharging,
+        chargerIncluded: parent.chargerIncluded || '',
+        batteryWarranty: parent.batteryWarranty || '',
+        motorPower: parent.motorPower || '',
+        brakingSystem: parent.brakingSystem || '',
+        tyreType: parent.tyreType || '',
+        wheelType: parent.wheelType || '',
+        wheelSize: parent.wheelSize || '',
+        groundClearance: parent.groundClearance || '',
+        displayType: parent.displayType || '',
+        colors: [cleanColor],
+        keyFeatures: ensureArray(parent.keyFeatures),
+        bootSpace: parent.bootSpace || '',
+      });
+
+      toast({
+        title: "Success",
+        description: `Color variant "${cleanColor}" successfully created.`,
+      });
+
+      // Reset form
+      setColorVariantForm({
+        colorName: '',
+        price: String(parent.price || ''),
+        slug: `${parent.slug || generateVehicleSlug(parent.make, parent.model)}-`,
+      });
+      setColorVariantFiles([]);
+      
+      // Refresh listing
+      await fetchVehicles();
+
+      // Refetch current parent to show newly added variant in the list
+      const response = await fetch('/api/admin/inventory');
+      const data = await response.json();
+      if (response.ok && data.vehicles) {
+        const found = (data.vehicles || []).find((v: any) => String(v.id) === String(parent.id));
+        if (found) {
+          const normalizedFound = {
+            ...found,
+            price: Number(found.price) || 0,
+            images: getVehicleImages(found),
+            colorVariants: Array.isArray(found.colorVariants)
+              ? found.colorVariants.map((cv: any) => ({
+                  ...cv,
+                  price: Number(cv.price) || 0,
+                  images: getVehicleImages(cv),
+                }))
+              : [],
+          };
+          setSelectedParentForColors(normalizedFound);
+        }
+      }
+
+    } catch (err: any) {
+      toast({
+        title: "Failed to Add Variant",
+        description: err.message || "Something went wrong.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAddingColorVariant(false);
+    }
+  };
+
+  const handleDeleteColorVariant = async (childId: string) => {
+    if (!confirm("Are you sure you want to delete this color variant? This will permanently remove its image files and database record.")) return;
+    try {
+      await deleteVehicleAPI(childId);
+      toast({
+        title: "Deleted",
+        description: "Color variant deleted successfully.",
+      });
+      // Refresh lists
+      await fetchVehicles();
+      if (selectedParentForColors) {
+        const response = await fetch('/api/admin/inventory');
+        const data = await response.json();
+        if (response.ok && data.vehicles) {
+          const found = (data.vehicles || []).find((v: any) => String(v.id) === String(selectedParentForColors.id));
+          if (found) {
+            const normalizedFound = {
+              ...found,
+              price: Number(found.price) || 0,
+              images: getVehicleImages(found),
+              colorVariants: Array.isArray(found.colorVariants)
+                ? found.colorVariants.map((cv: any) => ({
+                    ...cv,
+                    price: Number(cv.price) || 0,
+                    images: getVehicleImages(cv),
+                  }))
+                : [],
+            };
+            setSelectedParentForColors(normalizedFound);
+          } else {
+            setIsColorsModalOpen(false);
+          }
+        }
+      }
+    } catch (err: any) {
+      toast({
+        title: "Delete Failed",
+        description: err.message || "Failed to delete variant.",
+        variant: "destructive",
+      });
+    }
+  };
   const fetchAllBrands = React.useCallback(async () => {
     try {
       setIsBrandsLoading(true);
@@ -338,6 +535,13 @@ export default function AdminInventoryPage() {
         ...vehicle,
         price: Number(vehicle.price) || 0,
         images: getVehicleImages(vehicle),
+        colorVariants: Array.isArray(vehicle.colorVariants)
+          ? vehicle.colorVariants.map((cv: any) => ({
+              ...cv,
+              price: Number(cv.price) || 0,
+              images: getVehicleImages(cv),
+            }))
+          : [],
       }));
       setVehicles(normalizedVehicles);
     } catch (err: any) {
@@ -354,7 +558,8 @@ export default function AdminInventoryPage() {
   }, [fetchVehicles, fetchAllBrands]);
 
   const filteredVehicles = React.useMemo(() => {
-    let result = vehicles;
+    // Only display parent vehicles in the main inventory table
+    let result = vehicles.filter(v => v.parentId === null || v.parentId === undefined);
     
     // Brand filter
     if (selectedBrandId && selectedBrandId !== 'all') {
@@ -374,8 +579,12 @@ export default function AdminInventoryPage() {
       result = result.filter(v => 
         v.make.toLowerCase().includes(term) || 
         v.model.toLowerCase().includes(term) ||
-        v.trim.toLowerCase().includes(term) ||
-        v.id.toLowerCase().includes(term)
+        (v.trim && v.trim.toLowerCase().includes(term)) ||
+        String(v.id).includes(term) ||
+        (v.colors && v.colors.some((c: any) => c.toLowerCase().includes(term))) ||
+        (v.colorVariants && v.colorVariants.some((cv: any) => 
+          cv.colors && cv.colors.some((c: any) => c.toLowerCase().includes(term))
+        ))
       );
     }
     
@@ -429,6 +638,8 @@ export default function AdminInventoryPage() {
     bootSpace: '',
   });
   const [colorsInput, setColorsInput] = React.useState('');
+  const [ridingModesInput, setRidingModesInput] = React.useState('');
+  const [keyFeaturesInput, setKeyFeaturesInput] = React.useState('');
 
   // Auto-generate slug for single form
   React.useEffect(() => {
@@ -514,6 +725,9 @@ export default function AdminInventoryPage() {
       });
       setIsAddModalOpen(false);
       setSelectedFiles([]);
+      setColorsInput('');
+      setRidingModesInput('');
+      setKeyFeaturesInput('');
       setFormData({
         brandId: 0,
         make: '',
@@ -611,6 +825,8 @@ export default function AdminInventoryPage() {
       bootSpace: vehicle.bootSpace || '',
     });
     setColorsInput(ensureArray(vehicle.colors).join(', '));
+    setRidingModesInput(ensureArray(vehicle.ridingModes).join(', '));
+    setKeyFeaturesInput(ensureArray(vehicle.keyFeatures).join(', '));
     setIsEditModalOpen(true);
   };
 
@@ -694,6 +910,8 @@ export default function AdminInventoryPage() {
       bootSpace: '',
     });
     setColorsInput('');
+    setRidingModesInput('');
+    setKeyFeaturesInput('');
   };
 
   const handleUpdateUnit = async () => {
@@ -1139,69 +1357,93 @@ export default function AdminInventoryPage() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Top Speed</Label>
-                                <Select value={entry.topSpeed} onValueChange={(val) => updateBulkVehicle(idx, 'topSpeed', val)}>
-                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
-                                    <SelectValue placeholder="Speed" />
-                                  </SelectTrigger>
-                                  <SelectContent>{TOP_SPEEDS.map((speed) => (<SelectItem key={speed} value={speed}>{speed}</SelectItem>))}</SelectContent>
-                                </Select>
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    type="number"
+                                    step="any"
+                                    placeholder="Speed"
+                                    value={extractNumber(entry.topSpeed)}
+                                    onChange={(e) => updateBulkVehicle(idx, 'topSpeed', e.target.value.trim() !== '' ? `${e.target.value.trim()} km/h` : '')}
+                                    className="h-8 text-[9px] bg-muted/20 flex-1"
+                                  />
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-2 rounded border border-border/50 h-8 flex items-center justify-center min-w-[50px] whitespace-nowrap">
+                                    km/h
+                                  </span>
+                                </div>
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Certified Range</Label>
-                                <Select value={entry.certifiedRange} onValueChange={(val) => updateBulkVehicle(idx, 'certifiedRange', val)}>
-                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
-                                    <SelectValue placeholder="Range" />
-                                  </SelectTrigger>
-                                  <SelectContent>{RANGES.map((range) => (<SelectItem key={range} value={range}>{range}</SelectItem>))}</SelectContent>
-                                </Select>
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    type="number"
+                                    step="any"
+                                    placeholder="Range"
+                                    value={extractNumber(entry.certifiedRange)}
+                                    onChange={(e) => updateBulkVehicle(idx, 'certifiedRange', e.target.value.trim() !== '' ? `${e.target.value.trim()} km` : '')}
+                                    className="h-8 text-[9px] bg-muted/20 flex-1"
+                                  />
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-2 rounded border border-border/50 h-8 flex items-center justify-center min-w-[50px] whitespace-nowrap">
+                                    km
+                                  </span>
+                                </div>
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Real-World Range</Label>
-                                <Select value={entry.realWorldRange} onValueChange={(val) => updateBulkVehicle(idx, 'realWorldRange', val)}>
-                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
-                                    <SelectValue placeholder="Range" />
-                                  </SelectTrigger>
-                                  <SelectContent>{RANGES.map((range) => (<SelectItem key={range} value={range}>{range}</SelectItem>))}</SelectContent>
-                                </Select>
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    type="number"
+                                    step="any"
+                                    placeholder="Range"
+                                    value={extractNumber(entry.realWorldRange)}
+                                    onChange={(e) => updateBulkVehicle(idx, 'realWorldRange', e.target.value.trim() !== '' ? `${e.target.value.trim()} km` : '')}
+                                    className="h-8 text-[9px] bg-muted/20 flex-1"
+                                  />
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-2 rounded border border-border/50 h-8 flex items-center justify-center min-w-[50px] whitespace-nowrap">
+                                    km
+                                  </span>
+                                </div>
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Climbing Degree</Label>
-                                <Select value={entry.climbingDegree} onValueChange={(val) => updateBulkVehicle(idx, 'climbingDegree', val)}>
-                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
-                                    <SelectValue placeholder="Degree" />
-                                  </SelectTrigger>
-                                  <SelectContent>{CLIMBING_DEGREES.map((degree) => (<SelectItem key={degree} value={degree}>{degree}</SelectItem>))}</SelectContent>
-                                </Select>
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    type="number"
+                                    step="any"
+                                    placeholder="Degree"
+                                    value={extractNumber(entry.climbingDegree)}
+                                    onChange={(e) => updateBulkVehicle(idx, 'climbingDegree', e.target.value.trim() !== '' ? `${e.target.value.trim()} Degrees` : '')}
+                                    className="h-8 text-[9px] bg-muted/20 flex-1"
+                                  />
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-2 rounded border border-border/50 h-8 flex items-center justify-center min-w-[50px] whitespace-nowrap">
+                                    Deg
+                                  </span>
+                                </div>
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Load Capacity</Label>
-                                <Select value={entry.loadCapacity} onValueChange={(val) => updateBulkVehicle(idx, 'loadCapacity', val)}>
-                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
-                                    <SelectValue placeholder="Capacity" />
-                                  </SelectTrigger>
-                                  <SelectContent>{LOAD_CAPACITIES.map((capacity) => (<SelectItem key={capacity} value={capacity}>{capacity}</SelectItem>))}</SelectContent>
-                                </Select>
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    type="number"
+                                    step="any"
+                                    placeholder="Capacity"
+                                    value={extractNumber(entry.loadCapacity)}
+                                    onChange={(e) => updateBulkVehicle(idx, 'loadCapacity', e.target.value.trim() !== '' ? `${e.target.value.trim()} kg` : '')}
+                                    className="h-8 text-[9px] bg-muted/20 flex-1"
+                                  />
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-2 rounded border border-border/50 h-8 flex items-center justify-center min-w-[50px] whitespace-nowrap">
+                                    kg
+                                  </span>
+                                </div>
                               </div>
                             </div>
-                            <div className="md:col-span-3 space-y-2">
-                              <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Riding Modes</Label>
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                                {['Eco', 'City', 'Sport', 'Reverse'].map((mode) => (
-                                  <div key={mode} className="flex items-center space-x-2">
-                                    <Checkbox
-                                      id={`bulk-mode-${idx}-${mode}`}
-                                      checked={entry.ridingModes.includes(mode)}
-                                      onCheckedChange={(checked) => {
-                                        const updatedModes = checked
-                                          ? [...entry.ridingModes, mode]
-                                          : entry.ridingModes.filter(m => m !== mode);
-                                        updateBulkVehicle(idx, 'ridingModes', updatedModes);
-                                      }}
-                                    />
-                                    <Label htmlFor={`bulk-mode-${idx}-${mode}`} className="text-[8px] font-black uppercase cursor-pointer">{mode}</Label>
-                                  </div>
-                                ))}
-                              </div>
+                            <div className="md:col-span-3 space-y-1">
+                              <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Riding Modes (Comma separated)</Label>
+                              <Input 
+                                placeholder="Eco, City, Sport, Reverse" 
+                                className="h-8 text-[9px] bg-muted/20" 
+                                value={entry.ridingModes.join(', ')} 
+                                onChange={(e) => updateBulkVehicle(idx, 'ridingModes', e.target.value.split(',').map(m => m.trim()).filter(Boolean))} 
+                              />
                             </div>
                           </div>
 
@@ -1228,39 +1470,60 @@ export default function AdminInventoryPage() {
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Battery Capacity</Label>
-                                <Select value={entry.batteryCapacity} onValueChange={(val) => updateBulkVehicle(idx, 'batteryCapacity', val)}>
-                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
-                                    <SelectValue placeholder="Capacity" />
-                                  </SelectTrigger>
-                                  <SelectContent>{BATTERY_CAPACITIES.map((capacity) => (<SelectItem key={capacity} value={capacity}>{capacity}</SelectItem>))}</SelectContent>
-                                </Select>
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    type="number"
+                                    step="any"
+                                    placeholder="Capacity"
+                                    value={extractNumber(entry.batteryCapacity)}
+                                    onChange={(e) => updateBulkVehicle(idx, 'batteryCapacity', e.target.value.trim() !== '' ? `${e.target.value.trim()} kWh` : '')}
+                                    className="h-8 text-[9px] bg-muted/20 flex-1"
+                                  />
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-2 rounded border border-border/50 h-8 flex items-center justify-center min-w-[50px] whitespace-nowrap">
+                                    kWh
+                                  </span>
+                                </div>
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Charging Time</Label>
-                                <Select value={entry.chargingTime} onValueChange={(val) => updateBulkVehicle(idx, 'chargingTime', val)}>
-                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
-                                    <SelectValue placeholder="Time" />
-                                  </SelectTrigger>
-                                  <SelectContent>{CHARGING_TIMES.map((time) => (<SelectItem key={time} value={time}>{time}</SelectItem>))}</SelectContent>
-                                </Select>
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    type="number"
+                                    step="any"
+                                    placeholder="Time"
+                                    value={extractNumber(entry.chargingTime)}
+                                    onChange={(e) => updateBulkVehicle(idx, 'chargingTime', e.target.value.trim() !== '' ? `${e.target.value.trim()} Hours` : '')}
+                                    className="h-8 text-[9px] bg-muted/20 flex-1"
+                                  />
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-2 rounded border border-border/50 h-8 flex items-center justify-center min-w-[50px] whitespace-nowrap">
+                                    Hrs
+                                  </span>
+                                </div>
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Battery Warranty</Label>
-                                <Select value={entry.batteryWarranty} onValueChange={(val) => updateBulkVehicle(idx, 'batteryWarranty', val)}>
-                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
-                                    <SelectValue placeholder="Warranty" />
-                                  </SelectTrigger>
-                                  <SelectContent>{BATTERY_WARRANTIES.map((warranty) => (<SelectItem key={warranty} value={warranty}>{warranty}</SelectItem>))}</SelectContent>
-                                </Select>
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    type="number"
+                                    step="any"
+                                    placeholder="Warranty"
+                                    value={extractNumber(entry.batteryWarranty)}
+                                    onChange={(e) => updateBulkVehicle(idx, 'batteryWarranty', e.target.value.trim() !== '' ? `${e.target.value.trim()} Years` : '')}
+                                    className="h-8 text-[9px] bg-muted/20 flex-1"
+                                  />
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-2 rounded border border-border/50 h-8 flex items-center justify-center min-w-[50px] whitespace-nowrap">
+                                    Yrs
+                                  </span>
+                                </div>
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Charger Details</Label>
-                                <Select value={entry.chargerIncluded} onValueChange={(val) => updateBulkVehicle(idx, 'chargerIncluded', val)}>
-                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
-                                    <SelectValue placeholder="Charger" />
-                                  </SelectTrigger>
-                                  <SelectContent>{CHARGER_OPTIONS.map((charger) => (<SelectItem key={charger} value={charger}>{charger}</SelectItem>))}</SelectContent>
-                                </Select>
+                                <Input 
+                                  placeholder="e.g. 5A Standard Charger (or 'None')" 
+                                  className="h-8 text-[9px] bg-muted/20" 
+                                  value={entry.chargerIncluded} 
+                                  onChange={(e) => updateBulkVehicle(idx, 'chargerIncluded', e.target.value)} 
+                                />
                               </div>
                               <div className="flex items-center space-x-2 pt-2">
                                 <Checkbox id={`bulk-fast-${idx}`} checked={entry.fastCharging} onCheckedChange={(checked) => updateBulkVehicle(idx, 'fastCharging', !!checked)} />
@@ -1279,12 +1542,19 @@ export default function AdminInventoryPage() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Motor Power</Label>
-                                <Select value={entry.motorPower} onValueChange={(val) => updateBulkVehicle(idx, 'motorPower', val)}>
-                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
-                                    <SelectValue placeholder="Power" />
-                                  </SelectTrigger>
-                                  <SelectContent>{MOTOR_POWERS.map((power) => (<SelectItem key={power} value={power}>{power}</SelectItem>))}</SelectContent>
-                                </Select>
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    type="number"
+                                    step="any"
+                                    placeholder="Power"
+                                    value={extractNumber(entry.motorPower)}
+                                    onChange={(e) => updateBulkVehicle(idx, 'motorPower', e.target.value.trim() !== '' ? `${e.target.value.trim()}W` : '')}
+                                    className="h-8 text-[9px] bg-muted/20 flex-1"
+                                  />
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-2 rounded border border-border/50 h-8 flex items-center justify-center min-w-[50px] whitespace-nowrap">
+                                    W
+                                  </span>
+                                </div>
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Braking System</Label>
@@ -1325,21 +1595,35 @@ export default function AdminInventoryPage() {
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Wheel Size</Label>
-                                <Select value={entry.wheelSize} onValueChange={(val) => updateBulkVehicle(idx, 'wheelSize', val)}>
-                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
-                                    <SelectValue placeholder="Size" />
-                                  </SelectTrigger>
-                                  <SelectContent>{WHEEL_SIZES.map((size) => (<SelectItem key={size} value={size}>{size}</SelectItem>))}</SelectContent>
-                                </Select>
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    type="number"
+                                    step="any"
+                                    placeholder="Size"
+                                    value={extractNumber(entry.wheelSize)}
+                                    onChange={(e) => updateBulkVehicle(idx, 'wheelSize', e.target.value.trim() !== '' ? `${e.target.value.trim()} inch` : '')}
+                                    className="h-8 text-[9px] bg-muted/20 flex-1"
+                                  />
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-2 rounded border border-border/50 h-8 flex items-center justify-center min-w-[50px] whitespace-nowrap">
+                                    inch
+                                  </span>
+                                </div>
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Ground Clearance</Label>
-                                <Select value={entry.groundClearance} onValueChange={(val) => updateBulkVehicle(idx, 'groundClearance', val)}>
-                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
-                                    <SelectValue placeholder="Clearance" />
-                                  </SelectTrigger>
-                                  <SelectContent>{GROUND_CLEARANCES.map((clearance) => (<SelectItem key={clearance} value={clearance}>{clearance}</SelectItem>))}</SelectContent>
-                                </Select>
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    type="number"
+                                    step="any"
+                                    placeholder="Clearance"
+                                    value={extractNumber(entry.groundClearance)}
+                                    onChange={(e) => updateBulkVehicle(idx, 'groundClearance', e.target.value.trim() !== '' ? `${e.target.value.trim()} mm` : '')}
+                                    className="h-8 text-[9px] bg-muted/20 flex-1"
+                                  />
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-2 rounded border border-border/50 h-8 flex items-center justify-center min-w-[50px] whitespace-nowrap">
+                                    mm
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -1354,7 +1638,10 @@ export default function AdminInventoryPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Display Type</Label>
-                                <Select value={entry.displayType} onValueChange={(val) => updateBulkVehicle(idx, 'displayType', val)}>
+                                <Select 
+                                  value={isPredefinedDisplay(entry.displayType) ? entry.displayType : "Other"}
+                                  onValueChange={(val) => updateBulkVehicle(idx, 'displayType', val === "Other" ? "Other" : val)}
+                                >
                                   <SelectTrigger className="h-8 text-[9px] bg-muted/20">
                                     <SelectValue placeholder="Display" />
                                   </SelectTrigger>
@@ -1362,42 +1649,47 @@ export default function AdminInventoryPage() {
                                     <SelectItem value="LED Digital">LED Digital</SelectItem>
                                     <SelectItem value="TFT">TFT</SelectItem>
                                     <SelectItem value="Touchscreen">Touchscreen</SelectItem>
+                                    <SelectItem value="Other">Other</SelectItem>
                                   </SelectContent>
                                 </Select>
+                                {(!isPredefinedDisplay(entry.displayType) || entry.displayType === "Other") && (
+                                  <Input
+                                    value={entry.displayType === "Other" ? "" : entry.displayType}
+                                    onChange={(e) => updateBulkVehicle(idx, 'displayType', e.target.value)}
+                                    placeholder="Specify Display..."
+                                    className="h-8 text-[9px] bg-muted/20 mt-1"
+                                  />
+                                )}
                               </div>
                               <div className="space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Boot Space</Label>
-                                <Select value={entry.bootSpace} onValueChange={(val) => updateBulkVehicle(idx, 'bootSpace', val)}>
-                                  <SelectTrigger className="h-8 text-[9px] bg-muted/20">
-                                    <SelectValue placeholder="Boot" />
-                                  </SelectTrigger>
-                                  <SelectContent>{BOOT_SPACES.map((space) => (<SelectItem key={space} value={space}>{space}</SelectItem>))}</SelectContent>
-                                </Select>
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    type="number"
+                                    step="any"
+                                    placeholder="Boot"
+                                    value={extractNumber(entry.bootSpace)}
+                                    onChange={(e) => updateBulkVehicle(idx, 'bootSpace', e.target.value.trim() !== '' ? `${e.target.value.trim()} L` : '')}
+                                    className="h-8 text-[9px] bg-muted/20 flex-1"
+                                  />
+                                  <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-2 rounded border border-border/50 h-8 flex items-center justify-center min-w-[50px] whitespace-nowrap">
+                                    L
+                                  </span>
+                                </div>
                               </div>
                               <div className="md:col-span-2 space-y-1">
                                 <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Available Colors</Label>
                                 <Input placeholder="Red, Blue, Grey" className="h-8 text-[9px] bg-muted/20" value={entry.colors.join(', ')} onChange={(e) => updateBulkVehicle(idx, 'colors', e.target.value.split(',').map(c => c.trim()).filter(Boolean))} />
                               </div>
                             </div>
-                            <div className="md:col-span-2 space-y-2 pt-2">
-                              <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Key Features</Label>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                {['Anti-theft Alarm', 'USB Charging Port', 'Keyless Entry', 'Find My Scooter', 'Projector Headlight', 'DRL'].map((feature) => (
-                                  <div key={feature} className="flex items-center space-x-2">
-                                    <Checkbox
-                                      id={`bulk-feature-${idx}-${feature}`}
-                                      checked={entry.keyFeatures.includes(feature)}
-                                      onCheckedChange={(checked) => {
-                                        const updatedFeatures = checked
-                                          ? [...entry.keyFeatures, feature]
-                                          : entry.keyFeatures.filter(f => f !== feature);
-                                        updateBulkVehicle(idx, 'keyFeatures', updatedFeatures);
-                                      }}
-                                    />
-                                    <Label htmlFor={`bulk-feature-${idx}-${feature}`} className="text-[8px] font-black uppercase cursor-pointer">{feature}</Label>
-                                  </div>
-                                ))}
-                              </div>
+                            <div className="md:col-span-2 space-y-1 pt-2">
+                              <Label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Key Features (Comma separated)</Label>
+                              <Input 
+                                placeholder="Anti-theft Alarm, USB Charging Port, DRL" 
+                                className="h-8 text-[9px] bg-muted/20" 
+                                value={entry.keyFeatures.join(', ')} 
+                                onChange={(e) => updateBulkVehicle(idx, 'keyFeatures', e.target.value.split(',').map(f => f.trim()).filter(Boolean))} 
+                              />
                             </div>
                           </div>
 
@@ -1686,104 +1978,92 @@ export default function AdminInventoryPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Top Speed</Label>
-                        <Select
-                          value={formData.topSpeed}
-                          onValueChange={(val) => setFormData(prev => ({...prev, topSpeed: val}))}
-                        >
-                          <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                            <SelectValue placeholder="Select Speed" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {TOP_SPEEDS.map((speed) => (
-                              <SelectItem key={speed} value={speed}>{speed}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Speed"
+                            value={extractNumber(formData.topSpeed)}
+                            onChange={(e) => setFormData(prev => ({...prev, topSpeed: e.target.value.trim() !== '' ? `${e.target.value.trim()} km/h` : ''}))}
+                            className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                          />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                            km/h
+                          </span>
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Certified Range (ARAI)</Label>
-                        <Select
-                          value={formData.certifiedRange}
-                          onValueChange={(val) => setFormData(prev => ({...prev, certifiedRange: val}))}
-                        >
-                          <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                            <SelectValue placeholder="Select Range" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {RANGES.map((range) => (
-                              <SelectItem key={range} value={range}>{range}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Range"
+                            value={extractNumber(formData.certifiedRange)}
+                            onChange={(e) => setFormData(prev => ({...prev, certifiedRange: e.target.value.trim() !== '' ? `${e.target.value.trim()} km` : ''}))}
+                            className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                          />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                            km
+                          </span>
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Real-World Range</Label>
-                        <Select
-                          value={formData.realWorldRange}
-                          onValueChange={(val) => setFormData(prev => ({...prev, realWorldRange: val}))}
-                        >
-                          <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                            <SelectValue placeholder="Select Range" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {RANGES.map((range) => (
-                              <SelectItem key={range} value={range}>{range}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Range"
+                            value={extractNumber(formData.realWorldRange)}
+                            onChange={(e) => setFormData(prev => ({...prev, realWorldRange: e.target.value.trim() !== '' ? `${e.target.value.trim()} km` : ''}))}
+                            className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                          />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                            km
+                          </span>
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Climbing Degree</Label>
-                        <Select
-                          value={formData.climbingDegree}
-                          onValueChange={(val) => setFormData(prev => ({...prev, climbingDegree: val}))}
-                        >
-                          <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                            <SelectValue placeholder="Select Degree" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {CLIMBING_DEGREES.map((degree) => (
-                              <SelectItem key={degree} value={degree}>{degree}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Degree"
+                            value={extractNumber(formData.climbingDegree)}
+                            onChange={(e) => setFormData(prev => ({...prev, climbingDegree: e.target.value.trim() !== '' ? `${e.target.value.trim()} Degrees` : ''}))}
+                            className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                          />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                            Deg
+                          </span>
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Load Capacity</Label>
-                        <Select
-                          value={formData.loadCapacity}
-                          onValueChange={(val) => setFormData(prev => ({...prev, loadCapacity: val}))}
-                        >
-                          <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                            <SelectValue placeholder="Select Capacity" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {LOAD_CAPACITIES.map((capacity) => (
-                              <SelectItem key={capacity} value={capacity}>{capacity}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Capacity"
+                            value={extractNumber(formData.loadCapacity)}
+                            onChange={(e) => setFormData(prev => ({...prev, loadCapacity: e.target.value.trim() !== '' ? `${e.target.value.trim()} kg` : ''}))}
+                            className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                          />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                            kg
+                          </span>
+                        </div>
                       </div>
                       <div className="space-y-2 md:col-span-3">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3 block">Riding Modes</Label>
-                        <div className="flex flex-wrap gap-4">
-                          {['Eco', 'City', 'Sport', 'Reverse'].map((mode) => (
-                            <div key={mode} className="flex items-center space-x-2 bg-muted/10 p-2 rounded-lg border border-border/50">
-                              <Checkbox 
-                                id={`mode-${mode}`} 
-                                checked={formData.ridingModes.includes(mode)}
-                                onCheckedChange={(checked) => {
-                                  if (checked) {
-                                    setFormData(prev => ({...prev, ridingModes: [...prev.ridingModes, mode]}));
-                                  } else {
-                                    setFormData(prev => ({...prev, ridingModes: prev.ridingModes.filter(m => m !== mode)}));
-                                  }
-                                }}
-                              />
-                              <Label htmlFor={`mode-${mode}`} className="text-[10px] font-bold uppercase cursor-pointer">{mode}</Label>
-                            </div>
-                          ))}
-                        </div>
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Riding Modes (Comma separated)</Label>
+                        <Input 
+                          value={ridingModesInput}
+                          onChange={(e) => setRidingModesInput(e.target.value)}
+                          onBlur={() => setFormData(prev => ({...prev, ridingModes: ridingModesInput.split(',').map(m => m.trim()).filter(Boolean)}))}
+                          placeholder="Eco, City, Sport, Reverse" className="bg-muted/20 h-10 text-xs border-border/50" 
+                        />
                       </div>
                     </div>
                   </div>
@@ -1814,67 +2094,60 @@ export default function AdminInventoryPage() {
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Battery Capacity</Label>
-                        <Select
-                          value={formData.batteryCapacity}
-                          onValueChange={(val) => setFormData(prev => ({...prev, batteryCapacity: val}))}
-                        >
-                          <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                            <SelectValue placeholder="Select Capacity" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {BATTERY_CAPACITIES.map((cap) => (
-                              <SelectItem key={cap} value={cap}>{cap}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Capacity"
+                            value={extractNumber(formData.batteryCapacity)}
+                            onChange={(e) => setFormData(prev => ({...prev, batteryCapacity: e.target.value.trim() !== '' ? `${e.target.value.trim()} kWh` : ''}))}
+                            className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                          />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                            kWh
+                          </span>
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Charging Time (0-100%)</Label>
-                        <Select
-                          value={formData.chargingTime}
-                          onValueChange={(val) => setFormData(prev => ({...prev, chargingTime: val}))}
-                        >
-                          <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                            <SelectValue placeholder="Select Time" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {CHARGING_TIMES.map((time) => (
-                              <SelectItem key={time} value={time}>{time}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Time"
+                            value={extractNumber(formData.chargingTime)}
+                            onChange={(e) => setFormData(prev => ({...prev, chargingTime: e.target.value.trim() !== '' ? `${e.target.value.trim()} Hours` : ''}))}
+                            className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                          />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                            Hrs
+                          </span>
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Battery Warranty</Label>
-                        <Select
-                          value={formData.batteryWarranty}
-                          onValueChange={(val) => setFormData(prev => ({...prev, batteryWarranty: val}))}
-                        >
-                          <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                            <SelectValue placeholder="Select Warranty" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {BATTERY_WARRANTIES.map((warranty) => (
-                              <SelectItem key={warranty} value={warranty}>{warranty}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Warranty"
+                            value={extractNumber(formData.batteryWarranty)}
+                            onChange={(e) => setFormData(prev => ({...prev, batteryWarranty: e.target.value.trim() !== '' ? `${e.target.value.trim()} Years` : ''}))}
+                            className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                          />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                            Yrs
+                          </span>
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Charger Details</Label>
-                        <Select
+                        <Input 
                           value={formData.chargerIncluded}
-                          onValueChange={(val) => setFormData(prev => ({...prev, chargerIncluded: val}))}
-                        >
-                          <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                            <SelectValue placeholder="Select Charger" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {CHARGER_OPTIONS.map((charger) => (
-                              <SelectItem key={charger} value={charger}>{charger}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          onChange={(e) => setFormData(prev => ({...prev, chargerIncluded: e.target.value}))}
+                          placeholder="e.g. 5A Standard Charger (or type 'None')" 
+                          className="bg-muted/20 h-10 text-xs border-border/50"
+                        />
                       </div>
                       <div className="flex items-center space-x-2 pt-8">
                         <Checkbox 
@@ -1897,19 +2170,19 @@ export default function AdminInventoryPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Motor Power</Label>
-                        <Select
-                          value={formData.motorPower}
-                          onValueChange={(val) => setFormData(prev => ({...prev, motorPower: val}))}
-                        >
-                          <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                            <SelectValue placeholder="Select Power" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {MOTOR_POWERS.map((power) => (
-                              <SelectItem key={power} value={power}>{power}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Power"
+                            value={extractNumber(formData.motorPower)}
+                            onChange={(e) => setFormData(prev => ({...prev, motorPower: e.target.value.trim() !== '' ? `${e.target.value.trim()}W` : ''}))}
+                            className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                          />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                            W
+                          </span>
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Braking System</Label>
@@ -1959,35 +2232,35 @@ export default function AdminInventoryPage() {
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Wheel Size</Label>
-                        <Select
-                          value={formData.wheelSize}
-                          onValueChange={(val) => setFormData(prev => ({...prev, wheelSize: val}))}
-                        >
-                          <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                            <SelectValue placeholder="Select Size" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {WHEEL_SIZES.map((size) => (
-                              <SelectItem key={size} value={size}>{size}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Size"
+                            value={extractNumber(formData.wheelSize)}
+                            onChange={(e) => setFormData(prev => ({...prev, wheelSize: e.target.value.trim() !== '' ? `${e.target.value.trim()} inch` : ''}))}
+                            className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                          />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                            inch
+                          </span>
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Ground Clearance</Label>
-                        <Select
-                          value={formData.groundClearance}
-                          onValueChange={(val) => setFormData(prev => ({...prev, groundClearance: val}))}
-                        >
-                          <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                            <SelectValue placeholder="Select Clearance" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {GROUND_CLEARANCES.map((clearance) => (
-                              <SelectItem key={clearance} value={clearance}>{clearance}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Clearance"
+                            value={extractNumber(formData.groundClearance)}
+                            onChange={(e) => setFormData(prev => ({...prev, groundClearance: e.target.value.trim() !== '' ? `${e.target.value.trim()} mm` : ''}))}
+                            className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                          />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                            mm
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -2003,8 +2276,8 @@ export default function AdminInventoryPage() {
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Display Type</Label>
                         <Select
-                          value={formData.displayType}
-                          onValueChange={(val) => setFormData(prev => ({...prev, displayType: val}))}
+                          value={isPredefinedDisplay(formData.displayType) ? formData.displayType : "Other"}
+                          onValueChange={(val) => setFormData(prev => ({...prev, displayType: val === "Other" ? "Other" : val}))}
                         >
                           <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
                             <SelectValue placeholder="Select Display" />
@@ -2013,24 +2286,33 @@ export default function AdminInventoryPage() {
                             <SelectItem value="LED Digital">LED Digital</SelectItem>
                             <SelectItem value="TFT">TFT</SelectItem>
                             <SelectItem value="Touchscreen">Touchscreen</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
                           </SelectContent>
                         </Select>
+                        {(!isPredefinedDisplay(formData.displayType) || formData.displayType === "Other") && (
+                          <Input
+                            value={formData.displayType === "Other" ? "" : formData.displayType}
+                            onChange={(e) => setFormData(prev => ({...prev, displayType: e.target.value}))}
+                            placeholder="Specify display type..."
+                            className="bg-muted/20 h-10 text-xs border-border/50 mt-2"
+                          />
+                        )}
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Boot Space</Label>
-                        <Select
-                          value={formData.bootSpace}
-                          onValueChange={(val) => setFormData(prev => ({...prev, bootSpace: val}))}
-                        >
-                          <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                            <SelectValue placeholder="Select Boot Space" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {BOOT_SPACES.map((space) => (
-                              <SelectItem key={space} value={space}>{space}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Boot"
+                            value={extractNumber(formData.bootSpace)}
+                            onChange={(e) => setFormData(prev => ({...prev, bootSpace: e.target.value.trim() !== '' ? `${e.target.value.trim()} L` : ''}))}
+                            className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                          />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                            L
+                          </span>
+                        </div>
                       </div>
                       <div className="col-span-1 md:col-span-2 space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Available Colors (Comma separated)</Label>
@@ -2041,26 +2323,14 @@ export default function AdminInventoryPage() {
                           placeholder="Red, Blue, Grey" className="bg-muted/20 h-10 text-xs border-border/50" 
                         />
                       </div>
-                      <div className="col-span-1 md:col-span-2 space-y-3">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block mb-2">Key Features</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                          {['Anti-theft Alarm', 'USB Charging Port', 'Keyless Entry', 'Find My Scooter', 'Projector Headlight', 'DRL'].map((feat) => (
-                            <div key={feat} className="flex items-center space-x-2 bg-muted/10 p-2 rounded-lg border border-border/50">
-                              <Checkbox 
-                                id={`feat-${feat}`} 
-                                checked={formData.keyFeatures.includes(feat)}
-                                onCheckedChange={(checked) => {
-                                  if (checked) {
-                                    setFormData(prev => ({...prev, keyFeatures: [...prev.keyFeatures, feat]}));
-                                  } else {
-                                    setFormData(prev => ({...prev, keyFeatures: prev.keyFeatures.filter(f => f !== feat)}));
-                                  }
-                                }}
-                              />
-                              <Label htmlFor={`feat-${feat}`} className="text-[10px] font-bold uppercase cursor-pointer">{feat}</Label>
-                            </div>
-                          ))}
-                        </div>
+                      <div className="col-span-1 md:col-span-2 space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Key Features (Comma separated)</Label>
+                        <Input 
+                          value={keyFeaturesInput}
+                          onChange={(e) => setKeyFeaturesInput(e.target.value)}
+                          onBlur={() => setFormData(prev => ({...prev, keyFeatures: keyFeaturesInput.split(',').map(f => f.trim()).filter(Boolean)}))}
+                          placeholder="Anti-theft Alarm, USB Charging Port, DRL" className="bg-muted/20 h-10 text-xs border-border/50" 
+                        />
                       </div>
                     </div>
                   </div>
@@ -2267,80 +2537,182 @@ export default function AdminInventoryPage() {
                     </TableRow>
                   ) : (
                     filteredVehicles.map((item) => (
-                      <TableRow key={item.id} className="border-border/50 hover:bg-primary/5 transition-colors">
-                        <TableCell className="py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="h-10 w-16 rounded-md bg-muted/20 overflow-hidden border border-border/50 shrink-0">
-                              {getVehicleImages(item)[0] ? (
-                                <img 
-                                  src={getImageUrl(getVehicleImages(item)[0])} 
-                                  alt={item.model} 
-                                  className="h-full w-full object-cover"
-                                />
+                      <React.Fragment key={item.id}>
+                        <TableRow className="border-border/50 hover:bg-primary/5 transition-colors">
+                          <TableCell className="py-4">
+                            <div className="flex items-center gap-3">
+                              {item.colorVariants && item.colorVariants.length > 0 ? (
+                                <button 
+                                  onClick={() => setExpandedParentIds(prev => ({ ...prev, [item.id]: !prev[item.id] }))}
+                                  className="h-6 w-6 flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground transition-colors shrink-0"
+                                >
+                                  {expandedParentIds[item.id] ? (
+                                    <ChevronUp className="h-4 w-4" />
+                                  ) : (
+                                    <ChevronDown className="h-4 w-4" />
+                                  )}
+                                </button>
                               ) : (
-                                <div className="h-full w-full flex items-center justify-center">
-                                  <Package className="h-4 w-4 text-muted-foreground" />
-                                </div>
+                                <div className="w-6 h-6 shrink-0" />
                               )}
+                              <div className="h-10 w-16 rounded-md bg-muted/20 overflow-hidden border border-border/50 shrink-0">
+                                {getVehicleImages(item)[0] ? (
+                                  <img 
+                                    src={getImageUrl(getVehicleImages(item)[0])} 
+                                    alt={item.model} 
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="h-full w-full flex items-center justify-center">
+                                    <Package className="h-4 w-4 text-muted-foreground" />
+                                  </div>
+                                )}
+                              </div>
+                              <div>
+                                <p className="text-xs font-bold leading-none mb-1">{item.make} {item.model}</p>
+                                <p className="text-[8px] text-muted-foreground font-mono uppercase tracking-widest">{item.modelCode || item.id}</p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="text-xs font-bold leading-none mb-1">{item.make} {item.model}</p>
-                              <p className="text-[8px] text-muted-foreground font-mono uppercase tracking-widest">{item.modelCode || item.id}</p>
+                          </TableCell>
+                          <TableCell className="py-4">
+                            <Badge variant="secondary" className="text-[8px] font-black uppercase tracking-widest py-0.5 px-2">
+                              {item.category || 'N/A'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="py-4">
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-bold">{item.topSpeed || 'N/A'}</p>
+                              <p className="text-[8px] text-muted-foreground uppercase font-black">{item.certifiedRange || 'Range N/A'}</p>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4">
-                          <Badge variant="secondary" className="text-[8px] font-black uppercase tracking-widest py-0.5 px-2">
-                            {item.category || 'N/A'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="py-4">
-                          <div className="space-y-1">
-                            <p className="text-[10px] font-bold">{item.topSpeed || 'N/A'}</p>
-                            <p className="text-[8px] text-muted-foreground uppercase font-black">{item.certifiedRange || 'Range N/A'}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4">
-                          <div className="space-y-1">
-                            <p className="text-[10px] font-medium opacity-70">{item.batteryType || 'N/A'}</p>
-                            <p className="text-[8px] text-muted-foreground font-bold">{item.batteryCapacity || 'N/A'}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4 font-headline font-bold text-sm">
-                          {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(item.price)}
-                        </TableCell>
-                        <TableCell className="py-4">
-                          <Link 
-                            href={`/vehicles/${item.slug}`} 
-                            target="_blank"
-                            className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-primary/10 text-primary transition-colors"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Link>
-                        </TableCell>
-                        <TableCell className="py-4 text-right">
-                          <DropdownMenu modal={false}>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="bg-card/95 backdrop-blur-xl border-border/50" align="end">
-                              <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest">Management</DropdownMenuLabel>
-                              <DropdownMenuSeparator className="bg-border/50" />
-                              <DropdownMenuItem onClick={() => handleManageVariantsClick(item)} className="text-[10px] font-black uppercase tracking-widest text-primary focus:bg-primary/10 focus:text-primary cursor-pointer font-bold">
-                                Manage Variants
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleEditClick(item)} className="text-[10px] font-black uppercase tracking-widest focus:bg-primary/10 focus:text-primary cursor-pointer">
-                                Edit Asset
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleDeleteVehicle(item.id)} className="text-[10px] font-black uppercase tracking-widest text-red-500 focus:bg-red-500/10 focus:text-red-500 cursor-pointer">
-                                Delete Asset
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
+                          </TableCell>
+                          <TableCell className="py-4">
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-medium opacity-70">{item.batteryType || 'N/A'}</p>
+                              <p className="text-[8px] text-muted-foreground font-bold">{item.batteryCapacity || 'N/A'}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-4 font-headline font-bold text-sm">
+                            {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(item.price)}
+                          </TableCell>
+                          <TableCell className="py-4">
+                            <Link 
+                              href={`/vehicles/${item.slug}`} 
+                              target="_blank"
+                              className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-primary/10 text-primary transition-colors"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Link>
+                          </TableCell>
+                          <TableCell className="py-4 text-right">
+                            <DropdownMenu modal={false}>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="bg-card/95 backdrop-blur-xl border-border/50" align="end">
+                                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest">Management</DropdownMenuLabel>
+                                <DropdownMenuSeparator className="bg-border/50" />
+                                <DropdownMenuItem onClick={() => handleManageColorsClick(item)} className="text-[10px] font-black uppercase tracking-widest text-primary focus:bg-primary/10 focus:text-primary cursor-pointer font-bold">
+                                  Manage Colors
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleManageVariantsClick(item)} className="text-[10px] font-black uppercase tracking-widest text-primary focus:bg-primary/10 focus:text-primary cursor-pointer font-bold">
+                                  Manage Variants
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleEditClick(item)} className="text-[10px] font-black uppercase tracking-widest focus:bg-primary/10 focus:text-primary cursor-pointer">
+                                  Edit Asset
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleDeleteVehicle(item.id)} className="text-[10px] font-black uppercase tracking-widest text-red-500 focus:bg-red-500/10 focus:text-red-500 cursor-pointer">
+                                  Delete Asset
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+
+                        {expandedParentIds[item.id] && item.colorVariants && item.colorVariants.length > 0 && (
+                          <TableRow className="bg-muted/10 border-b border-border/30 hover:bg-muted/10">
+                            <TableCell colSpan={7} className="p-0 pl-16 pr-4 pb-4">
+                              <div className="rounded-lg border border-border/30 bg-card/50 overflow-hidden my-2 shadow-inner">
+                                <Table>
+                                  <TableHeader className="bg-muted/30">
+                                    <TableRow className="hover:bg-transparent border-b border-border/20">
+                                      <TableHead className="h-8 text-[9px] font-black uppercase tracking-widest text-muted-foreground pl-4">Color Variant</TableHead>
+                                      <TableHead className="h-8 text-[9px] font-black uppercase tracking-widest text-muted-foreground">Slug</TableHead>
+                                      <TableHead className="h-8 text-[9px] font-black uppercase tracking-widest text-muted-foreground">Price Override</TableHead>
+                                      <TableHead className="h-8 text-[9px] font-black uppercase tracking-widest text-muted-foreground">Link</TableHead>
+                                      <TableHead className="h-8 text-[9px] font-black uppercase tracking-widest text-muted-foreground text-right pr-4">Actions</TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody>
+                                    {item.colorVariants.map((child: any) => (
+                                      <TableRow key={child.id} className="hover:bg-primary/5 border-b border-border/20 last:border-0">
+                                        <TableCell className="py-2 pl-4">
+                                          <div className="flex items-center gap-2">
+                                            <div className="h-8 w-12 rounded bg-muted/20 overflow-hidden border border-border/50 shrink-0">
+                                              {child.images?.[0] ? (
+                                                <img 
+                                                  src={getImageUrl(child.images[0])} 
+                                                  alt={child.colors?.[0]} 
+                                                  className="h-full w-full object-cover"
+                                                />
+                                              ) : (
+                                                <div className="h-full w-full flex items-center justify-center">
+                                                  <ImageIcon className="h-3 w-3 text-muted-foreground" />
+                                                </div>
+                                              )}
+                                            </div>
+                                            <div>
+                                              <p className="text-[11px] font-bold">{child.colors?.[0] || 'Unnamed Color'}</p>
+                                            </div>
+                                          </div>
+                                        </TableCell>
+                                        <TableCell className="py-2 text-[10px] font-mono text-muted-foreground">
+                                          {child.slug}
+                                        </TableCell>
+                                        <TableCell className="py-2 font-headline font-bold text-xs">
+                                          {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(child.price)}
+                                        </TableCell>
+                                        <TableCell className="py-2">
+                                          <Link 
+                                            href={`/vehicles/${item.slug}?color=${encodeURIComponent(child.colors?.[0] || '')}`} 
+                                            target="_blank"
+                                            className="h-6 w-6 flex items-center justify-center rounded hover:bg-primary/10 text-primary transition-colors"
+                                          >
+                                            <ExternalLink className="h-3.5 w-3.5" />
+                                          </Link>
+                                        </TableCell>
+                                        <TableCell className="py-2 text-right pr-4">
+                                          <div className="flex justify-end gap-1">
+                                            <Button 
+                                              variant="ghost" 
+                                              size="icon" 
+                                              className="h-7 w-7 text-muted-foreground hover:text-primary"
+                                              onClick={() => handleEditClick(child)}
+                                              title="Edit Variant"
+                                            >
+                                              <Pencil className="h-3.5 w-3.5" />
+                                            </Button>
+                                            <Button 
+                                              variant="ghost" 
+                                              size="icon" 
+                                              className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50"
+                                              onClick={() => handleDeleteColorVariant(child.id)}
+                                              title="Delete Variant"
+                                            >
+                                              <Trash2 className="h-3.5 w-3.5" />
+                                            </Button>
+                                          </div>
+                                        </TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </React.Fragment>
                     ))
                   )}
                 </TableBody>
@@ -2348,6 +2720,199 @@ export default function AdminInventoryPage() {
             </CardContent>
           </Card>
       </div>
+
+      {/* Manage Colors Modal */}
+      <Dialog open={isColorsModalOpen} onOpenChange={setIsColorsModalOpen}>
+        <DialogContent className="bg-card/95 backdrop-blur-xl border-border/50 sm:max-w-[900px] p-0 overflow-hidden text-foreground">
+          <DialogHeader className="p-6 pb-2 border-b border-border/30">
+            <DialogTitle className="font-headline text-2xl font-black">Manage Color Variants</DialogTitle>
+            <DialogDescription className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              Configure color-specific pricing, slugs, and image galleries for {selectedParentForColors?.make} {selectedParentForColors?.model}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border/30 max-h-[70vh] overflow-y-auto">
+            {/* Left: Current Color Variants List */}
+            <div className="p-6 space-y-4">
+              <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Active Variants ({selectedParentForColors?.colorVariants?.length || 0})
+              </h3>
+              
+              {(!selectedParentForColors?.colorVariants || selectedParentForColors.colorVariants.length === 0) ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center border border-dashed border-border/50 rounded-xl bg-muted/5">
+                  <Package className="h-8 w-8 text-muted-foreground/50 mb-2" />
+                  <p className="text-xs font-bold text-muted-foreground">No color variants created yet.</p>
+                  <p className="text-[10px] text-muted-foreground/70 max-w-[250px] mt-1">This vehicle will only display its base configuration until variants are added.</p>
+                </div>
+              ) : (
+                <ScrollArea className="h-[400px] pr-4">
+                  <div className="space-y-3">
+                    {selectedParentForColors.colorVariants.map((child: any) => (
+                      <div key={child.id} className="flex items-center gap-3 p-3 bg-muted/10 hover:bg-muted/20 border border-border/30 rounded-xl transition-all">
+                        <div className="h-12 w-16 bg-muted/30 rounded-lg overflow-hidden border border-border/50 shrink-0">
+                          {child.images?.[0] ? (
+                            <img 
+                              src={getImageUrl(child.images[0])} 
+                              alt={child.colors?.[0]} 
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center">
+                              <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold leading-none mb-1">{child.colors?.[0] || 'Unnamed Color'}</p>
+                          <p className="text-[9px] text-muted-foreground font-mono truncate">{child.slug}</p>
+                          <p className="text-[11px] font-black text-primary font-headline mt-1">
+                            {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(child.price)}
+                          </p>
+                        </div>
+                        <div className="flex flex-col gap-1 shrink-0">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            type="button"
+                            className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
+                            onClick={() => {
+                              setIsColorsModalOpen(false);
+                              handleEditClick(child);
+                            }}
+                            title="Edit Variant Specs"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            type="button"
+                            className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                            onClick={() => handleDeleteColorVariant(child.id)}
+                            title="Delete Variant"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              )}
+            </div>
+
+            {/* Right: Add Color Variant Form */}
+            <form onSubmit={handleAddColorVariant} className="p-6 space-y-4">
+              <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Add New Color Variant
+              </h3>
+
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Color Name</Label>
+                  <Input 
+                    value={colorVariantForm.colorName}
+                    onChange={(e) => {
+                      const color = e.target.value;
+                      const cleanSlug = color.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+                      const parentSlug = selectedParentForColors?.slug || '';
+                      setColorVariantForm(prev => ({
+                        ...prev,
+                        colorName: color,
+                        slug: color ? `${parentSlug}-${cleanSlug}` : `${parentSlug}-`
+                      }));
+                    }}
+                    placeholder="e.g. True Blue, Matte Black" 
+                    className="bg-muted/20 h-9 text-xs border-border/50"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Price Override (₹)</Label>
+                  <Input 
+                    type="number"
+                    value={colorVariantForm.price}
+                    onChange={(e) => setColorVariantForm(prev => ({ ...prev, price: e.target.value }))}
+                    placeholder={selectedParentForColors ? `Inherited: ₹${selectedParentForColors.price}` : ''} 
+                    className="bg-muted/20 h-9 text-xs border-border/50"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Variant URL Slug</Label>
+                  <Input 
+                    value={colorVariantForm.slug}
+                    onChange={(e) => setColorVariantForm(prev => ({ ...prev, slug: e.target.value }))}
+                    placeholder="e.g. model-slug-color-name" 
+                    className="bg-muted/20 h-9 text-xs border-border/50 font-mono"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Color-Specific Images (Multiple)</Label>
+                  <Input 
+                    type="file" 
+                    accept="image/*" 
+                    multiple
+                    onChange={(e) => {
+                      if (e.target.files) {
+                        setColorVariantFiles(Array.from(e.target.files));
+                      }
+                    }}
+                    className="bg-muted/20 h-9 text-xs py-1.5 px-3 border-dashed border-primary/20" 
+                  />
+                  {colorVariantFiles.length > 0 && (
+                    <div className="p-2.5 bg-primary/5 rounded-lg border border-primary/10 space-y-1.5">
+                      <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground">
+                        <span>Selected ({colorVariantFiles.length})</span>
+                        <button type="button" onClick={() => setColorVariantFiles([])} className="hover:text-primary transition-colors">Clear</button>
+                      </div>
+                      <div className="max-h-[100px] overflow-y-auto space-y-1">
+                        {colorVariantFiles.map((file, idx) => (
+                          <div key={idx} className="text-[9px] font-bold truncate bg-background/50 px-2 py-1 rounded border border-border/30">
+                            {file.name}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full text-xs font-black uppercase tracking-widest h-9 mt-4 bg-primary hover:bg-primary/95 text-primary-foreground"
+                disabled={isAddingColorVariant}
+              >
+                {isAddingColorVariant ? (
+                  <>
+                    <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                    Creating Variant...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="mr-2 h-3.5 w-3.5" />
+                    Add Variant
+                  </>
+                )}
+              </Button>
+            </form>
+          </div>
+
+          <DialogFooter className="p-4 border-t border-border/30 bg-muted/5">
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="text-xs font-black uppercase tracking-widest h-9"
+              onClick={() => setIsColorsModalOpen(false)}
+            >
+              Close Panel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isEditModalOpen} onOpenChange={(open) => {
         if (open) {
@@ -2485,104 +3050,92 @@ export default function AdminInventoryPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Top Speed</Label>
-                    <Select
-                      value={formData.topSpeed}
-                      onValueChange={(val) => setFormData(prev => ({...prev, topSpeed: val}))}
-                    >
-                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                        <SelectValue placeholder="Select Speed" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {TOP_SPEEDS.map((speed) => (
-                          <SelectItem key={speed} value={speed}>{speed}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="Speed"
+                        value={extractNumber(formData.topSpeed)}
+                        onChange={(e) => setFormData(prev => ({...prev, topSpeed: e.target.value.trim() !== '' ? `${e.target.value.trim()} km/h` : ''}))}
+                        className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                      />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                        km/h
+                      </span>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Certified Range (ARAI)</Label>
-                    <Select
-                      value={formData.certifiedRange}
-                      onValueChange={(val) => setFormData(prev => ({...prev, certifiedRange: val}))}
-                    >
-                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                        <SelectValue placeholder="Select Range" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {RANGES.map((range) => (
-                          <SelectItem key={range} value={range}>{range}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="Range"
+                        value={extractNumber(formData.certifiedRange)}
+                        onChange={(e) => setFormData(prev => ({...prev, certifiedRange: e.target.value.trim() !== '' ? `${e.target.value.trim()} km` : ''}))}
+                        className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                      />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                        km
+                      </span>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Real-World Range</Label>
-                    <Select
-                      value={formData.realWorldRange}
-                      onValueChange={(val) => setFormData(prev => ({...prev, realWorldRange: val}))}
-                    >
-                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                        <SelectValue placeholder="Select Range" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {RANGES.map((range) => (
-                          <SelectItem key={range} value={range}>{range}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="Range"
+                        value={extractNumber(formData.realWorldRange)}
+                        onChange={(e) => setFormData(prev => ({...prev, realWorldRange: e.target.value.trim() !== '' ? `${e.target.value.trim()} km` : ''}))}
+                        className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                      />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                        km
+                      </span>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Climbing Degree</Label>
-                    <Select
-                      value={formData.climbingDegree}
-                      onValueChange={(val) => setFormData(prev => ({...prev, climbingDegree: val}))}
-                    >
-                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                        <SelectValue placeholder="Select Degree" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {CLIMBING_DEGREES.map((degree) => (
-                          <SelectItem key={degree} value={degree}>{degree}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="Degree"
+                        value={extractNumber(formData.climbingDegree)}
+                        onChange={(e) => setFormData(prev => ({...prev, climbingDegree: e.target.value.trim() !== '' ? `${e.target.value.trim()} Degrees` : ''}))}
+                        className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                      />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                        Deg
+                      </span>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Load Capacity</Label>
-                    <Select
-                      value={formData.loadCapacity}
-                      onValueChange={(val) => setFormData(prev => ({...prev, loadCapacity: val}))}
-                    >
-                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                        <SelectValue placeholder="Select Capacity" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {LOAD_CAPACITIES.map((capacity) => (
-                          <SelectItem key={capacity} value={capacity}>{capacity}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="Capacity"
+                        value={extractNumber(formData.loadCapacity)}
+                        onChange={(e) => setFormData(prev => ({...prev, loadCapacity: e.target.value.trim() !== '' ? `${e.target.value.trim()} kg` : ''}))}
+                        className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                      />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                        kg
+                      </span>
+                    </div>
                   </div>
                   <div className="space-y-2 md:col-span-3">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3 block">Riding Modes</Label>
-                    <div className="flex flex-wrap gap-4">
-                      {['Eco', 'City', 'Sport', 'Reverse'].map((mode) => (
-                        <div key={mode} className="flex items-center space-x-2 bg-muted/10 p-2 rounded-lg border border-border/50">
-                          <Checkbox 
-                            id={`edit-mode-${mode}`} 
-                            checked={formData.ridingModes.includes(mode)}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setFormData(prev => ({...prev, ridingModes: [...prev.ridingModes, mode]}));
-                              } else {
-                                setFormData(prev => ({...prev, ridingModes: prev.ridingModes.filter(m => m !== mode)}));
-                              }
-                            }}
-                          />
-                          <Label htmlFor={`edit-mode-${mode}`} className="text-[10px] font-bold uppercase cursor-pointer">{mode}</Label>
-                        </div>
-                      ))}
-                    </div>
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Riding Modes (Comma separated)</Label>
+                    <Input 
+                      value={ridingModesInput}
+                      onChange={(e) => setRidingModesInput(e.target.value)}
+                      onBlur={() => setFormData(prev => ({...prev, ridingModes: ridingModesInput.split(',').map(m => m.trim()).filter(Boolean)}))}
+                      placeholder="Eco, City, Sport, Reverse" className="bg-muted/20 h-10 text-xs border-border/50" 
+                    />
                   </div>
                 </div>
               </div>
@@ -2613,67 +3166,60 @@ export default function AdminInventoryPage() {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Battery Capacity</Label>
-                    <Select
-                      value={formData.batteryCapacity}
-                      onValueChange={(val) => setFormData(prev => ({...prev, batteryCapacity: val}))}
-                    >
-                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                        <SelectValue placeholder="Select Capacity" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {BATTERY_CAPACITIES.map((capacity) => (
-                          <SelectItem key={capacity} value={capacity}>{capacity}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="Capacity"
+                        value={extractNumber(formData.batteryCapacity)}
+                        onChange={(e) => setFormData(prev => ({...prev, batteryCapacity: e.target.value.trim() !== '' ? `${e.target.value.trim()} kWh` : ''}))}
+                        className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                      />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                        kWh
+                      </span>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Charging Time (0-100%)</Label>
-                    <Select
-                      value={formData.chargingTime}
-                      onValueChange={(val) => setFormData(prev => ({...prev, chargingTime: val}))}
-                    >
-                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                        <SelectValue placeholder="Select Time" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {CHARGING_TIMES.map((time) => (
-                          <SelectItem key={time} value={time}>{time}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="Time"
+                        value={extractNumber(formData.chargingTime)}
+                        onChange={(e) => setFormData(prev => ({...prev, chargingTime: e.target.value.trim() !== '' ? `${e.target.value.trim()} Hours` : ''}))}
+                        className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                      />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                        Hrs
+                      </span>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Battery Warranty</Label>
-                    <Select
-                      value={formData.batteryWarranty}
-                      onValueChange={(val) => setFormData(prev => ({...prev, batteryWarranty: val}))}
-                    >
-                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                        <SelectValue placeholder="Select Warranty" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {BATTERY_WARRANTIES.map((warranty) => (
-                          <SelectItem key={warranty} value={warranty}>{warranty}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="Warranty"
+                        value={extractNumber(formData.batteryWarranty)}
+                        onChange={(e) => setFormData(prev => ({...prev, batteryWarranty: e.target.value.trim() !== '' ? `${e.target.value.trim()} Years` : ''}))}
+                        className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                      />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                        Yrs
+                      </span>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Charger Details</Label>
-                    <Select
+                    <Input 
                       value={formData.chargerIncluded}
-                      onValueChange={(val) => setFormData(prev => ({...prev, chargerIncluded: val}))}
-                    >
-                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                        <SelectValue placeholder="Select Charger" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {CHARGER_OPTIONS.map((charger) => (
-                          <SelectItem key={charger} value={charger}>{charger}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      onChange={(e) => setFormData(prev => ({...prev, chargerIncluded: e.target.value}))}
+                      placeholder="e.g. 5A Standard Charger (or type 'None')" 
+                      className="bg-muted/20 h-10 text-xs border-border/50"
+                    />
                   </div>
                   <div className="flex items-center space-x-2 pt-8">
                     <Checkbox 
@@ -2696,19 +3242,19 @@ export default function AdminInventoryPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Motor Power</Label>
-                    <Select
-                      value={formData.motorPower}
-                      onValueChange={(val) => setFormData(prev => ({...prev, motorPower: val}))}
-                    >
-                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                        <SelectValue placeholder="Select Power" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {MOTOR_POWERS.map((power) => (
-                          <SelectItem key={power} value={power}>{power}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="Power"
+                        value={extractNumber(formData.motorPower)}
+                        onChange={(e) => setFormData(prev => ({...prev, motorPower: e.target.value.trim() !== '' ? `${e.target.value.trim()}W` : ''}))}
+                        className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                      />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                        W
+                      </span>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Braking System</Label>
@@ -2758,35 +3304,35 @@ export default function AdminInventoryPage() {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Wheel Size</Label>
-                    <Select
-                      value={formData.wheelSize}
-                      onValueChange={(val) => setFormData(prev => ({...prev, wheelSize: val}))}
-                    >
-                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                        <SelectValue placeholder="Select Size" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {WHEEL_SIZES.map((size) => (
-                          <SelectItem key={size} value={size}>{size}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="Size"
+                        value={extractNumber(formData.wheelSize)}
+                        onChange={(e) => setFormData(prev => ({...prev, wheelSize: e.target.value.trim() !== '' ? `${e.target.value.trim()} inch` : ''}))}
+                        className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                      />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                        inch
+                      </span>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Ground Clearance</Label>
-                    <Select
-                      value={formData.groundClearance}
-                      onValueChange={(val) => setFormData(prev => ({...prev, groundClearance: val}))}
-                    >
-                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                        <SelectValue placeholder="Select Clearance" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {GROUND_CLEARANCES.map((clearance) => (
-                          <SelectItem key={clearance} value={clearance}>{clearance}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="Clearance"
+                        value={extractNumber(formData.groundClearance)}
+                        onChange={(e) => setFormData(prev => ({...prev, groundClearance: e.target.value.trim() !== '' ? `${e.target.value.trim()} mm` : ''}))}
+                        className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                      />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                        mm
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2802,8 +3348,8 @@ export default function AdminInventoryPage() {
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Display Type</Label>
                     <Select
-                      value={formData.displayType}
-                      onValueChange={(val) => setFormData(prev => ({...prev, displayType: val}))}
+                      value={isPredefinedDisplay(formData.displayType) ? formData.displayType : "Other"}
+                      onValueChange={(val) => setFormData(prev => ({...prev, displayType: val === "Other" ? "Other" : val}))}
                     >
                       <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
                         <SelectValue placeholder="Select Display" />
@@ -2812,24 +3358,33 @@ export default function AdminInventoryPage() {
                         <SelectItem value="LED Digital">LED Digital</SelectItem>
                         <SelectItem value="TFT">TFT</SelectItem>
                         <SelectItem value="Touchscreen">Touchscreen</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
                       </SelectContent>
                     </Select>
+                    {(!isPredefinedDisplay(formData.displayType) || formData.displayType === "Other") && (
+                      <Input
+                        value={formData.displayType === "Other" ? "" : formData.displayType}
+                        onChange={(e) => setFormData(prev => ({...prev, displayType: e.target.value}))}
+                        placeholder="Specify display type..."
+                        className="bg-muted/20 h-10 text-xs border-border/50 mt-2"
+                      />
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Boot Space</Label>
-                    <Select
-                      value={formData.bootSpace}
-                      onValueChange={(val) => setFormData(prev => ({...prev, bootSpace: val}))}
-                    >
-                      <SelectTrigger className="bg-muted/20 h-10 text-xs border-border/50">
-                        <SelectValue placeholder="Select Boot Space" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {BOOT_SPACES.map((space) => (
-                          <SelectItem key={space} value={space}>{space}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="Boot"
+                        value={extractNumber(formData.bootSpace)}
+                        onChange={(e) => setFormData(prev => ({...prev, bootSpace: e.target.value.trim() !== '' ? `${e.target.value.trim()} L` : ''}))}
+                        className="bg-muted/20 h-10 text-xs border-border/50 flex-1"
+                      />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/25 px-3 rounded-md border border-border/50 h-10 flex items-center justify-center min-w-[70px] whitespace-nowrap">
+                        L
+                      </span>
+                    </div>
                   </div>
                   <div className="col-span-1 md:col-span-2 space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Available Colors (Comma separated)</Label>
@@ -2840,26 +3395,14 @@ export default function AdminInventoryPage() {
                       placeholder="Red, Blue, Grey" className="bg-muted/20 h-10 text-xs border-border/50" 
                     />
                   </div>
-                  <div className="col-span-1 md:col-span-2 space-y-3">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block mb-2">Key Features</Label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {['Anti-theft Alarm', 'USB Charging Port', 'Keyless Entry', 'Find My Scooter', 'Projector Headlight', 'DRL'].map((feat) => (
-                        <div key={feat} className="flex items-center space-x-2 bg-muted/10 p-2 rounded-lg border border-border/50">
-                          <Checkbox 
-                            id={`edit-feat-${feat}`} 
-                            checked={formData.keyFeatures.includes(feat)}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setFormData(prev => ({...prev, keyFeatures: [...prev.keyFeatures, feat]}));
-                              } else {
-                                setFormData(prev => ({...prev, keyFeatures: prev.keyFeatures.filter(f => f !== feat)}));
-                              }
-                            }}
-                          />
-                          <Label htmlFor={`edit-feat-${feat}`} className="text-[10px] font-bold uppercase cursor-pointer">{feat}</Label>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="col-span-1 md:col-span-2 space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Key Features (Comma separated)</Label>
+                    <Input 
+                      value={keyFeaturesInput}
+                      onChange={(e) => setKeyFeaturesInput(e.target.value)}
+                      onBlur={() => setFormData(prev => ({...prev, keyFeatures: keyFeaturesInput.split(',').map(f => f.trim()).filter(Boolean)}))}
+                      placeholder="Anti-theft Alarm, USB Charging Port, DRL" className="bg-muted/20 h-10 text-xs border-border/50" 
+                    />
                   </div>
                 </div>
               </div>

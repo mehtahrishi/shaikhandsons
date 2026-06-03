@@ -87,6 +87,7 @@ export async function createVehicle(data: {
   colors?: string[];
   keyFeatures?: string[];
   bootSpace?: string;
+  parentId?: number | null;
 }) {
   const res = await fetch('/api/admin/inventory', {
     method: 'POST',
@@ -189,6 +190,7 @@ export async function updateVehicleAPI(
     colors?: string[];
     keyFeatures?: string[];
     bootSpace?: string;
+    parentId?: number | null;
   }
 ) {
   const res = await fetch('/api/admin/inventory', {

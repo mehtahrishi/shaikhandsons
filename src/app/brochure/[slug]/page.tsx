@@ -22,6 +22,39 @@ const getFeatureIcon = (featureName: string) => {
   return <ChevronRight size={16} />;
 };
 
+const COLOR_MAP: Record<string, string> = {
+  'red': '#dc2626',
+  'blue': '#2563eb',
+  'black': '#0a0a0a',
+  'white': '#ffffff',
+  'grey': '#737373',
+  'gray': '#737373',
+  'silver': '#cbd5e1',
+  'yellow': '#eab308',
+  'green': '#16a34a',
+  'orange': '#ea580c',
+  'purple': '#a855f7',
+  'pink': '#ec4899',
+  'brown': '#78350f',
+  'midnight black': '#0a0a0a',
+  'ocean blue': '#1e40af',
+  'pearl white': '#f8fafc',
+  'electric green': '#4ade80',
+  'crimson': '#991b1b',
+  'royal blue': '#1e3a8a',
+  'matte black': '#1a1a1a',
+  'glossy black': '#000000',
+  'candy red': '#dc2626',
+  'titanium grey': '#52525b',
+  'metallic silver': '#94a3b8',
+};
+
+const getColorHex = (colorName: string) => {
+  const name = colorName.toLowerCase().trim();
+  if (name.startsWith('#')) return name;
+  return COLOR_MAP[name] || name;
+};
+
 export default async function BrochurePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   if (!slug) notFound();
@@ -45,9 +78,33 @@ export default async function BrochurePage({ params }: { params: Promise<{ slug:
   const formattedPrice = new Intl.NumberFormat("en-IN", {
     style: "currency", currency: "INR", minimumFractionDigits: 0, maximumFractionDigits: 0,
   }).format(priceNumber);
+  const cvs = vehicle.colorVariants || [];
+  const pcs = vehicle.colors || [];
+  const seenColors = new Set<string>();
+  const allColors: string[] = [];
 
+  pcs.forEach((cName: string) => {
+    const trimmed = cName.trim();
+    const lowerName = trimmed.toLowerCase();
+    if (trimmed && !seenColors.has(lowerName)) {
+      seenColors.add(lowerName);
+      allColors.push(trimmed);
+    }
+  });
+
+  cvs.forEach((cv: any) => {
+    const cNames = cv.colors || [];
+    cNames.forEach((cName: string) => {
+      const trimmed = cName.trim();
+      const lowerName = trimmed.toLowerCase();
+      if (trimmed && !seenColors.has(lowerName)) {
+        seenColors.add(lowerName);
+        allColors.push(trimmed);
+      }
+    });
+  });
   // Generate QR server-side
-  const vehicleUrl = `https://shaikhandsons.com/vehicles/${vehicle.slug}`;
+  const vehicleUrl = `https://shaikhandsons.in/vehicles/${vehicle.slug}`;
   let qrDataUrl = "";
   try {
     qrDataUrl = await QRCode.toDataURL(vehicleUrl, {
@@ -55,7 +112,7 @@ export default async function BrochurePage({ params }: { params: Promise<{ slug:
       color: { dark: "#0a0a0a", light: "#ffffff" },
       errorCorrectionLevel: "M",
     });
-  } catch {}
+  } catch { }
 
   const collect = (arr: any[]) => arr.filter(Boolean) as { label: string; value: string; icon: React.ReactNode }[];
 
@@ -138,28 +195,99 @@ export default async function BrochurePage({ params }: { params: Promise<{ slug:
             <span className="ml-auto px-3 py-1 bg-neutral-900 text-white text-[8px] font-black uppercase tracking-widest rounded-full">{vehicle.category}</span>
           )}
         </div>
-        {(vehicle.shortDescription || vehicle.designPhilosophy) && (
+        {vehicle.shortDescription && (
           <p className="text-sm text-neutral-600 leading-relaxed font-light">
-            {vehicle.designPhilosophy || vehicle.shortDescription}
+            {vehicle.shortDescription}
           </p>
+        )}
+        {vehicle.designPhilosophy && (
+          <p className="text-sm text-neutral-500 italic leading-relaxed font-light">
+            "{vehicle.designPhilosophy}"
+          </p>
+        )}
+        
+        {/* AVAILABLE COLOR VARIANTS */}
+        {allColors.length > 0 && (
+          <div className="flex items-center gap-3 pt-2">
+            <span className="text-[9px] font-black uppercase tracking-widest text-neutral-500">Available Colors:</span>
+            <div className="flex flex-wrap gap-2">
+              {allColors.map((color, i) => (
+                <div key={i} className="flex items-center gap-1.5 px-2.5 py-1 border border-neutral-200 rounded-full bg-neutral-50">
+                  <span className="w-2.5 h-2.5 rounded-full border border-neutral-300" style={{ backgroundColor: getColorHex(color) }} />
+                  <span className="text-[10px] font-bold text-neutral-700">{color}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </section>
 
-      {/* ALL SPECS in one unified grid */}
-      {allSpecs.length > 0 && (
+      {/* TECHNICAL CAPABILITIES */}
+      {techSpecs.length > 0 && (
         <section className="px-10 py-6 border-t border-neutral-200">
           <div className="flex items-center gap-3 mb-5">
             <div className="h-1 w-8 bg-red-600 rounded-full" />
-            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-neutral-900">Specifications</h3>
+            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-neutral-900">Technical Capabilities</h3>
           </div>
           <div className="grid grid-cols-3 gap-3">
-            {allSpecs.map((it, i) => (
-              <div key={i} className="p-3 border border-neutral-200 rounded-lg bg-white flex items-center gap-3">
-                <div className="w-8 h-8 rounded-md bg-neutral-900 text-white flex items-center justify-center shrink-0">{it.icon}</div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[8px] font-black uppercase tracking-widest text-neutral-500 truncate">{it.label}</p>
-                  <p className="text-sm font-black text-neutral-900 leading-tight truncate">{it.value}</p>
-                </div>
+            {techSpecs.map((it, i) => (
+              <div key={i} className="p-3 border border-neutral-200 rounded-lg bg-white min-w-0">
+                <p className="text-[8px] font-black uppercase tracking-widest text-neutral-500 truncate">{it.label}</p>
+                <p className="text-sm font-black text-neutral-900 leading-tight truncate">{it.value}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* BATTERY & CHARGING */}
+      {batteryCharging.length > 0 && (
+        <section className="px-10 py-6 border-t border-neutral-200">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="h-1 w-8 bg-red-600 rounded-full" />
+            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-neutral-900">Battery & Charging</h3>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {batteryCharging.map((it, i) => (
+              <div key={i} className="p-3 border border-neutral-200 rounded-lg bg-white min-w-0">
+                <p className="text-[8px] font-black uppercase tracking-widest text-neutral-500 truncate">{it.label}</p>
+                <p className="text-sm font-black text-neutral-900 leading-tight truncate">{it.value}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* HARDWARE & CONTROL */}
+      {hardware.length > 0 && (
+        <section className="px-10 py-6 border-t border-neutral-200">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="h-1 w-8 bg-red-600 rounded-full" />
+            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-neutral-900">Hardware & Control</h3>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {hardware.map((it, i) => (
+              <div key={i} className="p-3 border border-neutral-200 rounded-lg bg-white min-w-0">
+                <p className="text-[8px] font-black uppercase tracking-widest text-neutral-500 truncate">{it.label}</p>
+                <p className="text-sm font-black text-neutral-900 leading-tight truncate">{it.value}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* SMART TECH */}
+      {smartFeatures.length > 0 && (
+        <section className="px-10 py-6 border-t border-neutral-200">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="h-1 w-8 bg-red-600 rounded-full" />
+            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-neutral-900">Smart Tech</h3>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {smartFeatures.map((it, i) => (
+              <div key={i} className="p-3 border border-neutral-200 rounded-lg bg-white min-w-0">
+                <p className="text-[8px] font-black uppercase tracking-widest text-neutral-500 truncate">{it.label}</p>
+                <p className="text-sm font-black text-neutral-900 leading-tight truncate">{it.value}</p>
               </div>
             ))}
           </div>
@@ -176,7 +304,6 @@ export default async function BrochurePage({ params }: { params: Promise<{ slug:
           <div className="grid grid-cols-2 gap-3">
             {vehicle.keyFeatures.map((feature: string, idx: number) => (
               <div key={idx} className="flex items-start gap-3 p-3 border border-neutral-200 rounded-lg bg-white">
-                <div className="w-8 h-8 rounded-md bg-neutral-900 text-white flex items-center justify-center shrink-0">{getFeatureIcon(feature)}</div>
                 <div className="min-w-0">
                   <h4 className="font-black text-xs text-neutral-900">{feature}</h4>
                   <p className="text-[10px] text-neutral-600 mt-0.5 leading-snug">Intelligent luxury technology integrated perfectly.</p>
@@ -187,19 +314,37 @@ export default async function BrochurePage({ params }: { params: Promise<{ slug:
         </section>
       )}
 
-      {/* FOOTER: website | instagram | QR */}
-      <footer className="mt-4 px-10 py-5 bg-neutral-900 text-white flex items-center justify-between border-t-2 border-neutral-900">
-        <div className="flex items-center gap-8 text-[10px] uppercase tracking-widest font-bold">
-          <div className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            <span>shaikhandsons.com</span>
+      {/* EV BATTERY SOLUTIONS & CUSTOMIZATION */}
+      <section className="px-10 py-6">
+        <div className="p-5 border border-neutral-200 rounded-lg bg-neutral-50">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="h-1 w-8 bg-red-600 rounded-full" />
+            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-neutral-900">EV Battery & Customization Solutions</h3>
           </div>
-          <div className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-            <span>@shaikhandsons</span>
-          </div>
+          <p className="text-xs text-neutral-600 leading-relaxed font-medium">
+            We specialize in providing high-performance EV battery packs in vast variants to power all types of electric vehicles. Whether you require custom battery configurations, replacement modules, or capacity upgrades, we deliver industry-grade reliability and advanced thermal management solutions.
+          </p>
         </div>
-        <div className="flex items-center gap-3">
+      </section>
+
+      {/* FOOTER: website | instagram | contact | QR */}
+      <footer className="mt-4 px-10 py-5 bg-neutral-900 text-white flex items-center justify-between border-t-2 border-neutral-900">
+        <div className="flex flex-col gap-1.5 min-w-0">
+          <div className="flex items-center gap-8 text-[10px] uppercase tracking-widest font-bold">
+            <div className="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+              <span>shaikhandsons.in</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg>
+              <span>@shaikhandsons_ev_bikes</span>
+            </div>
+          </div>
+          <p className="text-[10px] text-neutral-400 font-medium">
+            For more details call or whatsapp on <span className="text-white font-semibold">+91 93211 11322</span> and email <span className="text-white font-semibold">shaikhandsons22@gmail.com</span>
+          </p>
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
           {qrDataUrl && <img src={qrDataUrl} alt="Scan to view online" className="w-16 h-16 bg-white p-1 rounded" />}
           <p className="text-[8px] font-black uppercase tracking-widest text-neutral-400 max-w-[80px] leading-tight">Scan to view online</p>
         </div>

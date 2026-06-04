@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getVehicleBySlug, getVehicleById } from "@/lib/db/inventory";
 import QRCode from "qrcode";
 import { Document, Page, View, Text, Image, StyleSheet, renderToBuffer } from "@react-pdf/renderer";
+import fs from "fs";
+import pathModule from "path";
+import sharp from "sharp";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -81,7 +84,7 @@ const styles = StyleSheet.create({
   },
   priceRow: {
     flexDirection: "row",
-    alignItems: "baseline",
+    alignItems: "flex-end",
     gap: 10,
     marginBottom: 4,
   },
@@ -91,6 +94,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
     fontFamily: "Helvetica-Bold",
     textTransform: "uppercase",
+    marginBottom: 3,
   },
   price: {
     fontFamily: "Helvetica-Bold",
@@ -113,17 +117,33 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: "#525252",
     lineHeight: 1.5,
-    marginBottom: 14,
+    marginBottom: 10,
     marginTop: 6,
+  },
+  designPhilosophy: {
+    fontSize: 9.5,
+    fontFamily: "Helvetica-Oblique",
+    color: "#404040",
+    lineHeight: 1.5,
+    marginBottom: 14,
+    marginTop: 2,
   },
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     marginBottom: 8,
+    marginTop: 12,
     borderTopWidth: 1,
     borderTopColor: "#e5e5e5",
     paddingTop: 12,
+  },
+  sectionHeaderNoBorder: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 8,
+    marginTop: 6,
   },
   accent: {
     width: 20,
@@ -141,6 +161,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 6,
+    marginBottom: 12,
   },
   specCard: {
     width: "31.5%",
@@ -217,6 +238,31 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica-Bold",
     letterSpacing: 1.5,
   },
+  footerInfoCol: {
+    flexDirection: "column",
+    gap: 4,
+    flex: 1,
+  },
+  footerContactText: {
+    fontSize: 7.5,
+    fontFamily: "Helvetica",
+    color: "#a3a3a3",
+    marginTop: 2,
+  },
+  batteryServicesBlock: {
+    marginTop: 14,
+    padding: 10,
+    backgroundColor: "#fafafa",
+    borderWidth: 1,
+    borderColor: "#e5e5e5",
+    borderRadius: 6,
+  },
+  batteryServicesText: {
+    fontSize: 8.5,
+    color: "#525252",
+    lineHeight: 1.45,
+    marginTop: 6,
+  },
   footerQr: {
     flexDirection: "row",
     alignItems: "center",
@@ -232,11 +278,85 @@ const styles = StyleSheet.create({
     textAlign: "right",
     lineHeight: 1.2,
   },
+  colorsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    marginBottom: 8,
+    gap: 8,
+  },
+  colorsLabel: {
+    fontSize: 7.5,
+    fontFamily: "Helvetica-Bold",
+    textTransform: "uppercase",
+    color: "#737373",
+    letterSpacing: 0.8,
+  },
+  colorsList: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    alignItems: "center",
+  },
+  colorPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    borderWidth: 1,
+    borderColor: "#e5e5e5",
+    borderRadius: 99,
+    paddingVertical: 2.5,
+    paddingHorizontal: 6,
+    backgroundColor: "#ffffff",
+  },
+  colorDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    borderWidth: 0.5,
+    borderColor: "#d4d4d4",
+  },
+  colorPillText: {
+    fontSize: 7,
+    fontFamily: "Helvetica-Bold",
+    color: "#404040",
+  },
 });
 
 const shortLabel = (s: string) => {
   const firstWord = (s.split(" ").find((w) => /[A-Za-z]/.test(w)) || s).replace(/[^A-Za-z]/g, "");
   return firstWord.slice(0, 3).toUpperCase().padEnd(3, "X");
+};const COLOR_MAP: Record<string, string> = {
+  'red': '#dc2626',
+  'blue': '#2563eb',
+  'black': '#0a0a0a',
+  'white': '#ffffff',
+  'grey': '#737373',
+  'gray': '#737373',
+  'silver': '#cbd5e1',
+  'yellow': '#eab308',
+  'green': '#16a34a',
+  'orange': '#ea580c',
+  'purple': '#a855f7',
+  'pink': '#ec4899',
+  'brown': '#78350f',
+  'midnight black': '#0a0a0a',
+  'ocean blue': '#1e40af',
+  'pearl white': '#f8fafc',
+  'electric green': '#4ade80',
+  'crimson': '#991b1b',
+  'royal blue': '#1e3a8a',
+  'matte black': '#1a1a1a',
+  'glossy black': '#000000',
+  'candy red': '#dc2626',
+  'titanium grey': '#52525b',
+  'metallic silver': '#94a3b8',
+};
+
+const getColorHex = (colorName: string) => {
+  const name = colorName.toLowerCase().trim();
+  if (name.startsWith('#')) return name;
+  return COLOR_MAP[name] || name;
 };
 
 const fetchImageBuffer = async (url: string): Promise<{ buf: Buffer; mime: string } | null> => {
@@ -251,8 +371,18 @@ const fetchImageBuffer = async (url: string): Promise<{ buf: Buffer; mime: strin
     if (!res.ok) return null;
     const arr = await res.arrayBuffer();
     if (!arr || arr.byteLength === 0) return null;
-    const mime = (res.headers.get("content-type") || "image/jpeg").split(";")[0].trim();
-    return { buf: Buffer.from(arr), mime: mime.startsWith("image/") ? mime : "image/jpeg" };
+    let buf = Buffer.from(arr);
+    let mime = "image/png"; // target compatibility format for react-pdf
+
+    try {
+      buf = Buffer.from(await sharp(buf).png().toBuffer());
+    } catch (err) {
+      console.error("Network image sharp conversion error:", err);
+      const origMime = (res.headers.get("content-type") || "image/jpeg").split(";")[0].trim();
+      return { buf, mime: origMime };
+    }
+
+    return { buf, mime };
   } catch {
     return null;
   }
@@ -279,7 +409,7 @@ const imageCandidates = (rawPath: string, origin: string): string[] => {
         const local = `${origin}${u.pathname}${u.search}`;
         if (!out.includes(local)) out.unshift(local);
       }
-    } catch {}
+    } catch { }
     return out;
   }
   // Relative path — local first, then public duckdns
@@ -291,6 +421,27 @@ const imageCandidates = (rawPath: string, origin: string): string[] => {
 
 const loadImage = async (rawPath: string, origin: string): Promise<string | null> => {
   if (!rawPath) return null;
+  if (rawPath.startsWith("data:")) return rawPath;
+
+  // 1. Try reading directly from local filesystem if it's an uploaded relative path
+  if (rawPath.startsWith("/uploads")) {
+    try {
+      const localFilePath = pathModule.join(process.cwd(), "public", rawPath);
+      if (fs.existsSync(localFilePath)) {
+        let buf = fs.readFileSync(localFilePath);
+        try {
+          buf = Buffer.from(await sharp(buf).png().toBuffer());
+          return toDataUrl(buf, "image/png");
+        } catch (err) {
+          console.error("Local file sharp conversion error:", err);
+        }
+      }
+    } catch (e) {
+      console.error("Local file read error in brochure api:", e);
+    }
+  }
+
+  // 2. Fallback to network fetching
   for (const url of imageCandidates(rawPath, origin)) {
     const result = await fetchImageBuffer(url);
     if (result) return toDataUrl(result.buf, result.mime);
@@ -303,6 +454,27 @@ type DebugTrace = { raw: string; candidates: { url: string; status: string; byte
 const loadImageDebug = async (rawPath: string, origin: string): Promise<DebugTrace> => {
   const trace: DebugTrace = { raw: rawPath, candidates: [] };
   if (!rawPath) return trace;
+
+  if (rawPath.startsWith("/uploads")) {
+    try {
+      const localFilePath = pathModule.join(process.cwd(), "public", rawPath);
+      const exists = fs.existsSync(localFilePath);
+      trace.candidates.push({
+        url: `file://${localFilePath}`,
+        status: exists ? "FOUND ON LOCAL DISK" : "NOT FOUND ON LOCAL DISK",
+        bytes: exists ? fs.statSync(localFilePath).size : 0
+      });
+      if (exists) {
+        return trace;
+      }
+    } catch (e: any) {
+      trace.candidates.push({
+        url: `file://${rawPath}`,
+        status: `ERR: ${e?.message || "unknown"}`
+      });
+    }
+  }
+
   for (const url of imageCandidates(rawPath, origin)) {
     try {
       const res = await fetch(url, {
@@ -373,9 +545,36 @@ export async function GET(
   }).catch(() => "");
 
   const priceNumber = typeof vehicle.price === "string" ? parseFloat(vehicle.price) : (vehicle.price ?? 0);
-  const formattedPrice = new Intl.NumberFormat("en-IN", {
+  const rawFormatted = new Intl.NumberFormat("en-IN", {
     style: "currency", currency: "INR", minimumFractionDigits: 0, maximumFractionDigits: 0,
   }).format(priceNumber);
+  const formattedPrice = rawFormatted.replace("₹", "Rs. ").replace("\u20B9", "Rs. ").replace("INR", "Rs. ").trim();
+
+  const cvs = vehicle.colorVariants || [];
+  const pcs = vehicle.colors || [];
+  const seenColors = new Set<string>();
+  const allColors: string[] = [];
+
+  pcs.forEach((cName: string) => {
+    const trimmed = cName.trim();
+    const lowerName = trimmed.toLowerCase();
+    if (trimmed && !seenColors.has(lowerName)) {
+      seenColors.add(lowerName);
+      allColors.push(trimmed);
+    }
+  });
+
+  cvs.forEach((cv: any) => {
+    const cNames = cv.colors || [];
+    cNames.forEach((cName: string) => {
+      const trimmed = cName.trim();
+      const lowerName = trimmed.toLowerCase();
+      if (trimmed && !seenColors.has(lowerName)) {
+        seenColors.add(lowerName);
+        allColors.push(trimmed);
+      }
+    });
+  });
 
   const collect = (arr: any[]): Spec[] => arr.filter(Boolean) as Spec[];
   const techSpecs = collect([
@@ -408,7 +607,8 @@ export async function GET(
   ]);
   const allSpecs = [...techSpecs, ...battery, ...hardware, ...smart];
   const keyFeatures: string[] = vehicle.keyFeatures || [];
-  const overview = vehicle.designPhilosophy || vehicle.shortDescription || "";
+  const shortDescription = vehicle.shortDescription || "";
+  const designPhilosophy = vehicle.designPhilosophy || "";
 
   const BrochureDoc = (
     <Document>
@@ -447,20 +647,95 @@ export async function GET(
           {vehicle.category && <Text style={styles.categoryPill}>{vehicle.category}</Text>}
         </View>
 
-        {/* OVERVIEW */}
-        {overview ? <Text style={styles.overview}>{overview}</Text> : null}
+        {/* DESCRIPTION & PHILOSOPHY */}
+        {shortDescription ? <Text style={styles.overview}>{shortDescription}</Text> : null}
+        {designPhilosophy ? <Text style={styles.designPhilosophy}>{designPhilosophy}</Text> : null}
 
-        {/* SPECIFICATIONS */}
-        {allSpecs.length > 0 && (
+        {/* AVAILABLE COLOR VARIANTS */}
+        {allColors.length > 0 && (
+          <View style={styles.colorsContainer}>
+            <Text style={styles.colorsLabel}>Available Colors:</Text>
+            <View style={styles.colorsList}>
+              {allColors.map((color, i) => (
+                <View key={i} style={styles.colorPill}>
+                  <View style={[styles.colorDot, { backgroundColor: getColorHex(color) }]} />
+                  <Text style={styles.colorPillText}>{color}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* TECHNICAL CAPABILITIES */}
+        {techSpecs.length > 0 && (
           <>
             <View style={styles.sectionHeader}>
               <View style={styles.accent} />
-              <Text style={styles.sectionTitle}>Specifications</Text>
+              <Text style={styles.sectionTitle}>Technical Capabilities</Text>
             </View>
             <View style={styles.specGrid}>
-              {allSpecs.map((s, i) => (
+              {techSpecs.map((s, i) => (
                 <View key={i} style={styles.specCard}>
-                  <Text style={styles.specIcon}>{shortLabel(s.label)}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.specLabel}>{s.label}</Text>
+                    <Text style={styles.specValue}>{s.value}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+
+        {/* BATTERY & CHARGING */}
+        {battery.length > 0 && (
+          <>
+            <View style={styles.sectionHeader}>
+              <View style={styles.accent} />
+              <Text style={styles.sectionTitle}>Battery & Charging</Text>
+            </View>
+            <View style={styles.specGrid}>
+              {battery.map((s, i) => (
+                <View key={i} style={styles.specCard}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.specLabel}>{s.label}</Text>
+                    <Text style={styles.specValue}>{s.value}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+
+        {/* HARDWARE & CONTROL */}
+        {hardware.length > 0 && (
+          <View break>
+            <View style={styles.sectionHeader}>
+              <View style={styles.accent} />
+              <Text style={styles.sectionTitle}>Hardware & Control</Text>
+            </View>
+            <View style={styles.specGrid}>
+              {hardware.map((s, i) => (
+                <View key={i} style={styles.specCard}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.specLabel}>{s.label}</Text>
+                    <Text style={styles.specValue}>{s.value}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* SMART TECH */}
+        {smart.length > 0 && (
+          <>
+            <View style={styles.sectionHeader}>
+              <View style={styles.accent} />
+              <Text style={styles.sectionTitle}>Smart Tech</Text>
+            </View>
+            <View style={styles.specGrid}>
+              {smart.map((s, i) => (
+                <View key={i} style={styles.specCard}>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.specLabel}>{s.label}</Text>
                     <Text style={styles.specValue}>{s.value}</Text>
@@ -481,7 +756,6 @@ export async function GET(
             <View style={styles.specGrid}>
               {keyFeatures.map((f, i) => (
                 <View key={i} style={styles.featureCard}>
-                  <Text style={styles.specIcon}>{f.slice(0, 2).toUpperCase()}</Text>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.featureTitle}>{f}</Text>
                     <Text style={styles.featureDesc}>Intelligent luxury technology integrated perfectly.</Text>
@@ -492,11 +766,27 @@ export async function GET(
           </>
         )}
 
+        {/* EV BATTERY SOLUTIONS & CUSTOMIZATION */}
+        <View style={styles.batteryServicesBlock}>
+          <View style={styles.sectionHeaderNoBorder}>
+            <View style={styles.accent} />
+            <Text style={styles.sectionTitle}>EV Battery & Customization Solutions</Text>
+          </View>
+          <Text style={styles.batteryServicesText}>
+            We specialize in providing high-performance EV battery packs in vast variants to power all types of electric vehicles. Whether you require custom battery configurations, replacement modules, or capacity upgrades, we deliver industry-grade reliability and advanced thermal management solutions.
+          </Text>
+        </View>
+
         {/* FOOTER */}
         <View style={styles.footer} fixed>
-          <View style={styles.footerLinks}>
-            <Text>shaikhandsons.com</Text>
-            <Text>@shaikhandsons</Text>
+          <View style={styles.footerInfoCol}>
+            <View style={styles.footerLinks}>
+              <Text>shaikhandsons.in</Text>
+              <Text>@shaikhandsons_ev_bikes</Text>
+            </View>
+            <Text style={styles.footerContactText}>
+              For more details call or whatsapp on +91 93211 11322 and email shaikhandsons22@gmail.com
+            </Text>
           </View>
           <View style={styles.footerQr}>
             <Text style={styles.footerQrLabel}>Scan to view online</Text>

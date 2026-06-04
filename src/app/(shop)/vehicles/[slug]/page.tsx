@@ -166,6 +166,7 @@ export default function VehicleDetailPage() {
   const [selectedColor, setSelectedColor] = React.useState<string>('');
   const [activeTab, setActiveTab] = React.useState<'specs' | 'features'>('specs');
   const [isLiked, setIsLiked] = React.useState(false);
+  const [isDownloadingBrochure, setIsDownloadingBrochure] = React.useState(false);
   // Variants
   const [variants, setVariants] = React.useState<any[]>([]);
   const [selectedVariantId, setSelectedVariantId] = React.useState<number | null>(null);
@@ -1323,12 +1324,14 @@ export default function VehicleDetailPage() {
               </AnimatePresence>
             </motion.div>
 
-            {/* Download Brochure */}
+            {/* Floating Download Brochure Button */}
             <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5 }}
+              disabled={isDownloadingBrochure}
               onClick={async () => {
+                setIsDownloadingBrochure(true);
                 try {
                   const res = await fetch(`/api/brochure/${slug}`);
                   if (!res.ok) throw new Error("PDF generation failed");
@@ -1343,12 +1346,18 @@ export default function VehicleDetailPage() {
                   URL.revokeObjectURL(url);
                 } catch {
                   window.open(`/brochure/${slug}`, "_blank");
+                } finally {
+                  setIsDownloadingBrochure(false);
                 }
               }}
-              className="w-full mt-4 py-4 rounded-2xl border border-border/50 bg-card/30 backdrop-blur-md hover:bg-card/60 hover:border-primary/30 transition-all group flex items-center justify-center gap-3"
+              className="fixed bottom-[calc(76px+env(safe-area-inset-bottom,0px))] md:bottom-8 left-4 md:left-8 z-40 flex items-center gap-2.5 px-4 py-3 rounded-full border border-border/50 bg-background/80 hover:bg-background/95 backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-300 group disabled:opacity-75 disabled:cursor-not-allowed"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary group-hover:translate-y-0.5 transition-transform"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
-              <span className="text-xs font-black uppercase tracking-[0.25em] text-foreground">Download Brochure</span>
+              {isDownloadingBrochure ? (
+                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary group-hover:translate-y-0.5 transition-transform"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+              )}
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground">Brochure</span>
             </motion.button>
           </div>
         </div>

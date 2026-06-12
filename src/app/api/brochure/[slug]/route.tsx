@@ -14,11 +14,11 @@ type AnyVehicle = Record<string, any>;
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 28,
-    paddingLeft: 28,
-    paddingRight: 28,
+    paddingTop: 32,
+    paddingLeft: 36,
+    paddingRight: 36,
     paddingBottom: 80,
-    fontSize: 10,
+    fontSize: 9.5,
     fontFamily: "Helvetica",
     color: "#171717",
     backgroundColor: "#ffffff",
@@ -27,9 +27,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderBottomWidth: 2,
+    borderBottomWidth: 1,
     borderBottomColor: "#171717",
-    paddingBottom: 10,
+    paddingBottom: 12,
     marginBottom: 16,
   },
   brandRow: { flexDirection: "row", alignItems: "center", gap: 8 },
@@ -40,14 +40,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#171717",
     color: "#ffffff",
     fontFamily: "Helvetica-Bold",
-    fontSize: 18,
+    fontSize: 16,
     textAlign: "center",
-    paddingTop: 7,
+    paddingTop: 8,
   },
   brandName: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 15,
-    letterSpacing: 0.2,
+    fontSize: 16,
+    letterSpacing: 0.5,
   },
   brandTag: {
     fontSize: 7,
@@ -71,16 +71,28 @@ const styles = StyleSheet.create({
   },
   photos: {
     flexDirection: "row",
-    gap: 8,
-    marginBottom: 16,
+    gap: 10,
+    marginBottom: 14,
   },
-  photo: {
+  photoContainer: {
     flex: 1,
+    flexDirection: "column",
+    gap: 4,
+  },
+  photoImage: {
     aspectRatio: "1.35",
     backgroundColor: "#fafafa",
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: "#e5e5e5",
     borderRadius: 4,
+    width: "100%",
+  },
+  photoFigureLabel: {
+    fontSize: 5.5,
+    fontFamily: "Helvetica",
+    color: "#a3a3a3",
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
   },
   priceRow: {
     flexDirection: "row",
@@ -89,16 +101,16 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   priceLabel: {
-    fontSize: 8,
+    fontSize: 7.5,
     color: "#737373",
     letterSpacing: 1.5,
     fontFamily: "Helvetica-Bold",
     textTransform: "uppercase",
-    marginBottom: 3,
+    marginBottom: 2,
   },
   price: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 22,
+    fontSize: 24,
     letterSpacing: -0.5,
   },
   categoryPill: {
@@ -114,18 +126,51 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   overview: {
-    fontSize: 10,
+    fontSize: 9.5,
     color: "#525252",
     lineHeight: 1.5,
-    marginBottom: 10,
+    marginBottom: 6,
     marginTop: 6,
   },
   designPhilosophy: {
-    fontSize: 9.5,
+    fontSize: 9,
     fontFamily: "Helvetica-Oblique",
-    color: "#404040",
-    lineHeight: 1.5,
-    marginBottom: 14,
+    color: "#525252",
+    lineHeight: 1.45,
+    borderLeftWidth: 1.5,
+    borderLeftColor: "#171717",
+    paddingLeft: 8,
+    marginBottom: 12,
+    marginTop: 4,
+  },
+  heroHighlightBanner: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    borderTopWidth: 0.5,
+    borderTopColor: "#e5e5e5",
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#e5e5e5",
+    paddingVertical: 8,
+    marginVertical: 10,
+    backgroundColor: "#fafafa",
+    borderRadius: 4,
+  },
+  heroHighlightItem: {
+    alignItems: "center",
+    flex: 1,
+  },
+  heroHighlightLabel: {
+    fontSize: 6.5,
+    fontFamily: "Helvetica",
+    color: "#737373",
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+  },
+  heroHighlightValue: {
+    fontSize: 14,
+    fontFamily: "Helvetica-Bold",
+    color: "#171717",
     marginTop: 2,
   },
   sectionHeader: {
@@ -133,90 +178,94 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
     marginBottom: 8,
-    marginTop: 12,
-    borderTopWidth: 1,
+    marginTop: 10,
+    borderTopWidth: 0.5,
     borderTopColor: "#e5e5e5",
-    paddingTop: 12,
+    paddingTop: 10,
   },
   sectionHeaderNoBorder: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    marginBottom: 8,
-    marginTop: 6,
+    marginBottom: 6,
+    marginTop: 4,
   },
   accent: {
-    width: 20,
-    height: 3,
+    width: 15,
+    height: 2,
     backgroundColor: "#dc2626",
-    borderRadius: 2,
+    borderRadius: 1,
   },
   sectionTitle: {
-    fontSize: 10,
+    fontSize: 9,
     fontFamily: "Helvetica-Bold",
-    letterSpacing: 2.5,
+    letterSpacing: 2,
     textTransform: "uppercase",
   },
-  specGrid: {
+  specGridTwoCol: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 16,
+    marginBottom: 8,
+  },
+  specCol: {
+    flex: 1,
+    flexDirection: "column",
+    gap: 5,
+  },
+  specRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#f5f5f5",
+    paddingBottom: 3,
+  },
+  specRowLabel: {
+    fontSize: 7,
+    fontFamily: "Helvetica",
+    color: "#737373",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  specRowValue: {
+    fontSize: 8,
+    fontFamily: "Helvetica-Bold",
+    color: "#171717",
+  },
+  featuresGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 6,
-    marginBottom: 12,
+    gap: 8,
+    marginBottom: 10,
   },
-  specCard: {
-    width: "31.5%",
-    borderWidth: 1,
+  featureItem: {
+    width: "48.5%",
+    borderWidth: 0.5,
     borderColor: "#e5e5e5",
     borderRadius: 4,
     padding: 6,
     flexDirection: "row",
-    alignItems: "center",
     gap: 6,
+    alignItems: "flex-start",
     backgroundColor: "#ffffff",
   },
-  specIcon: {
-    width: 22,
-    height: 22,
-    borderRadius: 3,
-    backgroundColor: "#171717",
-    color: "#ffffff",
-    fontFamily: "Helvetica-Bold",
-    fontSize: 10,
-    textAlign: "center",
-    paddingTop: 6,
-  },
-  specLabel: {
-    fontSize: 6.5,
-    color: "#737373",
-    fontFamily: "Helvetica-Bold",
-    letterSpacing: 1,
-    textTransform: "uppercase",
-  },
-  specValue: {
-    fontSize: 9.5,
-    fontFamily: "Helvetica-Bold",
-    color: "#171717",
-    marginTop: 1,
-  },
-  featureCard: {
-    width: "48.5%",
-    borderWidth: 1,
-    borderColor: "#e5e5e5",
-    borderRadius: 4,
-    padding: 7,
-    flexDirection: "row",
-    gap: 8,
-    alignItems: "flex-start",
+  featureDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: "#dc2626",
+    marginTop: 4,
   },
   featureTitle: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 9.5,
+    fontSize: 8.5,
     color: "#171717",
   },
   featureDesc: {
-    fontSize: 8,
-    color: "#525252",
-    marginTop: 2,
+    fontSize: 7.5,
+    color: "#737373",
+    marginTop: 1.5,
     lineHeight: 1.35,
   },
   footer: {
@@ -226,17 +275,17 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: "#171717",
     color: "#ffffff",
-    padding: 14,
+    padding: 12,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   footerLinks: {
     flexDirection: "row",
-    gap: 18,
-    fontSize: 8,
+    gap: 16,
+    fontSize: 7.5,
     fontFamily: "Helvetica-Bold",
-    letterSpacing: 1.5,
+    letterSpacing: 1.2,
   },
   footerInfoCol: {
     flexDirection: "column",
@@ -244,24 +293,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   footerContactText: {
-    fontSize: 7.5,
+    fontSize: 7,
     fontFamily: "Helvetica",
     color: "#a3a3a3",
     marginTop: 2,
   },
   batteryServicesBlock: {
-    marginTop: 14,
+    marginTop: 12,
     padding: 10,
-    backgroundColor: "#fafafa",
-    borderWidth: 1,
-    borderColor: "#e5e5e5",
+    backgroundColor: "#171717",
     borderRadius: 6,
   },
-  batteryServicesText: {
+  batteryServicesTitle: {
     fontSize: 8.5,
-    color: "#525252",
+    fontFamily: "Helvetica-Bold",
+    color: "#ffffff",
+    textTransform: "uppercase",
+    letterSpacing: 1.2,
+  },
+  batteryServicesText: {
+    fontSize: 7.5,
+    color: "#d4d4d4",
     lineHeight: 1.45,
-    marginTop: 6,
+    marginTop: 4,
   },
   footerQr: {
     flexDirection: "row",
@@ -269,7 +323,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   footerQrLabel: {
-    fontSize: 6.5,
+    fontSize: 6,
     color: "#a3a3a3",
     fontFamily: "Helvetica-Bold",
     letterSpacing: 1.2,
@@ -281,12 +335,12 @@ const styles = StyleSheet.create({
   colorsContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
-    marginBottom: 8,
+    marginTop: 6,
+    marginBottom: 6,
     gap: 8,
   },
   colorsLabel: {
-    fontSize: 7.5,
+    fontSize: 7,
     fontFamily: "Helvetica-Bold",
     textTransform: "uppercase",
     color: "#737373",
@@ -302,22 +356,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: "#e5e5e5",
     borderRadius: 99,
-    paddingVertical: 2.5,
-    paddingHorizontal: 6,
+    paddingVertical: 2,
+    paddingHorizontal: 5,
     backgroundColor: "#ffffff",
   },
   colorDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
     borderWidth: 0.5,
     borderColor: "#d4d4d4",
   },
   colorPillText: {
-    fontSize: 7,
+    fontSize: 6.5,
     fontFamily: "Helvetica-Bold",
     color: "#404040",
   },
@@ -610,6 +664,47 @@ export async function GET(
   const shortDescription = vehicle.shortDescription || "";
   const designPhilosophy = vehicle.designPhilosophy || "";
 
+  // Extract highlights for the premium spec banner
+  const findSpecValue = (specsList: Spec[], labels: string[]) => {
+    const found = specsList.find(s => labels.some(l => s.label.toLowerCase().includes(l.toLowerCase())));
+    return found ? found.value : null;
+  };
+  const topSpeedVal = findSpecValue(techSpecs, ["speed", "top speed"]) || vehicle.topSpeed || null;
+  const rangeVal = findSpecValue(techSpecs, ["range", "certified", "real-world"]) || vehicle.certifiedRange || vehicle.realWorldRange || null;
+  const motorVal = findSpecValue(hardware, ["power", "motor"]) || vehicle.motorPower || null;
+
+  const renderSpecSection = (title: string, list: Spec[]) => {
+    if (list.length === 0) return null;
+    const leftCol = list.filter((_, idx) => idx % 2 === 0);
+    const rightCol = list.filter((_, idx) => idx % 2 !== 0);
+    return (
+      <View style={{ marginBottom: 10 }}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.accent} />
+          <Text style={styles.sectionTitle}>{title}</Text>
+        </View>
+        <View style={styles.specGridTwoCol}>
+          <View style={styles.specCol}>
+            {leftCol.map((s, i) => (
+              <View key={i} style={styles.specRow}>
+                <Text style={styles.specRowLabel}>{s.label}</Text>
+                <Text style={styles.specRowValue}>{s.value}</Text>
+              </View>
+            ))}
+          </View>
+          <View style={styles.specCol}>
+            {rightCol.map((s, i) => (
+              <View key={i} style={styles.specRow}>
+                <Text style={styles.specRowLabel}>{s.label}</Text>
+                <Text style={styles.specRowValue}>{s.value}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+    );
+  };
+
   const BrochureDoc = (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -632,11 +727,13 @@ export async function GET(
 
         {/* TWO PHOTOS */}
         <View style={styles.photos}>
-          <View style={styles.photo}>
-            {img1Data ? <Image src={img1Data} style={{ width: "100%", height: "100%" }} /> : null}
+          <View style={styles.photoContainer}>
+            {img1Data ? <Image src={img1Data} style={styles.photoImage} /> : null}
+            <Text style={styles.photoFigureLabel}>FIG 01 // FRONT PERSPECTIVE</Text>
           </View>
-          <View style={styles.photo}>
-            {img2Data ? <Image src={img2Data} style={{ width: "100%", height: "100%" }} /> : null}
+          <View style={styles.photoContainer}>
+            {img2Data ? <Image src={img2Data} style={styles.photoImage} /> : null}
+            <Text style={styles.photoFigureLabel}>FIG 02 // SIDE VIEW</Text>
           </View>
         </View>
 
@@ -647,9 +744,33 @@ export async function GET(
           {vehicle.category && <Text style={styles.categoryPill}>{vehicle.category}</Text>}
         </View>
 
+        {/* HERO SPECS HIGHLIGHT BANNER */}
+        {(topSpeedVal || rangeVal || motorVal) && (
+          <View style={styles.heroHighlightBanner}>
+            {topSpeedVal && (
+              <View style={styles.heroHighlightItem}>
+                <Text style={styles.heroHighlightLabel}>Top Speed</Text>
+                <Text style={styles.heroHighlightValue}>{topSpeedVal}</Text>
+              </View>
+            )}
+            {rangeVal && (
+              <View style={styles.heroHighlightItem}>
+                <Text style={styles.heroHighlightLabel}>Range</Text>
+                <Text style={styles.heroHighlightValue}>{rangeVal}</Text>
+              </View>
+            )}
+            {motorVal && (
+              <View style={styles.heroHighlightItem}>
+                <Text style={styles.heroHighlightLabel}>Motor Power</Text>
+                <Text style={styles.heroHighlightValue}>{motorVal}</Text>
+              </View>
+            )}
+          </View>
+        )}
+
         {/* DESCRIPTION & PHILOSOPHY */}
         {shortDescription ? <Text style={styles.overview}>{shortDescription}</Text> : null}
-        {designPhilosophy ? <Text style={styles.designPhilosophy}>{designPhilosophy}</Text> : null}
+        {designPhilosophy ? <Text style={styles.designPhilosophy}>"{designPhilosophy}"</Text> : null}
 
         {/* AVAILABLE COLOR VARIANTS */}
         {allColors.length > 0 && (
@@ -667,111 +788,45 @@ export async function GET(
         )}
 
         {/* TECHNICAL CAPABILITIES */}
-        {techSpecs.length > 0 && (
-          <>
-            <View style={styles.sectionHeader}>
-              <View style={styles.accent} />
-              <Text style={styles.sectionTitle}>Technical Capabilities</Text>
-            </View>
-            <View style={styles.specGrid}>
-              {techSpecs.map((s, i) => (
-                <View key={i} style={styles.specCard}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.specLabel}>{s.label}</Text>
-                    <Text style={styles.specValue}>{s.value}</Text>
-                  </View>
-                </View>
-              ))}
-            </View>
-          </>
-        )}
+        {renderSpecSection("Technical Capabilities", techSpecs)}
 
         {/* BATTERY & CHARGING */}
-        {battery.length > 0 && (
-          <>
-            <View style={styles.sectionHeader}>
-              <View style={styles.accent} />
-              <Text style={styles.sectionTitle}>Battery & Charging</Text>
-            </View>
-            <View style={styles.specGrid}>
-              {battery.map((s, i) => (
-                <View key={i} style={styles.specCard}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.specLabel}>{s.label}</Text>
-                    <Text style={styles.specValue}>{s.value}</Text>
-                  </View>
-                </View>
-              ))}
-            </View>
-          </>
-        )}
+        {renderSpecSection("Battery & Charging", battery)}
 
         {/* HARDWARE & CONTROL */}
         {hardware.length > 0 && (
           <View break>
-            <View style={styles.sectionHeader}>
-              <View style={styles.accent} />
-              <Text style={styles.sectionTitle}>Hardware & Control</Text>
-            </View>
-            <View style={styles.specGrid}>
-              {hardware.map((s, i) => (
-                <View key={i} style={styles.specCard}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.specLabel}>{s.label}</Text>
-                    <Text style={styles.specValue}>{s.value}</Text>
-                  </View>
-                </View>
-              ))}
-            </View>
+            {renderSpecSection("Hardware & Control", hardware)}
           </View>
         )}
 
         {/* SMART TECH */}
-        {smart.length > 0 && (
-          <>
-            <View style={styles.sectionHeader}>
-              <View style={styles.accent} />
-              <Text style={styles.sectionTitle}>Smart Tech</Text>
-            </View>
-            <View style={styles.specGrid}>
-              {smart.map((s, i) => (
-                <View key={i} style={styles.specCard}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.specLabel}>{s.label}</Text>
-                    <Text style={styles.specValue}>{s.value}</Text>
-                  </View>
-                </View>
-              ))}
-            </View>
-          </>
-        )}
+        {renderSpecSection("Smart Tech", smart)}
 
         {/* KEY FEATURES */}
         {keyFeatures.length > 0 && (
-          <>
+          <View>
             <View style={styles.sectionHeader}>
               <View style={styles.accent} />
               <Text style={styles.sectionTitle}>Signature Innovations</Text>
             </View>
-            <View style={styles.specGrid}>
+            <View style={styles.featuresGrid}>
               {keyFeatures.map((f, i) => (
-                <View key={i} style={styles.featureCard}>
+                <View key={i} style={styles.featureItem}>
+                  <View style={styles.featureDot} />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.featureTitle}>{f}</Text>
-                    <Text style={styles.featureDesc}>Intelligent luxury technology integrated perfectly.</Text>
+                    <Text style={styles.featureDesc}>Intelligent luxury technology integrated perfectly into every ride.</Text>
                   </View>
                 </View>
               ))}
             </View>
-          </>
+          </View>
         )}
 
         {/* EV BATTERY SOLUTIONS & CUSTOMIZATION */}
         <View style={styles.batteryServicesBlock}>
-          <View style={styles.sectionHeaderNoBorder}>
-            <View style={styles.accent} />
-            <Text style={styles.sectionTitle}>EV Battery & Customization Solutions</Text>
-          </View>
+          <Text style={styles.batteryServicesTitle}>EV Battery & Customization Solutions</Text>
           <Text style={styles.batteryServicesText}>
             We specialize in providing high-performance EV battery packs in vast variants to power all types of electric vehicles. Whether you require custom battery configurations, replacement modules, or capacity upgrades, we deliver industry-grade reliability and advanced thermal management solutions.
           </Text>
@@ -790,7 +845,7 @@ export async function GET(
           </View>
           <View style={styles.footerQr}>
             <Text style={styles.footerQrLabel}>Scan to view online</Text>
-            {qrDataUrl ? <Image src={qrDataUrl} style={{ width: 44, height: 44, backgroundColor: "#ffffff", padding: 2, borderRadius: 3 }} /> : null}
+            {qrDataUrl ? <Image src={qrDataUrl} style={{ width: 34, height: 34, backgroundColor: "#ffffff", padding: 2, borderRadius: 2 }} /> : null}
           </View>
         </View>
       </Page>
